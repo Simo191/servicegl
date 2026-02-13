@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MultiServices.Maui.Views.Restaurant.CheckoutPage"
+             Title="Valider la commande">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="16">
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="📍 Adresse de livraison" Style="{StaticResource Title3}" />
+                    <Frame BackgroundColor="#F3F4F6" CornerRadius="12" Padding="12" HasShadow="False">
+                        <Label Text="🏠 Maison - 123 Rue Mohammed V, Casablanca" FontSize="14" />
+                    </Frame>
+                </VerticalStackLayout>
+            </Frame>
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="💳 Mode de paiement" Style="{StaticResource Title3}" />
+                    <Frame BackgroundColor="#F3F4F6" CornerRadius="12" Padding="12" HasShadow="False">
+                        <Label Text="Carte bancaire •••• 4242" FontSize="14" />
+                    </Frame>
+                    <Frame BackgroundColor="#F3F4F6" CornerRadius="12" Padding="12" HasShadow="False">
+                        <Label Text="💵 Espèces à la livraison" FontSize="14" />
+                    </Frame>
+                </VerticalStackLayout>
+            </Frame>
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="🎁 Code promo" Style="{StaticResource Title3}" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Entry Placeholder="Entrez votre code" Style="{StaticResource EntryStyle}" />
+                        <Button Text="Appliquer" BackgroundColor="{StaticResource Primary}" TextColor="White" CornerRadius="10" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="💰 Pourboire livreur" Style="{StaticResource Title3}" />
+                    <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                        <Frame BackgroundColor="#F3F4F6" CornerRadius="12" Padding="16,8" HasShadow="False"><Label Text="5 DH" FontSize="14" /></Frame>
+                        <Frame BackgroundColor="#F3F4F6" CornerRadius="12" Padding="16,8" HasShadow="False"><Label Text="10 DH" FontSize="14" /></Frame>
+                        <Frame BackgroundColor="#F3F4F6" CornerRadius="12" Padding="16,8" HasShadow="False"><Label Text="20 DH" FontSize="14" /></Frame>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+            <Button Text="Confirmer la commande" Style="{StaticResource PrimaryButton}" Margin="0,8" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

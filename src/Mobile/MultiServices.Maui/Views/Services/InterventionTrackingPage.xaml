@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Maui.ViewModels.Services"
+             x:Class="MultiServices.Maui.Views.Services.InterventionTrackingPage"
+             x:DataType="vm:InterventionTrackingViewModel"
+             Title="Suivi intervention">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="16">
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{Binding Intervention.InterventionNumber, StringFormat='Intervention #{0}'}" Style="{StaticResource Title2}" />
+                    <Label Text="{Binding Intervention.ProviderName}" FontSize="15" TextColor="{StaticResource TextSecondary}" />
+                    <Label Text="{Binding Intervention.ServiceName}" FontSize="14" TextColor="{StaticResource Info}" />
+                    <Frame BackgroundColor="{Binding Intervention.Status, Converter={StaticResource StatusToColor}}" CornerRadius="8" Padding="12,6" HasShadow="False" HorizontalOptions="Start">
+                        <Label Text="{Binding Intervention.Status, Converter={StaticResource StatusToText}}" TextColor="White" FontAttributes="Bold" />
+                    </Frame>
+                </VerticalStackLayout>
+            </Frame>
+            <Frame Style="{StaticResource CardFrame}" IsVisible="{Binding Intervention.IntervenantName, Converter={StaticResource NullToBool}}">
+                <Grid ColumnDefinitions="50,*,Auto">
+                    <Frame BackgroundColor="#DBEAFE" CornerRadius="25" HeightRequest="50" WidthRequest="50" HasShadow="False" Padding="0">
+                        <Label Text="👷" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Frame>
+                    <VerticalStackLayout Grid.Column="1" Padding="12,0" VerticalOptions="Center">
+                        <Label Text="{Binding Intervention.IntervenantName}" FontAttributes="Bold" />
+                        <Label Text="Votre intervenant" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="2" Text="📞" BackgroundColor="{StaticResource Success}" TextColor="White"
+                            CornerRadius="20" HeightRequest="40" WidthRequest="40" Command="{Binding CallIntervenantCommand}" />
+                </Grid>
+            </Frame>
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Détails" Style="{StaticResource Title3}" />
+                    <Grid ColumnDefinitions="*,Auto"><Label Text="Date prévue" /><Label Grid.Column="1" Text="{Binding Intervention.ScheduledDate, StringFormat='{0:dd/MM/yyyy}'}" /></Grid>
+                    <Grid ColumnDefinitions="*,Auto"><Label Text="Coût estimé" /><Label Grid.Column="1" Text="{Binding Intervention.EstimatedCost, StringFormat='{0:N2} DH'}" FontAttributes="Bold" TextColor="{StaticResource Primary}" /></Grid>
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,39 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.DotSettings.user
+
+# Node
+node_modules/
+dist/
+.angular/
+
+# MAUI
+*.apk
+*.aab
+*.ipa
+*.app
+
+# Environment
+.env
+appsettings.Development.json
+appsettings.Local.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Docker
+docker-compose.override.yml

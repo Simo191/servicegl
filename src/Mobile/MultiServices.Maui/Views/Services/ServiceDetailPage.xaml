@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Maui.ViewModels.Services"
+             xmlns:models="clr-namespace:MultiServices.Maui.Models"
+             x:Class="MultiServices.Maui.Views.Services.ServiceDetailPage"
+             x:DataType="vm:ServiceDetailViewModel"
+             Title="{Binding Title}">
+    <ScrollView>
+        <VerticalStackLayout Spacing="16" Padding="16">
+            <!-- Provider Header -->
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="60,*,Auto">
+                        <Frame BackgroundColor="#DBEAFE" CornerRadius="30" HeightRequest="60" WidthRequest="60" HasShadow="False" Padding="0">
+                            <Label Text="🛠️" FontSize="28" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Frame>
+                        <VerticalStackLayout Grid.Column="1" Padding="12,0" VerticalOptions="Center">
+                            <Label Text="{Binding Provider.CompanyName}" Style="{StaticResource Title2}" />
+                            <Label Text="{Binding Provider.Category}" FontSize="14" TextColor="{StaticResource Info}" />
+                        </VerticalStackLayout>
+                        <Button Grid.Column="2" Text="♡" BackgroundColor="Transparent" TextColor="{StaticResource Danger}" FontSize="22"
+                                Command="{Binding ToggleFavoriteCommand}" VerticalOptions="Start" />
+                    </Grid>
+                    <HorizontalStackLayout Spacing="16">
+                        <Label Text="{Binding Provider.Rating, StringFormat='★ {0:F1}'}" FontSize="14" TextColor="#F59E0B" FontAttributes="Bold" />
+                        <Label Text="{Binding Provider.TotalReviews, StringFormat='{0} avis'}" FontSize="13" TextColor="{StaticResource TextMuted}" />
+                        <Label Text="{Binding Provider.YearsExperience, StringFormat='{0} ans exp.'}" FontSize="13" TextColor="{StaticResource TextMuted}" />
+                        <Label Text="{Binding Provider.CompletedInterventions, StringFormat='{0} interventions'}" FontSize="13" TextColor="{StaticResource TextMuted}" />
+                    </HorizontalStackLayout>
+                    <Label Text="{Binding Provider.Description}" Style="{StaticResource BodyText}" />
+                </VerticalStackLayout>
+            </Frame>
+            <!-- Services -->
+            <Label Text="Services proposés" Style="{StaticResource Title3}" />
+            <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Services}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="models:ServiceOfferingDto">
+                        <Frame CornerRadius="12" Padding="14" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="15" />
+                                    <Label Text="{Binding Description}" FontSize="12" TextColor="{StaticResource TextMuted}" MaxLines="2" />
+                                    <HorizontalStackLayout Spacing="8">
+                                        <Label Text="{Binding PricingType}" FontSize="12" TextColor="{StaticResource Info}" />
+                                        <Label Text="{Binding FixedPrice, StringFormat='{0:N0} DH'}" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                                <Button Grid.Column="1" Text="Réserver" BackgroundColor="{StaticResource Primary}" TextColor="White"
+                                        CornerRadius="10" FontSize="13" Padding="12,6" VerticalOptions="Center"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ServiceDetailViewModel}}, Path=BookServiceCommand}"
+                                        CommandParameter="{Binding}" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+            <!-- Portfolio -->
+            <Label Text="Portfolio" Style="{StaticResource Title3}" Margin="0,8,0,0" />
+            <CollectionView ItemsSource="{Binding Portfolio}" HeightRequest="180">
+                <CollectionView.ItemsLayout><LinearItemsLayout Orientation="Horizontal" ItemSpacing="12" /></CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:PortfolioItemDto">
+                        <Frame WidthRequest="220" CornerRadius="12" Padding="0" HasShadow="True" BorderColor="Transparent">
+                            <VerticalStackLayout>
+                                <Grid ColumnDefinitions="*,*" HeightRequest="100">
+                                    <BoxView BackgroundColor="#FEE2E2" /><Label Text="Avant" FontSize="10" HorizontalOptions="Center" VerticalOptions="Center" />
+                                    <BoxView Grid.Column="1" BackgroundColor="#D1FAE5" /><Label Grid.Column="1" Text="Après" FontSize="10" HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Grid>
+                                <Label Text="{Binding Title}" Padding="8" FontSize="13" FontAttributes="Bold" />
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <!-- Reviews -->
+            <Label Text="Avis clients" Style="{StaticResource Title3}" Margin="0,8,0,0" />
+            <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Reviews}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="models:ReviewDto">
+                        <Frame CornerRadius="12" Padding="12" HasShadow="False" BackgroundColor="White" BorderColor="{StaticResource Border}">
+                            <VerticalStackLayout Spacing="4">
+                                <HorizontalStackLayout Spacing="8">
+                                    <Label Text="{Binding UserName}" FontAttributes="Bold" FontSize="14" />
+                                    <Label Text="{Binding Rating, StringFormat='★ {0}'}" TextColor="#F59E0B" FontSize="13" />
+                                </HorizontalStackLayout>
+                                <Label Text="{Binding Comment}" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                                <Label Text="{Binding CreatedAt, StringFormat='{0:dd/MM/yyyy}'}" FontSize="11" TextColor="{StaticResource TextMuted}" />
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

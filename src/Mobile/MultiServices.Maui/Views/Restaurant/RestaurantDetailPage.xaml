@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Maui.ViewModels.Restaurant"
+             xmlns:models="clr-namespace:MultiServices.Maui.Models"
+             x:Class="MultiServices.Maui.Views.Restaurant.RestaurantDetailPage"
+             x:DataType="vm:RestaurantDetailViewModel"
+             Title="{Binding Title}">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView>
+            <VerticalStackLayout Spacing="16">
+                <!-- Hero -->
+                <Grid HeightRequest="200">
+                    <BoxView BackgroundColor="#FEF3C7" />
+                    <VerticalStackLayout VerticalOptions="End" Padding="16" Spacing="4">
+                        <Label Text="{Binding Restaurant.Name}" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
+                        <HorizontalStackLayout Spacing="12">
+                            <Label Text="{Binding Restaurant.CuisineType}" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                            <Label Text="{Binding Restaurant.Rating, StringFormat='★ {0:F1}'}" FontSize="14" TextColor="#F59E0B" FontAttributes="Bold" />
+                            <Label Text="{Binding Restaurant.PriceRange}" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Spacing="16">
+                            <Label Text="{Binding Restaurant.EstimatedDeliveryMinutes, StringFormat='🕐 {0} min'}" FontSize="13" TextColor="{StaticResource TextMuted}" />
+                            <Label Text="{Binding Restaurant.DeliveryFee, StringFormat='🛵 {0:N2} DH'}" FontSize="13" TextColor="{StaticResource TextMuted}" />
+                            <Label Text="{Binding Restaurant.MinimumOrder, StringFormat='Min: {0:N2} DH'}" FontSize="13" TextColor="{StaticResource TextMuted}" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                    <Button Text="{Binding IsFavorite, Converter={StaticResource BoolToFav}}" BackgroundColor="White" TextColor="{StaticResource Danger}"
+                            CornerRadius="20" HeightRequest="40" WidthRequest="40" HorizontalOptions="End" VerticalOptions="Start" Margin="16"
+                            Command="{Binding ToggleFavoriteCommand}" />
+                </Grid>
+
+                <!-- Menu Categories -->
+                <ScrollView Orientation="Horizontal" Padding="16,0">
+                    <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding MenuCategories}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="models:MenuCategoryDto">
+                                <Frame BackgroundColor="{StaticResource PrimaryLight}" CornerRadius="18" Padding="14,8" HasShadow="False" BorderColor="Transparent">
+                                    <Label Text="{Binding Name}" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                                </Frame>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </HorizontalStackLayout>
+                </ScrollView>
+
+                <!-- Menu Items -->
+                <VerticalStackLayout Padding="16" Spacing="8" BindableLayout.ItemsSource="{Binding MenuCategories}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="models:MenuCategoryDto">
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="{Binding Name}" Style="{StaticResource Title3}" Margin="0,8,0,4" />
+                                <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Items}">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate x:DataType="models:MenuItemDto">
+                                            <Frame CornerRadius="12" Padding="12" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
+                                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                                    <VerticalStackLayout Spacing="4">
+                                                        <HorizontalStackLayout Spacing="6">
+                                                            <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="15" />
+                                                            <Frame IsVisible="{Binding IsPopular}" BackgroundColor="#FEF3C7" CornerRadius="6" Padding="6,1" HasShadow="False">
+                                                                <Label Text="★ Populaire" FontSize="9" TextColor="#92400E" />
+                                                            </Frame>
+                                                        </HorizontalStackLayout>
+                                                        <Label Text="{Binding Description}" FontSize="12" TextColor="{StaticResource TextMuted}" MaxLines="2" LineBreakMode="TailTruncation" />
+                                                        <Label Text="{Binding BasePrice, StringFormat='{0:N2} DH'}" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                                                    </VerticalStackLayout>
+                                                    <Button Grid.Column="1" Text="+" BackgroundColor="{StaticResource Primary}" TextColor="White"
+                                                            CornerRadius="20" HeightRequest="40" WidthRequest="40" FontSize="18" VerticalOptions="Center"
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:RestaurantDetailViewModel}}, Path=AddToCartCommand}"
+                                                            CommandParameter="{Binding}" />
+                                                </Grid>
+                                            </Frame>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Cart Bar -->
+        <Frame Grid.Row="1" BackgroundColor="{StaticResource Primary}" CornerRadius="0" Padding="16,12" HasShadow="True"
+               IsVisible="{Binding Cart.ItemCount, Converter={StaticResource NullToBool}}">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Frame BackgroundColor="White" CornerRadius="12" Padding="8,4" HasShadow="False">
+                    <Label Text="{Binding Cart.ItemCount}" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                </Frame>
+                <Label Grid.Column="1" Text="Voir le panier" TextColor="White" FontAttributes="Bold" FontSize="16"
+                       VerticalOptions="Center" HorizontalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ProceedToCheckoutCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Grid.Column="2" Text="{Binding Cart.Total, StringFormat='{0:N2} DH'}" TextColor="White" FontAttributes="Bold" FontSize="16" VerticalOptions="Center" />
+            </Grid>
+        </Frame>
+    </Grid>
+</ContentPage>

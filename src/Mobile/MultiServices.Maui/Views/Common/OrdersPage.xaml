@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Maui.ViewModels.Common"
+             x:Class="MultiServices.Maui.Views.Common.OrdersPage"
+             x:DataType="vm:OrdersViewModel"
+             Title="Mes commandes">
+    <Grid RowDefinitions="Auto,*">
+        <HorizontalStackLayout Spacing="8" Padding="16,12" HorizontalOptions="Center">
+            <Frame BackgroundColor="{StaticResource Primary}" CornerRadius="18" Padding="16,8" HasShadow="False">
+                <Label Text="En cours" TextColor="White" FontSize="14" FontAttributes="Bold">
+                    <Label.GestureRecognizers><TapGestureRecognizer Command="{Binding SetTabCommand}" CommandParameter="active" /></Label.GestureRecognizers>
+                </Label>
+            </Frame>
+            <Frame BackgroundColor="#F3F4F6" CornerRadius="18" Padding="16,8" HasShadow="False">
+                <Label Text="Terminées" FontSize="14" TextColor="{StaticResource TextSecondary}">
+                    <Label.GestureRecognizers><TapGestureRecognizer Command="{Binding SetTabCommand}" CommandParameter="completed" /></Label.GestureRecognizers>
+                </Label>
+            </Frame>
+        </HorizontalStackLayout>
+        <RefreshView Grid.Row="1" Command="{Binding LoadOrdersCommand}" IsRefreshing="{Binding IsRefreshing}">
+            <CollectionView ItemsSource="{Binding Orders}">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8" Padding="40">
+                        <Label Text="📦" FontSize="48" HorizontalOptions="Center" />
+                        <Label Text="Aucune commande" Style="{StaticResource Title3}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:OrderSummary">
+                        <Frame Margin="16,6" CornerRadius="14" Padding="16" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                <Frame BackgroundColor="#F3F4F6" CornerRadius="22" HeightRequest="44" WidthRequest="44" HasShadow="False" Padding="0">
+                                    <Label Text="{Binding TypeIcon}" FontSize="20" HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Frame>
+                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                    <Label Text="{Binding ProviderName}" FontAttributes="Bold" FontSize="15" />
+                                    <Label Text="{Binding OrderNumber}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                                    <Frame BackgroundColor="{Binding Status, Converter={StaticResource StatusToColor}}" CornerRadius="6" Padding="8,2" HasShadow="False" HorizontalOptions="Start">
+                                        <Label Text="{Binding Status, Converter={StaticResource StatusToText}}" TextColor="White" FontSize="10" FontAttributes="Bold" />
+                                    </Frame>
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" HorizontalOptions="End">
+                                    <Label Text="{Binding TotalAmount, StringFormat='{0:N2} DH'}" FontAttributes="Bold" FontSize="14" TextColor="{StaticResource Primary}" />
+                                    <Label Text="{Binding CreatedAt, StringFormat='{0:dd/MM HH:mm}'}" FontSize="11" TextColor="{StaticResource TextMuted}" />
+                                </VerticalStackLayout>
+                            </Grid>
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:OrdersViewModel}}, Path=ViewOrderCommand}" CommandParameter="{Binding}" />
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

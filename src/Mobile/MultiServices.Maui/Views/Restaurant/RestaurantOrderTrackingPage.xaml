@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Maui.ViewModels.Restaurant"
+             x:Class="MultiServices.Maui.Views.Restaurant.RestaurantOrderTrackingPage"
+             x:DataType="vm:RestaurantOrderTrackingViewModel"
+             Title="Suivi commande">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="16">
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{Binding Order.OrderNumber, StringFormat='Commande #{0}'}" Style="{StaticResource Title2}" />
+                    <Label Text="{Binding Order.RestaurantName}" FontSize="15" TextColor="{StaticResource TextSecondary}" />
+                    <Frame BackgroundColor="{Binding Order.Status, Converter={StaticResource StatusToColor}}" CornerRadius="8" Padding="12,6" HasShadow="False" HorizontalOptions="Start">
+                        <Label Text="{Binding Order.Status, Converter={StaticResource StatusToText}}" TextColor="White" FontAttributes="Bold" FontSize="14" />
+                    </Frame>
+                </VerticalStackLayout>
+            </Frame>
+            <!-- Status Timeline -->
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="4" BindableLayout.ItemsSource="{Binding StatusHistory}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="models:OrderStatusHistoryDto" xmlns:models="clr-namespace:MultiServices.Maui.Models">
+                            <HorizontalStackLayout Spacing="12" Padding="0,4">
+                                <Frame BackgroundColor="{StaticResource Success}" CornerRadius="8" HeightRequest="16" WidthRequest="16" HasShadow="False" Padding="0" />
+                                <VerticalStackLayout>
+                                    <Label Text="{Binding Status}" FontAttributes="Bold" FontSize="14" />
+                                    <Label Text="{Binding Timestamp, StringFormat='{0:HH:mm}'}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </Frame>
+            <!-- Deliverer info -->
+            <Frame Style="{StaticResource CardFrame}" IsVisible="{Binding Order.DelivererName, Converter={StaticResource NullToBool}}">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Frame BackgroundColor="{StaticResource PrimaryLight}" CornerRadius="25" HeightRequest="50" WidthRequest="50" HasShadow="False" Padding="0">
+                        <Label Text="🛵" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Frame>
+                    <VerticalStackLayout Grid.Column="1" Padding="12,0" VerticalOptions="Center">
+                        <Label Text="{Binding Order.DelivererName}" FontAttributes="Bold" FontSize="15" />
+                        <Label Text="Votre livreur" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="2" Text="📞" BackgroundColor="{StaticResource Success}" TextColor="White"
+                            CornerRadius="20" HeightRequest="40" WidthRequest="40" Command="{Binding CallDelivererCommand}" VerticalOptions="Center" />
+                </Grid>
+            </Frame>
+            <!-- Order Summary -->
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Résumé" Style="{StaticResource Title3}" />
+                    <Grid ColumnDefinitions="*,Auto"><Label Text="Sous-total" /><Label Grid.Column="1" Text="{Binding Order.SubTotal, StringFormat='{0:N2} DH'}" /></Grid>
+                    <Grid ColumnDefinitions="*,Auto"><Label Text="Livraison" /><Label Grid.Column="1" Text="{Binding Order.DeliveryFee, StringFormat='{0:N2} DH'}" /></Grid>
+                    <BoxView HeightRequest="1" BackgroundColor="{StaticResource Border}" />
+                    <Grid ColumnDefinitions="*,Auto"><Label Text="Total" FontAttributes="Bold" /><Label Grid.Column="1" Text="{Binding Order.TotalAmount, StringFormat='{0:N2} DH'}" FontAttributes="Bold" TextColor="{StaticResource Primary}" /></Grid>
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

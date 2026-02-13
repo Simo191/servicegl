@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MultiServices.Maui.Views.Grocery.GroceryCheckoutPage"
+             Title="Valider les courses">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="16">
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="📍 Adresse de livraison" Style="{StaticResource Title3}" />
+                    <Frame BackgroundColor="#F3F4F6" CornerRadius="12" Padding="12" HasShadow="False">
+                        <Label Text="🏠 Maison - 123 Rue Mohammed V, Casablanca" FontSize="14" />
+                    </Frame>
+                </VerticalStackLayout>
+            </Frame>
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="🕐 Créneau de livraison" Style="{StaticResource Title3}" />
+                    <HorizontalStackLayout Spacing="8">
+                        <Frame BackgroundColor="{StaticResource PrimaryLight}" CornerRadius="10" Padding="12,8" HasShadow="False"><Label Text="Maintenant" FontSize="13" /></Frame>
+                        <Frame BackgroundColor="#F3F4F6" CornerRadius="10" Padding="12,8" HasShadow="False"><Label Text="14h-16h" FontSize="13" /></Frame>
+                        <Frame BackgroundColor="#F3F4F6" CornerRadius="10" Padding="12,8" HasShadow="False"><Label Text="16h-18h" FontSize="13" /></Frame>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="⚙️ Options" Style="{StaticResource Title3}" />
+                    <HorizontalStackLayout Spacing="8">
+                        <Switch OnColor="{StaticResource Primary}" />
+                        <Label Text="Autoriser les remplacements" VerticalOptions="Center" FontSize="14" />
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="8">
+                        <Switch OnColor="{StaticResource Primary}" />
+                        <Label Text="Laisser devant la porte" VerticalOptions="Center" FontSize="14" />
+                    </HorizontalStackLayout>
+                    <Label Text="Type de sacs" FontSize="14" FontAttributes="Bold" Margin="0,4,0,0" />
+                    <HorizontalStackLayout Spacing="8">
+                        <Frame BackgroundColor="{StaticResource PrimaryLight}" CornerRadius="10" Padding="12,8" HasShadow="False"><Label Text="Plastique" FontSize="13" /></Frame>
+                        <Frame BackgroundColor="#F3F4F6" CornerRadius="10" Padding="12,8" HasShadow="False"><Label Text="Réutilisables (+3 DH)" FontSize="13" /></Frame>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="💳 Paiement" Style="{StaticResource Title3}" />
+                    <Frame BackgroundColor="#F3F4F6" CornerRadius="12" Padding="12" HasShadow="False"><Label Text="Carte •••• 4242" FontSize="14" /></Frame>
+                    <Frame BackgroundColor="#F3F4F6" CornerRadius="12" Padding="12" HasShadow="False"><Label Text="💵 Espèces" FontSize="14" /></Frame>
+                </VerticalStackLayout>
+            </Frame>
+            <Button Text="Confirmer les courses" Style="{StaticResource PrimaryButton}" Margin="0,8" BackgroundColor="{StaticResource Success}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

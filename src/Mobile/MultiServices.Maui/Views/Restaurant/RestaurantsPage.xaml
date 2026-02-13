@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Maui.ViewModels.Restaurant"
+             xmlns:models="clr-namespace:MultiServices.Maui.Models"
+             x:Class="MultiServices.Maui.Views.Restaurant.RestaurantsPage"
+             x:DataType="vm:RestaurantsViewModel"
+             Title="Restaurants">
+    <Grid RowDefinitions="Auto,*">
+        <VerticalStackLayout Padding="16,8" Spacing="12" BackgroundColor="{StaticResource Surface}">
+            <SearchBar Placeholder="Rechercher un restaurant..." Text="{Binding SearchQuery}"
+                       SearchCommand="{Binding SearchCommand}" Style="{StaticResource SearchBarStyle}" />
+            <ScrollView Orientation="Horizontal">
+                <HorizontalStackLayout Spacing="8">
+                    <CollectionView ItemsSource="{Binding CuisineTypes}" SelectionMode="Single"
+                                    SelectionChangedCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:RestaurantsViewModel}}, Path=SearchCommand}"
+                                    HeightRequest="36">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Horizontal" ItemSpacing="8" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Frame BackgroundColor="#F3F4F6" CornerRadius="18" Padding="14,6" HasShadow="False" BorderColor="Transparent">
+                                    <Label Text="{Binding}" FontSize="13" TextColor="{StaticResource TextPrimary}" />
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </HorizontalStackLayout>
+            </ScrollView>
+        </VerticalStackLayout>
+
+        <RefreshView Grid.Row="1" Command="{Binding LoadRestaurantsCommand}" IsRefreshing="{Binding IsRefreshing}">
+            <CollectionView ItemsSource="{Binding Restaurants}" SelectionMode="Single"
+                            SelectionChangedCommand="{Binding SelectRestaurantCommand}"
+                            SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8" Padding="40">
+                        <Label Text="🍔" FontSize="48" HorizontalOptions="Center" />
+                        <Label Text="Aucun restaurant trouvé" Style="{StaticResource Title3}" HorizontalOptions="Center" />
+                        <Label Text="Essayez d'élargir vos critères" Style="{StaticResource BodyText}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:RestaurantListDto">
+                        <Frame Margin="16,6" CornerRadius="16" Padding="0" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
+                            <Grid ColumnDefinitions="100,*" HeightRequest="110">
+                                <BoxView BackgroundColor="#FEF3C7" />
+                                <Frame AbsoluteLayout.LayoutBounds="0.5,0.5,50,50" BackgroundColor="White" CornerRadius="25" Padding="0" HasShadow="False" HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Label Text="🍔" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Frame>
+                                <VerticalStackLayout Grid.Column="1" Padding="12" Spacing="4" VerticalOptions="Center">
+                                    <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="15" LineBreakMode="TailTruncation" />
+                                    <Label Text="{Binding CuisineType}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                                    <HorizontalStackLayout Spacing="12">
+                                        <Label Text="{Binding Rating, StringFormat='★ {0:F1}'}" FontSize="12" TextColor="#F59E0B" FontAttributes="Bold" />
+                                        <Label Text="{Binding EstimatedDeliveryMinutes, StringFormat='🕐 {0} min'}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                                        <Label Text="{Binding PriceRange}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="8">
+                                        <Label Text="{Binding DeliveryFee, StringFormat='Livraison: {0:N2} DH'}" FontSize="11" TextColor="{StaticResource TextMuted}" />
+                                        <Frame IsVisible="{Binding HasActivePromotions}" BackgroundColor="#FEF3C7" CornerRadius="8" Padding="6,2" HasShadow="False">
+                                            <Label Text="PROMO" FontSize="9" FontAttributes="Bold" TextColor="#92400E" />
+                                        </Frame>
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

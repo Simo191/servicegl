@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Maui.ViewModels.Services"
+             xmlns:models="clr-namespace:MultiServices.Maui.Models"
+             x:Class="MultiServices.Maui.Views.Services.ServicesPage"
+             x:DataType="vm:ServicesViewModel"
+             Title="Services">
+    <Grid RowDefinitions="Auto,Auto,*">
+        <SearchBar Placeholder="Rechercher un prestataire..." Text="{Binding SearchQuery}"
+                   SearchCommand="{Binding LoadProvidersCommand}" Style="{StaticResource SearchBarStyle}" Margin="16,8" />
+        <!-- Category Cards -->
+        <ScrollView Grid.Row="1" Orientation="Horizontal" Padding="16,0" Margin="0,0,0,8">
+            <HorizontalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding Categories}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="vm:CategoryItem">
+                        <Frame CornerRadius="14" Padding="14,10" HasShadow="False" BackgroundColor="#EEF2FF" BorderColor="Transparent">
+                            <HorizontalStackLayout Spacing="6">
+                                <Label Text="{Binding Icon}" FontSize="18" />
+                                <Label Text="{Binding Label}" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                            </HorizontalStackLayout>
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ServicesViewModel}}, Path=SelectCategoryCommand}"
+                                                      CommandParameter="{Binding Key}" />
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </HorizontalStackLayout>
+        </ScrollView>
+        <!-- Providers List -->
+        <RefreshView Grid.Row="2" Command="{Binding LoadProvidersCommand}" IsRefreshing="{Binding IsRefreshing}">
+            <CollectionView ItemsSource="{Binding Providers}">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8" Padding="40">
+                        <Label Text="🛠️" FontSize="48" HorizontalOptions="Center" />
+                        <Label Text="Aucun prestataire trouvé" Style="{StaticResource Title3}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:ServiceProviderListDto">
+                        <Frame Margin="16,6" CornerRadius="16" Padding="16" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
+                            <Grid ColumnDefinitions="50,*" ColumnSpacing="12">
+                                <Frame BackgroundColor="#DBEAFE" CornerRadius="25" HeightRequest="50" WidthRequest="50" HasShadow="False" Padding="0">
+                                    <Label Text="🛠️" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Frame>
+                                <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                    <Label Text="{Binding CompanyName}" FontAttributes="Bold" FontSize="15" />
+                                    <Label Text="{Binding Category}" FontSize="12" TextColor="{StaticResource Info}" />
+                                    <HorizontalStackLayout Spacing="12">
+                                        <Label Text="{Binding Rating, StringFormat='★ {0:F1}'}" FontSize="12" TextColor="#F59E0B" FontAttributes="Bold" />
+                                        <Label Text="{Binding YearsExperience, StringFormat='{0} ans'}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                                        <Label Text="{Binding StartingPrice, StringFormat='À partir de {0:N0} DH'}" FontSize="12" TextColor="{StaticResource Primary}" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Grid>
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ServicesViewModel}}, Path=SelectProviderCommand}"
+                                                      CommandParameter="{Binding}" />
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Maui.ViewModels.Auth"
+             x:Class="MultiServices.Maui.Views.Auth.RegisterPage"
+             x:DataType="vm:RegisterViewModel"
+             Shell.NavBarIsVisible="False">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16" VerticalOptions="Center">
+            <Label Text="Créer un compte" Style="{StaticResource Title1}" Margin="0,40,0,10" />
+            <Label Text="Rejoignez MultiServices" Style="{StaticResource BodyText}" />
+
+            <Frame Style="{StaticResource CardFrame}" Padding="20">
+                <VerticalStackLayout Spacing="14">
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Prénom" Style="{StaticResource Caption}" />
+                            <Entry Placeholder="Prénom" Text="{Binding FirstName}" Style="{StaticResource EntryStyle}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="4">
+                            <Label Text="Nom" Style="{StaticResource Caption}" />
+                            <Entry Placeholder="Nom" Text="{Binding LastName}" Style="{StaticResource EntryStyle}" />
+                        </VerticalStackLayout>
+                    </Grid>
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Email" Style="{StaticResource Caption}" />
+                        <Entry Placeholder="votre@email.com" Keyboard="Email" Text="{Binding Email}" Style="{StaticResource EntryStyle}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Téléphone" Style="{StaticResource Caption}" />
+                        <Entry Placeholder="+212 6XX XXX XXX" Keyboard="Telephone" Text="{Binding Phone}" Style="{StaticResource EntryStyle}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Mot de passe" Style="{StaticResource Caption}" />
+                        <Entry Placeholder="Min. 8 caractères" IsPassword="True" Text="{Binding Password}" Style="{StaticResource EntryStyle}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Confirmer le mot de passe" Style="{StaticResource Caption}" />
+                        <Entry Placeholder="Confirmer" IsPassword="True" Text="{Binding ConfirmPassword}" Style="{StaticResource EntryStyle}" />
+                    </VerticalStackLayout>
+                    <HorizontalStackLayout Spacing="8">
+                        <CheckBox IsChecked="{Binding AcceptTerms}" Color="{StaticResource Primary}" />
+                        <Label Text="J'accepte les conditions d'utilisation" Style="{StaticResource BodyText}" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    <Button Text="S'inscrire" Style="{StaticResource PrimaryButton}" Command="{Binding RegisterCommand}"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}" />
+                    <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}" Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="4" Margin="0,0,0,40">
+                <Label Text="Déjà un compte ?" Style="{StaticResource BodyText}" />
+                <Label Text="Se connecter" TextColor="{StaticResource Primary}" FontAttributes="Bold">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToLoginCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

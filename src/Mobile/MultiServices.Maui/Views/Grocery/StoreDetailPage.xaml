@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Maui.ViewModels.Grocery"
+             xmlns:models="clr-namespace:MultiServices.Maui.Models"
+             x:Class="MultiServices.Maui.Views.Grocery.StoreDetailPage"
+             x:DataType="vm:StoreDetailViewModel"
+             Title="{Binding Title}">
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
+        <!-- Search & Filters -->
+        <Grid Padding="16,8" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <SearchBar Placeholder="Rechercher un produit..." Text="{Binding SearchQuery}"
+                       SearchCommand="{Binding LoadProductsCommand}" Style="{StaticResource SearchBarStyle}" />
+            <HorizontalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                <Frame BackgroundColor="{Binding FilterBio, Converter={StaticResource BoolToFilterBg}}" CornerRadius="10" Padding="8,4" HasShadow="False">
+                    <Label Text="Bio" FontSize="11" />
+                </Frame>
+                <Frame BackgroundColor="{Binding FilterHalal, Converter={StaticResource BoolToFilterBg}}" CornerRadius="10" Padding="8,4" HasShadow="False">
+                    <Label Text="Halal" FontSize="11" />
+                </Frame>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- Departments -->
+        <ScrollView Grid.Row="1" Orientation="Horizontal" Padding="16,0">
+            <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Departments}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="models:GroceryDepartmentDto">
+                        <Frame CornerRadius="12" Padding="12,8" HasShadow="False" BackgroundColor="#F3F4F6" BorderColor="Transparent">
+                            <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
+                                <Label Text="{Binding Name}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" />
+                                <Label Text="{Binding ProductCount, StringFormat='{0} produits'}" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" />
+                            </VerticalStackLayout>
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StoreDetailViewModel}}, Path=SelectDepartmentCommand}"
+                                                      CommandParameter="{Binding}" />
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </HorizontalStackLayout>
+        </ScrollView>
+
+        <!-- Products Grid -->
+        <CollectionView Grid.Row="2" ItemsSource="{Binding Products}" Margin="16,8">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="10" VerticalItemSpacing="10" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:GroceryProductDto">
+                    <Frame CornerRadius="12" Padding="0" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
+                        <VerticalStackLayout>
+                            <Grid HeightRequest="100">
+                                <BoxView BackgroundColor="#F9FAFB" />
+                                <Label Text="🛍️" FontSize="32" HorizontalOptions="Center" VerticalOptions="Center" />
+                                <Frame IsVisible="{Binding IsOnPromotion}" BackgroundColor="{StaticResource Danger}" CornerRadius="0" Padding="6,2"
+                                       HasShadow="False" HorizontalOptions="Start" VerticalOptions="Start">
+                                    <Label Text="{Binding PromotionLabel}" FontSize="9" TextColor="White" FontAttributes="Bold" />
+                                </Frame>
+                                <HorizontalStackLayout HorizontalOptions="End" VerticalOptions="Start" Margin="4">
+                                    <Frame IsVisible="{Binding IsBio}" BackgroundColor="#D1FAE5" CornerRadius="4" Padding="4,1" HasShadow="False">
+                                        <Label Text="BIO" FontSize="8" TextColor="#065F46" FontAttributes="Bold" />
+                                    </Frame>
+                                </HorizontalStackLayout>
+                            </Grid>
+                            <VerticalStackLayout Padding="8" Spacing="2">
+                                <Label Text="{Binding Name}" FontSize="13" FontAttributes="Bold" MaxLines="2" LineBreakMode="TailTruncation" />
+                                <Label Text="{Binding Brand}" FontSize="11" TextColor="{StaticResource TextMuted}" />
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding Price, StringFormat='{0:N2} DH'}" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                                        <Label Text="{Binding PricePerUnit, StringFormat='{0:N2} DH/kg'}" FontSize="10" TextColor="{StaticResource TextMuted}" />
+                                    </VerticalStackLayout>
+                                    <Button Grid.Column="1" Text="+" BackgroundColor="{StaticResource Success}" TextColor="White"
+                                            CornerRadius="16" HeightRequest="32" WidthRequest="32" FontSize="16" Padding="0"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StoreDetailViewModel}}, Path=AddToCartCommand}"
+                                            CommandParameter="{Binding}" />
+                                </Grid>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Cart Bar -->
+        <Frame Grid.Row="3" BackgroundColor="{StaticResource Success}" CornerRadius="0" Padding="16,12" HasShadow="True"
+               IsVisible="{Binding Cart.ItemCount, Converter={StaticResource NullToBool}}">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Frame BackgroundColor="White" CornerRadius="12" Padding="8,4" HasShadow="False">
+                    <Label Text="{Binding Cart.ItemCount}" FontAttributes="Bold" TextColor="{StaticResource Success}" />
+                </Frame>
+                <Label Grid.Column="1" Text="Voir le panier" TextColor="White" FontAttributes="Bold" FontSize="16"
+                       VerticalOptions="Center" HorizontalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ProceedToCheckoutCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Grid.Column="2" Text="{Binding Cart.Total, StringFormat='{0:N2} DH'}" TextColor="White" FontAttributes="Bold" FontSize="16" />
+            </Grid>
+        </Frame>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Maui.ViewModels.Grocery"
+             xmlns:models="clr-namespace:MultiServices.Maui.Models"
+             x:Class="MultiServices.Maui.Views.Grocery.ShoppingListsPage"
+             x:DataType="vm:ShoppingListsViewModel"
+             Title="Listes de courses">
+    <Grid RowDefinitions="*,Auto">
+        <RefreshView Command="{Binding LoadListsCommand}" IsRefreshing="{Binding IsRefreshing}">
+            <CollectionView ItemsSource="{Binding Lists}">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8" Padding="40">
+                        <Label Text="📋" FontSize="48" HorizontalOptions="Center" />
+                        <Label Text="Aucune liste" Style="{StaticResource Title3}" HorizontalOptions="Center" />
+                        <Label Text="Créez votre première liste de courses" Style="{StaticResource BodyText}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:ShoppingListDto">
+                        <Frame Margin="16,6" CornerRadius="14" Padding="16" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" />
+                                    <Label Text="{Binding ItemCount, StringFormat='{0} articles'}" FontSize="13" TextColor="{StaticResource TextMuted}" />
+                                    <HorizontalStackLayout Spacing="8">
+                                        <Label Text="{Binding CheckedCount, StringFormat='{0} cochés'}" FontSize="12" TextColor="{StaticResource Success}" />
+                                        <Frame IsVisible="{Binding IsRecurring}" BackgroundColor="#EEF2FF" CornerRadius="6" Padding="6,1" HasShadow="False">
+                                            <Label Text="🔄 Récurrente" FontSize="10" TextColor="{StaticResource Primary}" />
+                                        </Frame>
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="8">
+                                    <Button Text="🛒" BackgroundColor="{StaticResource Success}" TextColor="White" CornerRadius="10" HeightRequest="36" WidthRequest="36"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ShoppingListsViewModel}}, Path=ConvertToCartCommand}" CommandParameter="{Binding}" />
+                                </VerticalStackLayout>
+                            </Grid>
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ShoppingListsViewModel}}, Path=SelectListCommand}" CommandParameter="{Binding}" />
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+        <Button Grid.Row="1" Text="+ Nouvelle liste" Style="{StaticResource PrimaryButton}" Margin="16,8"
+                Command="{Binding CreateListCommand}" />
+    </Grid>
+</ContentPage>

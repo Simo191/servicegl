@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Maui.ViewModels.Auth"
+             x:Class="MultiServices.Maui.Views.Auth.LoginPage"
+             x:DataType="vm:LoginViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource Background}">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="20" VerticalOptions="Center">
+            <!-- Logo -->
+            <VerticalStackLayout Spacing="8" HorizontalOptions="Center" Margin="0,40,0,20">
+                <Label Text="🏠" FontSize="60" HorizontalOptions="Center" />
+                <Label Text="MultiServices" Style="{StaticResource Title1}" HorizontalOptions="Center" />
+                <Label Text="Restaurants • Services • Courses" Style="{StaticResource BodyText}" HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <!-- Form -->
+            <Frame Style="{StaticResource CardFrame}" Padding="20">
+                <VerticalStackLayout Spacing="16">
+                    <Label Text="Connexion" Style="{StaticResource Title2}" />
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Email" Style="{StaticResource Caption}" />
+                        <Entry Placeholder="votre@email.com" Keyboard="Email"
+                               Text="{Binding Email}" Style="{StaticResource EntryStyle}" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Mot de passe" Style="{StaticResource Caption}" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Entry Placeholder="••••••••" IsPassword="{Binding ShowPassword, Converter={StaticResource InverseBool}}"
+                                   Text="{Binding Password}" Style="{StaticResource EntryStyle}" />
+                            <Button Grid.Column="1" Text="👁" BackgroundColor="Transparent"
+                                    TextColor="{StaticResource TextMuted}" Command="{Binding TogglePasswordCommand}" />
+                        </Grid>
+                    </VerticalStackLayout>
+
+                    <Label Text="Mot de passe oublié ?" TextColor="{StaticResource Primary}"
+                           FontSize="13" HorizontalOptions="End">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+
+                    <Button Text="Se connecter" Style="{StaticResource PrimaryButton}"
+                            Command="{Binding LoginCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}" />
+
+                    <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}"
+                                       Color="{StaticResource Primary}" HeightRequest="30" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Social Login -->
+            <VerticalStackLayout Spacing="12">
+                <Label Text="Ou continuer avec" HorizontalOptions="Center" Style="{StaticResource Caption}" />
+                <HorizontalStackLayout Spacing="16" HorizontalOptions="Center">
+                    <Frame BackgroundColor="White" CornerRadius="12" Padding="16,10" HasShadow="True" BorderColor="Transparent">
+                        <Label Text="Google" FontSize="14" FontAttributes="Bold">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SocialLoginCommand}" CommandParameter="Google" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Frame>
+                    <Frame BackgroundColor="White" CornerRadius="12" Padding="16,10" HasShadow="True" BorderColor="Transparent">
+                        <Label Text="Facebook" FontSize="14" FontAttributes="Bold" TextColor="#1877F2">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SocialLoginCommand}" CommandParameter="Facebook" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Frame>
+                    <Frame BackgroundColor="White" CornerRadius="12" Padding="16,10" HasShadow="True" BorderColor="Transparent">
+                        <Label Text="Apple" FontSize="14" FontAttributes="Bold">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SocialLoginCommand}" CommandParameter="Apple" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Frame>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+            <!-- Register Link -->
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="4" Margin="0,10,0,40">
+                <Label Text="Pas encore de compte ?" Style="{StaticResource BodyText}" />
+                <Label Text="S'inscrire" TextColor="{StaticResource Primary}" FontAttributes="Bold" FontSize="15">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToRegisterCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

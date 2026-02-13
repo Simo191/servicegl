@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Maui.ViewModels.Grocery"
+             xmlns:models="clr-namespace:MultiServices.Maui.Models"
+             x:Class="MultiServices.Maui.Views.Grocery.GroceryStoresPage"
+             x:DataType="vm:GroceryStoresViewModel"
+             Title="Courses">
+    <Grid RowDefinitions="Auto,Auto,*">
+        <SearchBar Placeholder="Rechercher un magasin..." Text="{Binding SearchQuery}"
+                   SearchCommand="{Binding LoadStoresCommand}" Style="{StaticResource SearchBarStyle}" Margin="16,8" />
+        <!-- Brand Filters -->
+        <ScrollView Grid.Row="1" Orientation="Horizontal" Padding="16,0" Margin="0,0,0,8">
+            <HorizontalStackLayout Spacing="8">
+                <Frame BackgroundColor="#D1FAE5" CornerRadius="14" Padding="12,8" HasShadow="False" BorderColor="Transparent">
+                    <Label Text="Marjane" FontSize="13" FontAttributes="Bold" TextColor="#065F46">
+                        <Label.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectBrandCommand}" CommandParameter="Marjane" /></Label.GestureRecognizers>
+                    </Label>
+                </Frame>
+                <Frame BackgroundColor="#DBEAFE" CornerRadius="14" Padding="12,8" HasShadow="False" BorderColor="Transparent">
+                    <Label Text="Carrefour" FontSize="13" FontAttributes="Bold" TextColor="#1E40AF">
+                        <Label.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectBrandCommand}" CommandParameter="Carrefour" /></Label.GestureRecognizers>
+                    </Label>
+                </Frame>
+                <Frame BackgroundColor="#FEF3C7" CornerRadius="14" Padding="12,8" HasShadow="False" BorderColor="Transparent">
+                    <Label Text="Aswak Assalam" FontSize="13" FontAttributes="Bold" TextColor="#92400E">
+                        <Label.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectBrandCommand}" CommandParameter="Aswak Assalam" /></Label.GestureRecognizers>
+                    </Label>
+                </Frame>
+                <Frame BackgroundColor="#FCE7F3" CornerRadius="14" Padding="12,8" HasShadow="False" BorderColor="Transparent">
+                    <Label Text="Acima" FontSize="13" FontAttributes="Bold" TextColor="#9D174D">
+                        <Label.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectBrandCommand}" CommandParameter="Acima" /></Label.GestureRecognizers>
+                    </Label>
+                </Frame>
+                <Frame BackgroundColor="#EDE9FE" CornerRadius="14" Padding="12,8" HasShadow="False" BorderColor="Transparent">
+                    <Label Text="Label'Vie" FontSize="13" FontAttributes="Bold" TextColor="#5B21B6">
+                        <Label.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectBrandCommand}" CommandParameter="Label'Vie" /></Label.GestureRecognizers>
+                    </Label>
+                </Frame>
+            </HorizontalStackLayout>
+        </ScrollView>
+        <!-- Stores List -->
+        <RefreshView Grid.Row="2" Command="{Binding LoadStoresCommand}" IsRefreshing="{Binding IsRefreshing}">
+            <CollectionView ItemsSource="{Binding Stores}">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8" Padding="40">
+                        <Label Text="🛒" FontSize="48" HorizontalOptions="Center" />
+                        <Label Text="Aucun magasin trouvé" Style="{StaticResource Title3}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:GroceryStoreListDto">
+                        <Frame Margin="16,6" CornerRadius="16" Padding="16" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
+                            <Grid ColumnDefinitions="50,*" ColumnSpacing="12">
+                                <Frame BackgroundColor="#D1FAE5" CornerRadius="25" HeightRequest="50" WidthRequest="50" HasShadow="False" Padding="0">
+                                    <Label Text="🛒" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Frame>
+                                <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                    <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="15" />
+                                    <Label Text="{Binding Brand}" FontSize="12" TextColor="{StaticResource Success}" />
+                                    <HorizontalStackLayout Spacing="12">
+                                        <Label Text="{Binding Rating, StringFormat='★ {0:F1}'}" FontSize="12" TextColor="#F59E0B" FontAttributes="Bold" />
+                                        <Label Text="{Binding DeliveryFee, StringFormat='Livraison: {0:N2} DH'}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                                        <Frame IsVisible="{Binding HasFreeDelivery}" BackgroundColor="#D1FAE5" CornerRadius="6" Padding="6,1" HasShadow="False">
+                                            <Label Text="LIVR. GRATUITE" FontSize="9" FontAttributes="Bold" TextColor="#065F46" />
+                                        </Frame>
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Grid>
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:GroceryStoresViewModel}}, Path=SelectStoreCommand}"
+                                                      CommandParameter="{Binding}" />
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>
