@@ -11,6 +11,9 @@ public partial class AppShell : Shell
 {
     public AppShell()
     {
+        try
+        {
+
         InitializeComponent();
 
         // Auth routes
@@ -39,5 +42,12 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("editprofile", typeof(EditProfilePage));
         Routing.RegisterRoute("addresses", typeof(AddressesPage));
         Routing.RegisterRoute("support", typeof(SupportPage));
+
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
     }
 }

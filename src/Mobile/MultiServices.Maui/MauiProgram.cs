@@ -24,6 +24,10 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
+        try
+        {
+
+        
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
@@ -88,9 +92,16 @@ public static class MauiProgram
         builder.Services.AddTransient<GroceryCheckoutPage>();
 
 #if DEBUG
-        //builder.Logging.AddDebug();
+        builder.Logging.AddDebug();
 #endif
 
         return builder.Build();
+
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(ex);
+            throw;
+        }
     }
 }
