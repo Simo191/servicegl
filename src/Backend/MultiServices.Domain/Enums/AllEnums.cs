@@ -52,7 +52,8 @@ public enum NotificationType
 {
     Push = 0,
     Email = 1,
-    SMS = 2
+    SMS = 2,
+    System = 3
 }
 
 public enum Gender

@@ -74,7 +74,7 @@ public record WorkingHoursDto(DayOfWeek DayOfWeek, string OpenTime, string Close
 
 public record StorePromotionDto(Guid Id, string Title, string? Description,
     string? PromoCode, decimal? DiscountPercentage, decimal? DiscountAmount,
-    bool FreeDelivery, DateTime EndDate);
+    bool FreeDelivery, DateTime EndDate, DateTime StartDate, string DiscountType);
 
 // ==================== ORDERS ====================
 public record CreateGroceryOrderDto(Guid StoreId, List<GroceryCartItemDto> Items,

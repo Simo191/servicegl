@@ -40,5 +40,13 @@
     </MauiIcon>
     <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
   </ItemGroup>
+  <ItemGroup>
+    <MauiXaml Update="Views\Checkout\CheckoutAuthPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Views\Common\AddressEntryPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+  </ItemGroup>
 
 </Project>

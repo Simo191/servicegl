@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Deliverer.ViewModels"
+             x:Class="MultiServices.Deliverer.Views.EditProfilePage"
+             x:DataType="vm:EditProfileViewModel"
+             Title="Modifier le profil"
+             BackgroundColor="{StaticResource Background}">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="14">
+            <Frame Style="{StaticResource CardFrame}" Padding="20">
+                <VerticalStackLayout Spacing="12">
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <VerticalStackLayout>
+                            <Label Text="Prénom" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                            <Entry Text="{Binding FirstName}" Style="{StaticResource EntryStyle}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1">
+                            <Label Text="Nom" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                            <Entry Text="{Binding LastName}" Style="{StaticResource EntryStyle}" />
+                        </VerticalStackLayout>
+                    </Grid>
+                    <Label Text="Téléphone" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                    <Entry Text="{Binding PhoneNumber}" Keyboard="Telephone" Style="{StaticResource EntryStyle}" />
+                    <Label Text="Ville" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                    <Entry Text="{Binding City}" Style="{StaticResource EntryStyle}" />
+                    <Label Text="Véhicule" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                    <Picker ItemsSource="{Binding VehicleTypes}" SelectedIndex="{Binding SelectedVehicleIndex}" />
+                    <Label Text="Plaque d'immatriculation" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                    <Entry Text="{Binding LicensePlate}" Placeholder="Ex: 12345-A-67" Style="{StaticResource EntryStyle}" />
+
+                    <BoxView HeightRequest="1" Color="#E0E0E0" Margin="0,8" />
+                    <Label Text="Contact d'urgence" FontAttributes="Bold" FontSize="15" />
+                    <Entry Text="{Binding EmergencyContactName}" Placeholder="Nom du contact" Style="{StaticResource EntryStyle}" />
+                    <Entry Text="{Binding EmergencyContactPhone}" Placeholder="Téléphone" Keyboard="Telephone" Style="{StaticResource EntryStyle}" />
+
+                    <Button Text="Enregistrer" Style="{StaticResource PrimaryButton}" Command="{Binding SaveCommand}" Margin="0,8,0,0" />
+                    <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

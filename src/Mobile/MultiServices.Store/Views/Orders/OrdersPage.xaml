@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:vm="clr-namespace:MultiServices.Store.ViewModels"
+       xmlns:models="clr-namespace:MultiServices.Store.Models"
+       x:Class="MultiServices.Store.Views.Orders.OrdersPage" x:DataType="vm:OrdersViewModel" Title="{Binding Title}">
+    <Grid RowDefinitions="Auto,*">
+        <ScrollView Orientation="Horizontal" Padding="16,8"><HorizontalStackLayout Spacing="8">
+            <Button Text="Nouvelles" Command="{Binding FilterCommand}" CommandParameter="Received" BackgroundColor="{StaticResource Info}" TextColor="White" CornerRadius="20" HeightRequest="36" FontSize="13" />
+            <Button Text="Préparation" Command="{Binding FilterCommand}" CommandParameter="Preparing" BackgroundColor="{StaticResource Warning}" TextColor="White" CornerRadius="20" HeightRequest="36" FontSize="13" />
+            <Button Text="Prêtes" Command="{Binding FilterCommand}" CommandParameter="Ready" BackgroundColor="{StaticResource Success}" TextColor="White" CornerRadius="20" HeightRequest="36" FontSize="13" />
+            <Button Text="Toutes" Command="{Binding FilterCommand}" CommandParameter="" BackgroundColor="#95A5A6" TextColor="White" CornerRadius="20" HeightRequest="36" FontSize="13" />
+        </HorizontalStackLayout></ScrollView>
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Orders}" Margin="16,0" EmptyView="Aucune commande"><CollectionView.ItemTemplate><DataTemplate x:DataType="models:GroceryOrderDto">
+            <Frame Style="{StaticResource Card}" Margin="0,0,0,8"><Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                <Label Text="{Binding OrderNumber, StringFormat='#{0}'}" FontAttributes="Bold" /><Label Grid.Column="1" Text="{Binding TotalAmount, StringFormat='{0:N2} MAD'}" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                <Label Grid.Row="1" Text="{Binding CustomerName}" FontSize="13" /><Label Grid.Row="1" Grid.Column="1" Text="{Binding Status}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                <Label Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Items.Count, StringFormat='{0} produits'}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                <HorizontalStackLayout Grid.Row="3" Grid.ColumnSpan="2" Spacing="8" Margin="0,8,0,0">
+                    <Button Text="Picking" BackgroundColor="{StaticResource Warning}" TextColor="White" CornerRadius="8" HeightRequest="34" FontSize="12" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:OrdersViewModel}}, Path=StartPickingCommand}" CommandParameter="{Binding .}" />
+                    <Button Text="Prête ✓" BackgroundColor="{StaticResource Success}" TextColor="White" CornerRadius="8" HeightRequest="34" FontSize="12" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:OrdersViewModel}}, Path=MarkReadyCommand}" CommandParameter="{Binding .}" />
+                    <Button Text="🖨️" BackgroundColor="White" TextColor="{StaticResource TextPrimary}" BorderColor="{StaticResource Border}" BorderWidth="1" CornerRadius="8" HeightRequest="34" WidthRequest="40" FontSize="12" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:OrdersViewModel}}, Path=PrintPickingListCommand}" CommandParameter="{Binding .}" />
+                </HorizontalStackLayout>
+            </Grid></Frame></DataTemplate></CollectionView.ItemTemplate></CollectionView></Grid>
+</ContentPage>

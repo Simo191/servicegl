@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Deliverer.ViewModels.Onboarding"
+             x:Class="MultiServices.Deliverer.Views.Onboarding.VehicleSelectionPage"
+             x:DataType="vm:VehicleSelectionViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource Background}">
+    <Grid RowDefinitions="Auto,*,Auto" Padding="24">
+        <!-- Header -->
+        <VerticalStackLayout Spacing="8">
+            <Label Text="🛵" FontSize="48" HorizontalOptions="Center" />
+            <Label Text="Choisissez votre véhicule" FontSize="22" FontAttributes="Bold" HorizontalOptions="Center" />
+            <Label Text="Sélectionnez le type de véhicule avec lequel vous livrez"
+                   FontSize="14" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" HorizontalTextAlignment="Center" />
+        </VerticalStackLayout>
+
+        <!-- Vehicle Options -->
+        <ScrollView Grid.Row="1" Margin="0,16,0,0">
+            <CollectionView ItemsSource="{Binding VehicleOptions}" SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="x:Object">
+                        <Frame Style="{StaticResource CardFrame}" Margin="0,4"
+                               BackgroundColor="{Binding IsSelected, Converter={x:StaticResource BoolToColorConverter}}">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:VehicleSelectionViewModel}}, Path=SelectVehicleCommand}"
+                                                      CommandParameter="{Binding .}" />
+                            </Frame.GestureRecognizers>
+                            <Grid ColumnDefinitions="50,*,Auto" ColumnSpacing="12">
+                                <Label Text="{Binding Icon}" FontSize="32" VerticalOptions="Center" />
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                    <Label Text="{Binding Label}" FontSize="16" FontAttributes="Bold" />
+                                    <Label Text="{Binding Description}" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                                </VerticalStackLayout>
+                                <Label Grid.Column="2" Text="✓" FontSize="20" TextColor="{StaticResource Primary}"
+                                       IsVisible="{Binding IsSelected}" VerticalOptions="Center" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </ScrollView>
+
+        <!-- Plate + Continue -->
+        <VerticalStackLayout Grid.Row="2" Spacing="12">
+            <Entry Placeholder="Plaque d'immatriculation" Text="{Binding PlateNumber}"
+                   IsVisible="{Binding PlateRequired}" Style="{StaticResource FormEntry}" />
+            <Entry Placeholder="Modèle du véhicule (optionnel)" Text="{Binding VehicleModel}"
+                   IsVisible="{Binding PlateRequired}" Style="{StaticResource FormEntry}" />
+            <Button Text="Continuer" Style="{StaticResource PrimaryButton}"
+                    Command="{Binding ContinueCommand}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

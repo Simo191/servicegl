@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Deliverer.ViewModels.Onboarding"
+             x:Class="MultiServices.Deliverer.Views.Onboarding.PendingVerificationPage"
+             x:DataType="vm:PendingVerificationViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource Background}">
+    <VerticalStackLayout Padding="32" Spacing="20" VerticalOptions="Center">
+        <Frame BackgroundColor="#E8F5E9" CornerRadius="50" HeightRequest="100" WidthRequest="100"
+               HorizontalOptions="Center" Padding="0" HasShadow="False">
+            <Label Text="⏳" FontSize="48" HorizontalOptions="Center" VerticalOptions="Center" />
+        </Frame>
+
+        <Label Text="Vérification en cours" FontSize="24" FontAttributes="Bold"
+               HorizontalOptions="Center" TextColor="{StaticResource TextPrimary}" />
+
+        <Label Text="{Binding StatusMessage}" FontSize="16"
+               HorizontalOptions="Center" HorizontalTextAlignment="Center"
+               TextColor="{StaticResource TextSecondary}" />
+
+        <Label Text="{Binding StatusDetail}" FontSize="14"
+               HorizontalOptions="Center" HorizontalTextAlignment="Center"
+               TextColor="{StaticResource TextSecondary}" Margin="0,0,0,16" />
+
+        <Button Text="Vérifier le statut" Style="{StaticResource PrimaryButton}"
+                Command="{Binding CheckStatusCommand}" />
+
+        <ActivityIndicator IsRunning="{Binding IsChecking}" IsVisible="{Binding IsChecking}"
+                           Color="{StaticResource Primary}" />
+
+        <Button Text="Contacter le support" Style="{StaticResource SecondaryButton}"
+                Command="{Binding ContactSupportCommand}" />
+
+        <Label Text="Se déconnecter" TextColor="{StaticResource Danger}" FontSize="14"
+               HorizontalOptions="Center" Margin="0,16,0,0">
+            <Label.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding LogoutCommand}" />
+            </Label.GestureRecognizers>
+        </Label>
+    </VerticalStackLayout>
+</ContentPage>

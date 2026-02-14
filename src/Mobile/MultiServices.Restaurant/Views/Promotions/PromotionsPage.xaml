@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Restaurant.ViewModels" xmlns:models="clr-namespace:MultiServices.Restaurant.Models"
+             x:Class="MultiServices.Restaurant.Views.Promotions.PromotionsPage" x:DataType="vm:PromotionsViewModel" Title="Promotions">
+    <Grid RowDefinitions="Auto,*"><Button Text="+ Nouvelle promotion" Command="{Binding CreatePromotionCommand}" Style="{StaticResource PrimaryBtn}" Margin="16,8" />
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Promotions}" Margin="16,0"><CollectionView.ItemTemplate><DataTemplate x:DataType="models:PromotionDto">
+            <Frame Style="{StaticResource Card}" Margin="0,0,0,8"><Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto">
+                <Label Text="{Binding Title}" FontAttributes="Bold" FontSize="16" />
+                <Label Grid.Column="1" Text="{Binding DiscountType}" FontSize="12" TextColor="{StaticResource Primary}" />
+                <Switch Grid.Column="2" IsToggled="{Binding IsActive}" />
+                <Label Grid.Row="1" Text="{Binding EndDate, StringFormat='Expire le {0:dd/MM/yyyy}'}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+            </Grid></Frame>
+        </DataTemplate></CollectionView.ItemTemplate></CollectionView>
+    </Grid>
+</ContentPage>

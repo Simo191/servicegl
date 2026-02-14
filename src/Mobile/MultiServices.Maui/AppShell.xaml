@@ -1,51 +1,40 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!-- REMPLACER le fichier AppShell.xaml existant par celui-ci -->
+<!-- Changement principal: démarre sur AddressEntry puis Home, PAS sur Login -->
 <Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-       xmlns:auth="clr-namespace:MultiServices.Maui.Views.Auth"
        xmlns:common="clr-namespace:MultiServices.Maui.Views.Common"
        xmlns:restaurant="clr-namespace:MultiServices.Maui.Views.Restaurant"
        xmlns:services="clr-namespace:MultiServices.Maui.Views.Services"
        xmlns:grocery="clr-namespace:MultiServices.Maui.Views.Grocery"
        xmlns:profile="clr-namespace:MultiServices.Maui.Views.Profile"
+       xmlns:checkout="clr-namespace:MultiServices.Maui.Views.Checkout"
        x:Class="MultiServices.Maui.AppShell"
        Shell.FlyoutBehavior="Disabled"
        Shell.TabBarBackgroundColor="White"
        Shell.TabBarForegroundColor="{StaticResource Primary}"
-       Shell.TabBarUnselectedColor="{StaticResource TextMuted}"
-       Shell.TabBarTitleColor="{StaticResource Primary}">
+       Shell.TabBarUnselectedColor="{StaticResource TextMuted}">
 
-    <!-- Auth -->
-    <ShellContent Route="login"
-                  ContentTemplate="{DataTemplate auth:LoginPage}"
-                  Shell.TabBarIsVisible="False"
-                  Shell.NavBarIsVisible="False" />
+    <!-- Écran d'adresse (premier lancement, SANS login) -->
+    <ShellContent Route="address" ContentTemplate="{DataTemplate common:AddressEntryPage}"
+                  Shell.TabBarIsVisible="False" Shell.NavBarIsVisible="False" />
 
-    <ShellContent Route="register"
-                  ContentTemplate="{DataTemplate auth:RegisterPage}"
-                  Shell.TabBarIsVisible="False"
-                  Shell.NavBarIsVisible="False" />
-
-    <!-- Main TabBar -->
+    <!-- Main TabBar (accessible SANS compte) -->
     <TabBar Route="main">
         <Tab Title="Accueil" Icon="home_icon.png">
-            <ShellContent Route="home"
-                          ContentTemplate="{DataTemplate common:HomePage}" />
+            <ShellContent Route="home" ContentTemplate="{DataTemplate common:HomePage}" />
         </Tab>
         <Tab Title="Restos" Icon="restaurant_icon.png">
-            <ShellContent Route="restaurants"
-                          ContentTemplate="{DataTemplate restaurant:RestaurantsPage}" />
+            <ShellContent Route="restaurants" ContentTemplate="{DataTemplate restaurant:RestaurantsPage}" />
         </Tab>
         <Tab Title="Services" Icon="service_icon.png">
-            <ShellContent Route="services"
-                          ContentTemplate="{DataTemplate services:ServicesPage}" />
+            <ShellContent Route="services" ContentTemplate="{DataTemplate services:ServicesPage}" />
         </Tab>
         <Tab Title="Courses" Icon="grocery_icon.png">
-            <ShellContent Route="grocery"
-                          ContentTemplate="{DataTemplate grocery:GroceryStoresPage}" />
+            <ShellContent Route="grocery" ContentTemplate="{DataTemplate grocery:GroceryStoresPage}" />
         </Tab>
         <Tab Title="Profil" Icon="profile_icon.png">
-            <ShellContent Route="profile"
-                          ContentTemplate="{DataTemplate profile:ProfilePage}" />
+            <ShellContent Route="profile" ContentTemplate="{DataTemplate profile:ProfilePage}" />
         </Tab>
     </TabBar>
 </Shell>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MultiServices.Restaurant.Views.Settings.OpeningHoursPage" Title="Horaires">
+    <ScrollView><VerticalStackLayout Padding="16" Spacing="12">
+        <Label Text="Horaires d'ouverture" Style="{StaticResource H2}" />
+        <Frame Style="{StaticResource Card}"><Grid ColumnDefinitions="100,*,Auto,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="8">
+            <Label Text="Lundi" FontAttributes="Bold" /><TimePicker Grid.Column="1" /><Label Grid.Column="2" Text="—" HorizontalOptions="Center" /><TimePicker Grid.Column="3" /><Switch Grid.Column="4" IsToggled="True" />
+            <Label Grid.Row="1" Text="Mardi" FontAttributes="Bold" /><TimePicker Grid.Row="1" Grid.Column="1" /><Label Grid.Row="1" Grid.Column="2" Text="—" /><TimePicker Grid.Row="1" Grid.Column="3" /><Switch Grid.Row="1" Grid.Column="4" IsToggled="True" />
+            <Label Grid.Row="2" Text="Mercredi" FontAttributes="Bold" /><TimePicker Grid.Row="2" Grid.Column="1" /><Label Grid.Row="2" Grid.Column="2" Text="—" /><TimePicker Grid.Row="2" Grid.Column="3" /><Switch Grid.Row="2" Grid.Column="4" IsToggled="True" />
+            <Label Grid.Row="3" Text="Jeudi" FontAttributes="Bold" /><TimePicker Grid.Row="3" Grid.Column="1" /><Label Grid.Row="3" Grid.Column="2" Text="—" /><TimePicker Grid.Row="3" Grid.Column="3" /><Switch Grid.Row="3" Grid.Column="4" IsToggled="True" />
+            <Label Grid.Row="4" Text="Vendredi" FontAttributes="Bold" /><TimePicker Grid.Row="4" Grid.Column="1" /><Label Grid.Row="4" Grid.Column="2" Text="—" /><TimePicker Grid.Row="4" Grid.Column="3" /><Switch Grid.Row="4" Grid.Column="4" IsToggled="True" />
+            <Label Grid.Row="5" Text="Samedi" FontAttributes="Bold" /><TimePicker Grid.Row="5" Grid.Column="1" /><Label Grid.Row="5" Grid.Column="2" Text="—" /><TimePicker Grid.Row="5" Grid.Column="3" /><Switch Grid.Row="5" Grid.Column="4" IsToggled="True" />
+            <Label Grid.Row="6" Text="Dimanche" FontAttributes="Bold" /><TimePicker Grid.Row="6" Grid.Column="1" /><Label Grid.Row="6" Grid.Column="2" Text="—" /><TimePicker Grid.Row="6" Grid.Column="3" /><Switch Grid.Row="6" Grid.Column="4" IsToggled="False" />
+        </Grid></Frame>
+        <Button Text="Enregistrer" Style="{StaticResource PrimaryBtn}" />
+    </VerticalStackLayout></ScrollView>
+</ContentPage>

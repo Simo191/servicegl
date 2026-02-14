@@ -1,0 +1,2 @@
+namespace MultiServices.Restaurant.Views.Menu;
+public partial class MenuManagementPage : ContentPage { public MenuManagementPage(ViewModels.MenuManagementViewModel vm) { InitializeComponent(); BindingContext = vm; } protected override void OnAppearing() { base.OnAppearing(); (BindingContext as ViewModels.MenuManagementViewModel)?.LoadMenuCommand.Execute(null); } }

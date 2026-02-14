@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:vm="clr-namespace:MultiServices.Store.ViewModels"
+       x:Class="MultiServices.Store.Views.Dashboard.DashboardPage" x:DataType="vm:DashboardViewModel" Title="{Binding Title}">
+    <RefreshView Command="{Binding LoadDataCommand}" IsRefreshing="{Binding IsRefreshing}"><ScrollView><VerticalStackLayout Spacing="16" Padding="16">
+        <Frame Style="{StaticResource Card}"><Grid ColumnDefinitions="*,Auto"><VerticalStackLayout><Label Text="{Binding StoreName}" Style="{StaticResource H2}" />
+            <Label Text="{Binding StoreType}" FontSize="13" TextColor="{StaticResource TextMuted}" /><Label Text="{Binding StatusText}" FontSize="14" TextColor="{Binding StatusColor}" FontAttributes="Bold" /></VerticalStackLayout>
+            <Switch Grid.Column="1" IsToggled="{Binding IsOpen}" VerticalOptions="Center" /></Grid></Frame>
+        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+            <Frame Style="{StaticResource Card}" Padding="12"><VerticalStackLayout HorizontalOptions="Center"><Label Text="{Binding PendingOrdersCount}" FontSize="28" FontAttributes="Bold" TextColor="{StaticResource Info}" HorizontalOptions="Center" /><Label Text="En attente" FontSize="11" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" /></VerticalStackLayout></Frame>
+            <Frame Grid.Column="1" Style="{StaticResource Card}" Padding="12"><VerticalStackLayout HorizontalOptions="Center"><Label Text="{Binding TodayRevenue, StringFormat='{0:N0}'}" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource Success}" HorizontalOptions="Center" /><Label Text="CA MAD" FontSize="11" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" /></VerticalStackLayout></Frame>
+            <Frame Grid.Column="2" Style="{StaticResource Card}" Padding="12"><VerticalStackLayout HorizontalOptions="Center"><Label Text="{Binding LowStockAlerts}" FontSize="28" FontAttributes="Bold" TextColor="{StaticResource LowStock}" HorizontalOptions="Center" /><Label Text="Stock bas" FontSize="11" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" /></VerticalStackLayout></Frame>
+        </Grid></VerticalStackLayout></ScrollView></RefreshView>
+</ContentPage>

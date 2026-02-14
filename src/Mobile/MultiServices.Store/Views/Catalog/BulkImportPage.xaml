@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:vm="clr-namespace:MultiServices.Store.ViewModels"
+       x:Class="MultiServices.Store.Views.Catalog.BulkImportPage" x:DataType="vm:ProductFormViewModel" Title="{Binding Title}">
+    <VerticalStackLayout Spacing="16" Padding="24" VerticalOptions="Center">
+        <Label Text="📥 Import massif de produits" Style="{StaticResource H2}" HorizontalOptions="Center" />
+        <Label Text="Importez vos produits via fichier CSV ou Excel. Le fichier doit contenir: Nom, Description, Marque, Code-barre, Prix, Stock, Rayon, Bio, Halal" FontSize="13" TextColor="{StaticResource TextMuted}" HorizontalTextAlignment="Center" />
+        <Button Text="Choisir un fichier CSV/Excel" BackgroundColor="{StaticResource Primary}" TextColor="White" CornerRadius="10" HeightRequest="48" />
+        <Button Text="Télécharger le modèle CSV" BackgroundColor="White" TextColor="{StaticResource Primary}" BorderColor="{StaticResource Border}" BorderWidth="1" CornerRadius="10" HeightRequest="44" />
+    </VerticalStackLayout>
+</ContentPage>

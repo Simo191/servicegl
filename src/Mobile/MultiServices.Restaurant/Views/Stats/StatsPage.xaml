@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Restaurant.ViewModels" xmlns:models="clr-namespace:MultiServices.Restaurant.Models"
+             x:Class="MultiServices.Restaurant.Views.Stats.StatsPage" x:DataType="vm:StatsViewModel" Title="Statistiques">
+    <ScrollView><VerticalStackLayout Spacing="16" Padding="16">
+        <!-- Period selector -->
+        <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+            <Button Text="Jour" Command="{Binding SetPeriodCommand}" CommandParameter="day" BackgroundColor="{StaticResource Info}" TextColor="White" CornerRadius="20" HeightRequest="36" FontSize="13" />
+            <Button Text="Semaine" Command="{Binding SetPeriodCommand}" CommandParameter="week" BackgroundColor="{StaticResource Info}" TextColor="White" CornerRadius="20" HeightRequest="36" FontSize="13" />
+            <Button Text="Mois" Command="{Binding SetPeriodCommand}" CommandParameter="month" BackgroundColor="{StaticResource Primary}" TextColor="White" CornerRadius="20" HeightRequest="36" FontSize="13" />
+        </HorizontalStackLayout>
+        <!-- Revenue -->
+        <Frame Style="{StaticResource Card}"><VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+            <Label Text="Chiffre d'affaires" Style="{StaticResource H3}" HorizontalOptions="Center" />
+            <Label Text="{Binding Revenue, StringFormat='{0:N0} MAD'}" FontSize="36" FontAttributes="Bold" TextColor="{StaticResource Success}" HorizontalOptions="Center" />
+        </VerticalStackLayout></Frame>
+        <!-- KPIs -->
+        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+            <Frame Style="{StaticResource Card}" Padding="12"><VerticalStackLayout HorizontalOptions="Center"><Label Text="{Binding OrderCount}" FontSize="28" FontAttributes="Bold" HorizontalOptions="Center" /><Label Text="Commandes" FontSize="11" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" /></VerticalStackLayout></Frame>
+            <Frame Grid.Column="1" Style="{StaticResource Card}" Padding="12"><VerticalStackLayout HorizontalOptions="Center"><Label Text="{Binding AvgOrder, StringFormat='{0:N0} MAD'}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" /><Label Text="Panier moyen" FontSize="11" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" /></VerticalStackLayout></Frame>
+            <Frame Grid.Column="2" Style="{StaticResource Card}" Padding="12"><VerticalStackLayout HorizontalOptions="Center"><Label Text="{Binding Rating, StringFormat='★ {0:F1}'}" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource Warning}" HorizontalOptions="Center" /><Label Text="Note" FontSize="11" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" /></VerticalStackLayout></Frame>
+        </Grid>
+        <Frame Style="{StaticResource Card}"><VerticalStackLayout HorizontalOptions="Center"><Label Text="Commissions" FontSize="13" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" />
+            <Label Text="{Binding Commissions, StringFormat='{0:N0} MAD'}" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource Danger}" HorizontalOptions="Center" /></VerticalStackLayout></Frame>
+        <!-- Top selling items -->
+        <Frame Style="{StaticResource Card}"><VerticalStackLayout Spacing="8">
+            <Label Text="Plats les plus vendus" Style="{StaticResource H3}" />
+            <CollectionView ItemsSource="{Binding TopItems}"><CollectionView.ItemTemplate><DataTemplate x:DataType="models:TopItemDto">
+                <Grid ColumnDefinitions="*,Auto,Auto" Padding="0,6" ColumnSpacing="12">
+                    <Label Text="{Binding Name}" FontSize="14" /><Label Grid.Column="1" Text="{Binding Count, StringFormat='{0}x'}" FontAttributes="Bold" /><Label Grid.Column="2" Text="{Binding Revenue, StringFormat='{0:N0} MAD'}" TextColor="{StaticResource Success}" />
+                </Grid></DataTemplate></CollectionView.ItemTemplate></CollectionView>
+        </VerticalStackLayout></Frame>
+        <!-- Export buttons -->
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+            <Button Text="📊 Export CSV" Command="{Binding ExportCsvCommand}" BackgroundColor="White" TextColor="{StaticResource TextPrimary}" BorderColor="{StaticResource Border}" BorderWidth="1" CornerRadius="10" HeightRequest="44" />
+            <Button Grid.Column="1" Text="📄 Export PDF" Command="{Binding ExportPdfCommand}" BackgroundColor="White" TextColor="{StaticResource TextPrimary}" BorderColor="{StaticResource Border}" BorderWidth="1" CornerRadius="10" HeightRequest="44" />
+        </Grid>
+    </VerticalStackLayout></ScrollView>
+</ContentPage>

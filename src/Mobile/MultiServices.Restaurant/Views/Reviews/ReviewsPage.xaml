@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Restaurant.ViewModels" xmlns:models="clr-namespace:MultiServices.Restaurant.Models"
+             x:Class="MultiServices.Restaurant.Views.Reviews.ReviewsPage" x:DataType="vm:ReviewsViewModel" Title="Avis clients">
+    <CollectionView ItemsSource="{Binding Reviews}" Margin="16"><CollectionView.ItemTemplate><DataTemplate x:DataType="models:ReviewDto">
+        <Frame Style="{StaticResource Card}" Margin="0,0,0,8"><VerticalStackLayout Spacing="6">
+            <Grid ColumnDefinitions="*,Auto"><Label Text="{Binding CustomerName}" FontAttributes="Bold" /><Label Grid.Column="1" Text="{Binding OverallRating, StringFormat='★ {0}'}" TextColor="{StaticResource Warning}" FontAttributes="Bold" /></Grid>
+            <Label Text="{Binding Comment}" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+            <Label Text="{Binding CreatedAt, StringFormat='{0:dd/MM/yyyy}'}" FontSize="11" TextColor="{StaticResource TextMuted}" />
+            <Frame BackgroundColor="#F0F0F0" CornerRadius="8" Padding="8" HasShadow="False" IsVisible="{Binding Reply, Converter={x:Null}}"><Label Text="{Binding Reply}" FontSize="13" FontAttributes="Italic" /></Frame>
+            <Button Text="Répondre" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" FontSize="13" HorizontalOptions="Start"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ReviewsViewModel}}, Path=ReplyCommand}" CommandParameter="{Binding .}" />
+        </VerticalStackLayout></Frame>
+    </DataTemplate></CollectionView.ItemTemplate></CollectionView>
+</ContentPage>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Deliverer.ViewModels.Onboarding"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="MultiServices.Deliverer.Views.Onboarding.TrainingPage"
+             x:DataType="vm:TrainingViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource Background}">
+    <VerticalStackLayout Padding="24" Spacing="16">
+        <Label Text="🎓 Formation obligatoire" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
+
+        <!-- Progress -->
+        <Frame Style="{StaticResource CardFrame}" Padding="12">
+            <VerticalStackLayout Spacing="8">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="Progression" FontAttributes="Bold" />
+                    <Label Grid.Column="1" Text="{Binding WatchedVideos, StringFormat='{0}/{}/'}" />
+                </Grid>
+                <ProgressBar Progress="{Binding ProgressPercent, Converter={x:StaticResource PercentToDoubleConverter}}"
+                             ProgressColor="{StaticResource Primary}" />
+                <Label Text="{Binding ProgressPercent, StringFormat='{0:F0}% complété'}" FontSize="13"
+                       TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- Video Player Area -->
+        <Frame Style="{StaticResource CardFrame}" Padding="0" HeightRequest="220">
+            <Grid>
+                <BoxView Color="#1a1a1a" />
+                <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                    <Label Text="▶️" FontSize="48" HorizontalOptions="Center" />
+                    <Label Text="{Binding CurrentVideoTitle}" TextColor="White"
+                           FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" />
+                    <Label Text="{Binding CurrentVideoIndex, StringFormat='Vidéo {0:D} sur 5'}"
+                           TextColor="#BDBDBD" FontSize="13" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Grid>
+        </Frame>
+
+        <!-- Video Navigation -->
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+            <Button Text="◀ Précédent" Style="{StaticResource SecondaryButton}" HeightRequest="44"
+                    Command="{Binding PreviousVideoCommand}" FontSize="13" />
+            <Button Grid.Column="1" Text="✅ J'ai regardé" Style="{StaticResource PrimaryButton}" HeightRequest="44"
+                    Command="{Binding MarkVideoWatchedCommand}" FontSize="13"
+                    IsEnabled="{Binding CurrentVideoWatched, Converter={toolkit:InvertedBoolConverter}}" />
+            <Button Grid.Column="2" Text="Suivant ▶" Style="{StaticResource SecondaryButton}" HeightRequest="44"
+                    Command="{Binding NextVideoCommand}" FontSize="13" />
+        </Grid>
+
+        <!-- Error -->
+        <Frame BackgroundColor="#FFEBEE" CornerRadius="8" Padding="12"
+               IsVisible="{Binding HasError}" BorderColor="Transparent">
+            <Label Text="{Binding ErrorMessage}" TextColor="{StaticResource Danger}" FontSize="14" />
+        </Frame>
+
+        <!-- Quiz Button -->
+        <Button Text="Passer le quiz de certification 📝" Style="{StaticResource PrimaryButton}"
+                Command="{Binding GoToQuizCommand}"
+                IsEnabled="{Binding AllVideosWatched}"
+                Margin="0,8,0,0" />
+    </VerticalStackLayout>
+</ContentPage>

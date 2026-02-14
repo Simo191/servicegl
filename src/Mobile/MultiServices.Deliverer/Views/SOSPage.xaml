@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Deliverer.ViewModels"
+             x:Class="MultiServices.Deliverer.Views.SOSPage"
+             x:DataType="vm:SOSViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#FFEBEE">
+    <VerticalStackLayout Padding="32" Spacing="20" VerticalOptions="Center">
+        <!-- Not sent yet -->
+        <VerticalStackLayout IsVisible="{Binding SosSent, Converter={x:StaticResource InvertBoolConverter}}" Spacing="20">
+            <Label Text="🆘" FontSize="72" HorizontalOptions="Center" />
+            <Label Text="URGENCE" FontSize="32" FontAttributes="Bold" TextColor="{StaticResource Danger}"
+                   HorizontalOptions="Center" />
+
+            <Label Text="{Binding Countdown, StringFormat='Envoi dans {0}s...'}" FontSize="20"
+                   HorizontalOptions="Center" IsVisible="{Binding IsCounting}" TextColor="{StaticResource Danger}" />
+
+            <Entry Text="{Binding Message}" Placeholder="Décrivez la situation (optionnel)"
+                   Style="{StaticResource EntryStyle}" />
+
+            <Button Text="ENVOYER SOS" Style="{StaticResource DangerButton}" FontSize="18" HeightRequest="60"
+                    Command="{Binding SendSOSCommand}" />
+
+            <Button Text="Annuler" Style="{StaticResource SecondaryButton}"
+                    Command="{Binding CancelSOSCommand}" />
+
+            <BoxView HeightRequest="1" Color="#FFCDD2" Margin="0,8" />
+
+            <Button Text="📞 Appeler le SAMU (15)" BackgroundColor="#D32F2F" TextColor="White"
+                    CornerRadius="12" HeightRequest="50" FontSize="16"
+                    Command="{Binding CallEmergencyCommand}" />
+
+            <Button Text="📞 Appeler le support MultiServices" Style="{StaticResource SecondaryButton}"
+                    Command="{Binding CallSupportCommand}" />
+        </VerticalStackLayout>
+
+        <!-- SOS Sent -->
+        <VerticalStackLayout IsVisible="{Binding SosSent}" Spacing="16" VerticalOptions="Center">
+            <Label Text="✅" FontSize="72" HorizontalOptions="Center" />
+            <Label Text="SOS envoyé" FontSize="28" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#2E7D32" />
+            <Label Text="Notre équipe a été alertée et va vous contacter rapidement. Restez en sécurité."
+                   FontSize="16" HorizontalOptions="Center" HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+            <Button Text="Retour" Style="{StaticResource PrimaryButton}"
+                    Command="{Binding CancelSOSCommand}" />
+        </VerticalStackLayout>
+    </VerticalStackLayout>
+</ContentPage>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Restaurant.ViewModels" xmlns:models="clr-namespace:MultiServices.Restaurant.Models"
+             x:Class="MultiServices.Restaurant.Views.Orders.OrderDetailPage" x:DataType="vm:OrderDetailViewModel" Title="Détail Commande">
+    <ScrollView><VerticalStackLayout Spacing="16" Padding="16">
+        <!-- Header -->
+        <Frame Style="{StaticResource Card}"><VerticalStackLayout Spacing="8">
+            <Grid ColumnDefinitions="*,Auto"><Label Text="{Binding Order.OrderNumber, StringFormat='Commande #{0}'}" Style="{StaticResource H2}" />
+                <Frame Grid.Column="1" BackgroundColor="{StaticResource StatusNew}" CornerRadius="12" Padding="10,4" HasShadow="False"><Label Text="{Binding Order.Status}" TextColor="White" FontSize="13" FontAttributes="Bold" /></Frame></Grid>
+            <Label Text="{Binding Order.CreatedAt, StringFormat='{0:dd/MM/yyyy à HH:mm}'}" FontSize="13" TextColor="{StaticResource TextMuted}" />
+        </VerticalStackLayout></Frame>
+        <!-- Client -->
+        <Frame Style="{StaticResource Card}"><VerticalStackLayout Spacing="6">
+            <Label Text="Client" Style="{StaticResource H3}" />
+            <Label Text="{Binding Order.CustomerName}" FontSize="15" />
+            <HorizontalStackLayout Spacing="8"><Label Text="{Binding Order.CustomerPhone}" FontSize="14" TextColor="{StaticResource Info}" />
+                <Button Text="📞" BackgroundColor="Transparent" Command="{Binding CallCustomerCommand}" HeightRequest="30" WidthRequest="30" Padding="0" /></HorizontalStackLayout>
+            <Label Text="{Binding Order.DeliveryAddress}" FontSize="13" TextColor="{StaticResource TextMuted}" />
+            <Label Text="{Binding Order.SpecialInstructions}" FontSize="13" TextColor="{StaticResource Danger}" IsVisible="{Binding HasInstructions}" FontAttributes="Italic" />
+        </VerticalStackLayout></Frame>
+        <!-- Articles -->
+        <Frame Style="{StaticResource Card}"><VerticalStackLayout Spacing="8">
+            <Label Text="Articles commandés" Style="{StaticResource H3}" />
+            <CollectionView ItemsSource="{Binding Order.Items}"><CollectionView.ItemTemplate><DataTemplate x:DataType="models:OrderItemDto">
+                <Grid ColumnDefinitions="Auto,*,Auto" Padding="0,6" ColumnSpacing="8">
+                    <Frame BackgroundColor="{StaticResource Primary}" CornerRadius="6" WidthRequest="28" HeightRequest="28" Padding="0" HasShadow="False"><Label Text="{Binding Quantity, StringFormat='{0}x'}" TextColor="White" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" /></Frame>
+                    <VerticalStackLayout Grid.Column="1"><Label Text="{Binding Name}" FontSize="14" FontAttributes="Bold" />
+                        <Label Text="{Binding SizeName}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                        <Label Text="{Binding SpecialInstructions}" FontSize="11" TextColor="{StaticResource Danger}" FontAttributes="Italic" /></VerticalStackLayout>
+                    <Label Grid.Column="2" Text="{Binding TotalPrice, StringFormat='{0:N2} MAD'}" FontSize="14" VerticalOptions="Center" />
+                </Grid>
+            </DataTemplate></CollectionView.ItemTemplate></CollectionView>
+            <BoxView HeightRequest="1" BackgroundColor="{StaticResource Border}" />
+            <Grid ColumnDefinitions="*,Auto"><Label Text="Sous-total" /><Label Grid.Column="1" Text="{Binding Order.SubTotal, StringFormat='{0:N2} MAD'}" /></Grid>
+            <Grid ColumnDefinitions="*,Auto"><Label Text="Livraison" /><Label Grid.Column="1" Text="{Binding Order.DeliveryFee, StringFormat='{0:N2} MAD'}" /></Grid>
+            <Grid ColumnDefinitions="*,Auto"><Label Text="Réduction" TextColor="{StaticResource Success}" /><Label Grid.Column="1" Text="{Binding Order.Discount, StringFormat='-{0:N2} MAD'}" TextColor="{StaticResource Success}" /></Grid>
+            <Grid ColumnDefinitions="*,Auto"><Label Text="Pourboire" /><Label Grid.Column="1" Text="{Binding Order.Tip, StringFormat='{0:N2} MAD'}" /></Grid>
+            <BoxView HeightRequest="1" BackgroundColor="{StaticResource Border}" />
+            <Grid ColumnDefinitions="*,Auto"><Label Text="TOTAL" FontAttributes="Bold" FontSize="18" /><Label Grid.Column="1" Text="{Binding Order.TotalAmount, StringFormat='{0:N2} MAD'}" FontAttributes="Bold" FontSize="18" TextColor="{StaticResource Primary}" /></Grid>
+            <Label Text="{Binding Order.PaymentMethod, StringFormat='Paiement: {0}'}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+        </VerticalStackLayout></Frame>
+        <!-- Livreur -->
+        <Frame Style="{StaticResource Card}" IsVisible="{Binding Order.DelivererName, Converter={x:Null}}"><VerticalStackLayout Spacing="4">
+            <Label Text="Livreur" Style="{StaticResource H3}" />
+            <Label Text="{Binding Order.DelivererName}" FontSize="15" />
+            <Label Text="{Binding Order.DelivererPhone}" FontSize="14" TextColor="{StaticResource Info}" />
+        </VerticalStackLayout></Frame>
+        <!-- Actions -->
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="12" IsVisible="{Binding CanAccept}">
+            <Button Text="✓ Accepter" Style="{StaticResource SuccessBtn}" Command="{Binding AcceptCommand}" />
+            <Button Grid.Column="1" Text="✗ Refuser" Style="{StaticResource DangerBtn}" Command="{Binding RejectCommand}" />
+        </Grid>
+        <Button Text="▶ Commencer préparation" BackgroundColor="{StaticResource StatusPreparing}" TextColor="White" CornerRadius="10" HeightRequest="48" Command="{Binding PrepareCommand}" IsVisible="{Binding CanPrepare}" />
+        <Button Text="✓ Prêt pour livraison" Style="{StaticResource SuccessBtn}" Command="{Binding ReadyCommand}" IsVisible="{Binding CanReady}" />
+        <Button Text="🖨️ Imprimer bon de commande" BackgroundColor="White" TextColor="{StaticResource TextPrimary}" BorderColor="{StaticResource Border}" BorderWidth="1" CornerRadius="10" HeightRequest="44" Command="{Binding PrintCommand}" />
+    </VerticalStackLayout></ScrollView>
+</ContentPage>

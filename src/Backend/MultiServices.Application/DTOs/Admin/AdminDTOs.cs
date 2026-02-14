@@ -2,6 +2,37 @@ using MultiServices.Domain.Enums;
 
 namespace MultiServices.Application.DTOs.Admin;
 
+//public record DashboardDto(int TotalUsers, int TotalRestaurants, int TotalStores, int TotalProviders, int TotalDrivers,
+//    decimal TotalRevenue, decimal RestaurantRevenue, decimal GroceryRevenue, decimal ServiceRevenue, int PendingApprovals);
+//public record ApprovalDto(Guid EntityId, string EntityType, string Name, DateTime CreatedAt);
+//public record UserListDto(Guid Id, string Email, string FirstName, string LastName, string? Phone, bool IsActive, DateTime CreatedAt);
+//public record FinancialReportDto(decimal TotalRevenue, decimal TotalCommissions, decimal RestaurantRevenue, decimal GroceryRevenue, decimal ServiceRevenue, int TotalOrders, DateTime StartDate, DateTime EndDate);
+//public record CommissionSettingsDto(string Module, decimal Rate);
+//public record ApproveEntityDto(Guid EntityId, string EntityType);
+//public record CreatePromotionDto(string Code, string DiscountType, decimal DiscountValue, decimal? MaxDiscount, int MaxUsage, DateTime ExpiresAt);
+// These DTOs are referenced by AdminQueries/AdminCommands but were missing
+public record ApprovalDto(Guid Id, string EntityType, string Name, string? OwnerName,
+    string Status, DateTime CreatedAt);
+
+public record UserListDto(Guid Id, string FullName, string Email, string? Phone,
+    bool IsActive, bool IsVerified, List<string> Roles, DateTime CreatedAt, int TotalOrders);
+
+public record FinancialReportDto(decimal TotalRevenue, decimal RestaurantRevenue,
+    decimal GroceryRevenue, decimal ServiceRevenue, decimal TotalCommissions,
+    decimal TotalRefunds, int TotalOrders, int TotalPaidOrders);
+
+public record CommissionSettingsDto(string EntityType, Guid EntityId, decimal NewRate);
+
+public record CreatePromotionDto(string Code, string Title, string? Description,
+    string DiscountType, decimal DiscountValue, decimal? MinOrderAmount,
+    decimal? MaxDiscount, DateTime StartDate, DateTime EndDate,
+    int? MaxUsages, string ApplicableModule, bool FreeDelivery);
+
+public record ApproveEntityDto(string EntityType, Guid EntityId, bool Approved, string? RejectionReason);
+
+// Missing Grocery Store DTO for CreateStorePromotionCommand
+public record StorePromotionDto(string Title, string? Description, string? Code,
+    string DiscountType, decimal DiscountValue, DateTime StartDate, DateTime EndDate, bool FreeDelivery);
 // ==================== DASHBOARD ====================
 public class DashboardDto
 {
@@ -63,20 +94,20 @@ public class AdminUserListDto
 }
 
 /// <summary>Used by GetAllUsersQuery</summary>
-public class UserListDto
-{
-    public Guid Id { get; set; }
-    public string FullName { get; set; } = "";
-    public string Email { get; set; } = "";
-    public string? Phone { get; set; }
-    public bool IsActive { get; set; }
-    public bool IsVerified { get; set; }
-    public List<string> Roles { get; set; } = new();
-    public DateTime CreatedAt { get; set; }
-    public DateTime? LastLoginAt { get; set; }
-    public int TotalOrders { get; set; }
-    public decimal TotalSpent { get; set; }
-}
+//public class UserListDto
+//{
+//    public Guid Id { get; set; }
+//    public string FullName { get; set; } = "";
+//    public string Email { get; set; } = "";
+//    public string? Phone { get; set; }
+//    public bool IsActive { get; set; }
+//    public bool IsVerified { get; set; }
+//    public List<string> Roles { get; set; } = new();
+//    public DateTime CreatedAt { get; set; }
+//    public DateTime? LastLoginAt { get; set; }
+//    public int TotalOrders { get; set; }
+//    public decimal TotalSpent { get; set; }
+//}
 
 // ==================== ORDERS ====================
 public class AdminOrderListDto
@@ -96,28 +127,28 @@ public class AdminOrderListDto
 
 // ==================== APPROVALS ====================
 /// <summary>Used by GetPendingApprovalsQuery</summary>
-public class ApprovalDto
-{
-    public Guid EntityId { get; set; }
-    public string EntityType { get; set; } = "";
-    public string Name { get; set; } = "";
-    public string OwnerName { get; set; } = "";
-    public string? Email { get; set; }
-    public string? Phone { get; set; }
-    public string? City { get; set; }
-    public DateTime RequestedAt { get; set; }
-    public string Status { get; set; } = "Pending";
-    public List<string> Documents { get; set; } = new();
-}
+//public class ApprovalDto
+//{
+//    public Guid EntityId { get; set; }
+//    public string EntityType { get; set; } = "";
+//    public string Name { get; set; } = "";
+//    public string OwnerName { get; set; } = "";
+//    public string? Email { get; set; }
+//    public string? Phone { get; set; }
+//    public string? City { get; set; }
+//    public DateTime RequestedAt { get; set; }
+//    public string Status { get; set; } = "Pending";
+//    public List<string> Documents { get; set; } = new();
+//}
 
-/// <summary>Used by ApproveEntityCommand</summary>
-public class ApproveEntityDto
-{
-    public Guid EntityId { get; set; }
-    public string EntityType { get; set; } = "";
-    public bool Approved { get; set; }
-    public string? RejectionReason { get; set; }
-}
+///// <summary>Used by ApproveEntityCommand</summary>
+//public class ApproveEntityDto
+//{
+//    public Guid EntityId { get; set; }
+//    public string EntityType { get; set; } = "";
+//    public bool Approved { get; set; }
+//    public string? RejectionReason { get; set; }
+//}
 
 // ==================== FINANCE ====================
 public class AdminFinanceDto
@@ -141,18 +172,18 @@ public class FinanceChartData
 }
 
 /// <summary>Used by GetFinancialReportQuery</summary>
-public class FinancialReportDto
-{
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
-    public decimal TotalRevenue { get; set; }
-    public decimal TotalCommissions { get; set; }
-    public decimal TotalPayouts { get; set; }
-    public decimal TotalRefunds { get; set; }
-    public decimal NetProfit { get; set; }
-    public List<ModuleFinanceDto> ByModule { get; set; } = new();
-    public List<FinanceChartData> MonthlyData { get; set; } = new();
-}
+//public class FinancialReportDto
+//{
+//    public DateTime StartDate { get; set; }
+//    public DateTime EndDate { get; set; }
+//    public decimal TotalRevenue { get; set; }
+//    public decimal TotalCommissions { get; set; }
+//    public decimal TotalPayouts { get; set; }
+//    public decimal TotalRefunds { get; set; }
+//    public decimal NetProfit { get; set; }
+//    public List<ModuleFinanceDto> ByModule { get; set; } = new();
+//    public List<FinanceChartData> MonthlyData { get; set; } = new();
+//}
 
 public class ModuleFinanceDto
 {
@@ -171,32 +202,32 @@ public class CommissionConfigDto
 }
 
 /// <summary>Used by UpdateCommissionSettingsCommand</summary>
-public class CommissionSettingsDto
-{
-    public decimal RestaurantCommissionRate { get; set; }
-    public decimal ServiceCommissionRate { get; set; }
-    public decimal GroceryCommissionRate { get; set; }
-    public decimal DeliveryFeePerKm { get; set; }
-    public decimal DeliveryBaseFee { get; set; }
-}
+//public class CommissionSettingsDto
+//{
+//    public decimal RestaurantCommissionRate { get; set; }
+//    public decimal ServiceCommissionRate { get; set; }
+//    public decimal GroceryCommissionRate { get; set; }
+//    public decimal DeliveryFeePerKm { get; set; }
+//    public decimal DeliveryBaseFee { get; set; }
+//}
 
 // ==================== PROMOTIONS ====================
 /// <summary>Used by CreateGlobalPromotionCommand</summary>
-public class CreatePromotionDto
-{
-    public string Code { get; set; } = "";
-    public string Title { get; set; } = "";
-    public string? Description { get; set; }
-    public string DiscountType { get; set; } = "Percentage";
-    public decimal DiscountValue { get; set; }
-    public decimal? MinOrderAmount { get; set; }
-    public decimal? MaxDiscount { get; set; }
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
-    public int? MaxUsages { get; set; }
-    public string ApplicableModule { get; set; } = "All";
-    public bool FreeDelivery { get; set; }
-}
+//public class CreatePromotionDto
+//{
+//    public string Code { get; set; } = "";
+//    public string Title { get; set; } = "";
+//    public string? Description { get; set; }
+//    public string DiscountType { get; set; } = "Percentage";
+//    public decimal DiscountValue { get; set; }
+//    public decimal? MinOrderAmount { get; set; }
+//    public decimal? MaxDiscount { get; set; }
+//    public DateTime StartDate { get; set; }
+//    public DateTime EndDate { get; set; }
+//    public int? MaxUsages { get; set; }
+//    public string ApplicableModule { get; set; } = "All";
+//    public bool FreeDelivery { get; set; }
+//}
 
 public class CreatePromotionRequest
 {
@@ -227,3 +258,4 @@ public class AdminSearchRequest
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 20;
 }
+

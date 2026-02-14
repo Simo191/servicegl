@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Deliverer.ViewModels"
+             x:Class="MultiServices.Deliverer.Views.EditVehiclePage"
+             x:DataType="vm:EditVehicleViewModel"
+             Title="Modifier véhicule"
+             BackgroundColor="{StaticResource Background}">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="14">
+            <Label Text="🛵 Type de véhicule" FontSize="18" FontAttributes="Bold" />
+
+            <CollectionView ItemsSource="{Binding VehicleOptions}" SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="x:Object">
+                        <Frame Style="{StaticResource CardFrame}" Margin="0,3"
+                               BackgroundColor="{Binding IsSelected, Converter={x:StaticResource BoolToColorConverter}}">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:EditVehicleViewModel}}, Path=SelectVehicleCommand}"
+                                                      CommandParameter="{Binding .}" />
+                            </Frame.GestureRecognizers>
+                            <Grid ColumnDefinitions="40,*,Auto" ColumnSpacing="10">
+                                <Label Text="{Binding Icon}" FontSize="28" VerticalOptions="Center" />
+                                <Label Grid.Column="1" Text="{Binding Label}" FontSize="15" FontAttributes="Bold" VerticalOptions="Center" />
+                                <Label Grid.Column="2" Text="✓" FontSize="18" TextColor="{StaticResource Primary}"
+                                       IsVisible="{Binding IsSelected}" VerticalOptions="Center" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Entry Placeholder="Plaque d'immatriculation" Text="{Binding PlateNumber}"
+                   IsVisible="{Binding PlateRequired}" Style="{StaticResource FormEntry}" />
+            <Entry Placeholder="Modèle du véhicule" Text="{Binding VehicleModel}"
+                   IsVisible="{Binding PlateRequired}" Style="{StaticResource FormEntry}" />
+
+            <Button Text="Sauvegarder" Style="{StaticResource PrimaryButton}" Command="{Binding SaveCommand}" />
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="{StaticResource Primary}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

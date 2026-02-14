@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Restaurant.ViewModels"
+             x:Class="MultiServices.Restaurant.Views.Menu.MenuItemFormPage" x:DataType="vm:MenuItemFormViewModel" Title="{Binding Title}">
+    <ScrollView><VerticalStackLayout Spacing="16" Padding="16">
+        <Frame Style="{StaticResource Card}"><VerticalStackLayout Spacing="12">
+            <Label Text="Informations de base" Style="{StaticResource H3}" />
+            <Entry Placeholder="Nom du plat *" Text="{Binding Name}" />
+            <Editor Placeholder="Description" Text="{Binding Description}" HeightRequest="80" />
+            <Entry Placeholder="Prix (MAD) *" Text="{Binding Price}" Keyboard="Numeric" />
+            <HorizontalStackLayout Spacing="16"><Label Text="Populaire" VerticalOptions="Center" /><Switch IsToggled="{Binding IsPopular}" />
+                <Label Text="Disponible" VerticalOptions="Center" /><Switch IsToggled="{Binding IsAvailable}" /></HorizontalStackLayout>
+            <Button Text="📷 Ajouter photo" Command="{Binding UploadPhotoCommand}" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" BorderColor="{StaticResource Border}" BorderWidth="1" CornerRadius="8" HeightRequest="40" />
+        </VerticalStackLayout></Frame>
+
+        <Frame Style="{StaticResource Card}"><VerticalStackLayout Spacing="12">
+            <Label Text="Informations nutritionnelles" Style="{StaticResource H3}" />
+            <Entry Placeholder="Allergènes (gluten, lait, noix...)" Text="{Binding AllergensText}" />
+            <Entry Placeholder="Infos nutritionnelles" Text="{Binding NutritionalInfo}" />
+            <Entry Placeholder="Calories (kcal)" Text="{Binding CalorieCount}" Keyboard="Numeric" />
+        </VerticalStackLayout></Frame>
+
+        <Frame Style="{StaticResource Card}"><VerticalStackLayout Spacing="12">
+            <HorizontalStackLayout><Label Text="Tailles / Variantes" Style="{StaticResource H3}" /><Button Text="+ Ajouter" Command="{Binding AddSizeCommand}" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" FontSize="13" /></HorizontalStackLayout>
+            <CollectionView ItemsSource="{Binding Sizes}"><CollectionView.ItemTemplate><DataTemplate>
+                <Grid ColumnDefinitions="*,100,40" ColumnSpacing="8" Padding="0,4"><Entry Placeholder="Nom (ex: Grande)" /><Entry Grid.Column="1" Placeholder="+MAD" Keyboard="Numeric" />
+                <Button Grid.Column="2" Text="🗑" BackgroundColor="Transparent" TextColor="{StaticResource Danger}" /></Grid>
+            </DataTemplate></CollectionView.ItemTemplate></CollectionView>
+        </VerticalStackLayout></Frame>
+
+        <Frame Style="{StaticResource Card}"><VerticalStackLayout Spacing="12">
+            <HorizontalStackLayout><Label Text="Extras / Suppléments" Style="{StaticResource H3}" /><Button Text="+ Ajouter" Command="{Binding AddExtraCommand}" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" FontSize="13" /></HorizontalStackLayout>
+            <CollectionView ItemsSource="{Binding Extras}"><CollectionView.ItemTemplate><DataTemplate>
+                <Grid ColumnDefinitions="*,100,40" ColumnSpacing="8" Padding="0,4"><Entry Placeholder="Nom (ex: Fromage)" /><Entry Grid.Column="1" Placeholder="Prix" Keyboard="Numeric" />
+                <Button Grid.Column="2" Text="🗑" BackgroundColor="Transparent" TextColor="{StaticResource Danger}" /></Grid>
+            </DataTemplate></CollectionView.ItemTemplate></CollectionView>
+        </VerticalStackLayout></Frame>
+
+        <Button Text="Enregistrer" Command="{Binding SaveCommand}" Style="{StaticResource PrimaryBtn}" />
+    </VerticalStackLayout></ScrollView>
+</ContentPage>

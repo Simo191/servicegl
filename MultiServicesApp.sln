@@ -1,9 +1,7 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiServices.Domain", "src\Backend\MultiServices.Domain\MultiServices.Domain.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiServices.Application", "src\Backend\MultiServices.Application\MultiServices.Application.csproj", "{B2C3D4E5-F6A7-8901-BCDE-F12345678901}"
@@ -13,6 +11,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiServices.API", "src\Backend\MultiServices.API\MultiServices.API.csproj", "{D4E5F6A7-B8C9-0123-DEFA-234567890123}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiServices.Maui", "src\Mobile\MultiServices.Maui\MultiServices.Maui.csproj", "{E5F6A7B8-C9D0-1234-EFAB-345678901234}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiServices.Deliverer", "src\Mobile\MultiServices.Deliverer\MultiServices.Deliverer.csproj", "{70E2EB31-FBE7-2103-FE9E-0FD07913AF19}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiServices.Restaurant", "src\Mobile\MultiServices.Restaurant\MultiServices.Restaurant.csproj", "{74C93841-3EE1-BD3E-2DC4-83D7EEFD1288}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiServices.Store", "src\Mobile\MultiServices.Store\MultiServices.Store.csproj", "{A64CDB86-F108-3AB1-7872-C816EA3FC2CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,7 +42,26 @@ Global
 		{D4E5F6A7-B8C9-0123-DEFA-234567890123}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E5F6A7B8-C9D0-1234-EFAB-345678901234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E5F6A7B8-C9D0-1234-EFAB-345678901234}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5F6A7B8-C9D0-1234-EFAB-345678901234}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{E5F6A7B8-C9D0-1234-EFAB-345678901234}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5F6A7B8-C9D0-1234-EFAB-345678901234}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70E2EB31-FBE7-2103-FE9E-0FD07913AF19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70E2EB31-FBE7-2103-FE9E-0FD07913AF19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70E2EB31-FBE7-2103-FE9E-0FD07913AF19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70E2EB31-FBE7-2103-FE9E-0FD07913AF19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74C93841-3EE1-BD3E-2DC4-83D7EEFD1288}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74C93841-3EE1-BD3E-2DC4-83D7EEFD1288}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74C93841-3EE1-BD3E-2DC4-83D7EEFD1288}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74C93841-3EE1-BD3E-2DC4-83D7EEFD1288}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A64CDB86-F108-3AB1-7872-C816EA3FC2CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A64CDB86-F108-3AB1-7872-C816EA3FC2CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A64CDB86-F108-3AB1-7872-C816EA3FC2CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A64CDB86-F108-3AB1-7872-C816EA3FC2CE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {221ADA83-0F9A-4E16-9B05-6B34986B88FA}
 	EndGlobalSection
 EndGlobal

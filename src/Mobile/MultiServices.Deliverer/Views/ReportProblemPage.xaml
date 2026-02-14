@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Deliverer.ViewModels"
+             x:Class="MultiServices.Deliverer.Views.ReportProblemPage"
+             x:DataType="vm:ReportProblemViewModel"
+             Title="Signaler un problème"
+             BackgroundColor="{StaticResource Background}">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16">
+            <Label Text="Quel est le problème ?" FontSize="20" FontAttributes="Bold" />
+            <Label Text="Sélectionnez le motif puis décrivez le problème" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+
+            <CollectionView ItemsSource="{Binding Reasons}" SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="x:Object">
+                        <Frame Style="{StaticResource CardFrame}" Margin="0,3"
+                               BackgroundColor="{Binding IsSelected, Converter={x:StaticResource BoolToColorConverter}}">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ReportProblemViewModel}}, Path=SelectReasonCommand}"
+                                                      CommandParameter="{Binding .}" />
+                            </Frame.GestureRecognizers>
+                            <Grid ColumnDefinitions="40,*,Auto" ColumnSpacing="10">
+                                <Label Text="{Binding Icon}" FontSize="24" VerticalOptions="Center" />
+                                <Label Grid.Column="1" Text="{Binding Label}" FontSize="15" VerticalOptions="Center" />
+                                <Label Grid.Column="2" Text="✓" FontSize="18" TextColor="{StaticResource Primary}"
+                                       IsVisible="{Binding IsSelected}" VerticalOptions="Center" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Editor Placeholder="Décrivez le problème (optionnel)..." Text="{Binding Description}"
+                    HeightRequest="120" Style="{StaticResource FormEditor}" />
+
+            <Button Text="Envoyer le signalement" Style="{StaticResource PrimaryButton}"
+                    Command="{Binding SubmitCommand}" />
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="{StaticResource Primary}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

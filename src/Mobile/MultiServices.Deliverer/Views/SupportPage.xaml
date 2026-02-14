@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Deliverer.ViewModels"
+             x:Class="MultiServices.Deliverer.Views.SupportPage"
+             x:DataType="vm:SupportViewModel"
+             Title="Support"
+             BackgroundColor="{StaticResource Background}">
+    <Grid RowDefinitions="Auto,*,Auto" Padding="16">
+        <!-- Tab Selector -->
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+            <Button Text="❓ FAQ" HeightRequest="42" FontSize="14"
+                    Style="{Binding SelectedTab, Converter={x:StaticResource TabStyleConverter}, ConverterParameter=0}"
+                    Command="{Binding Source={RelativeSource Self}, Path=BindingContext.SwitchTabCommand}" CommandParameter="0" />
+            <Button Grid.Column="1" Text="🎫 Mes tickets" HeightRequest="42" FontSize="14"
+                    Style="{Binding SelectedTab, Converter={x:StaticResource TabStyleConverter}, ConverterParameter=1}"
+                    Command="{Binding Source={RelativeSource Self}, Path=BindingContext.SwitchTabCommand}" CommandParameter="1" />
+        </Grid>
+
+        <!-- FAQ List -->
+        <CollectionView Grid.Row="1" ItemsSource="{Binding FaqItems}" IsVisible="{Binding SelectedTab, Converter={x:StaticResource IntToBoolConverter}, ConverterParameter=0}"
+                        Margin="0,12,0,0">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="x:Object">
+                    <Frame Style="{StaticResource CardFrame}" Margin="0,4">
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{Binding Question}" FontSize="15" FontAttributes="Bold" />
+                            <Label Text="{Binding Answer}" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Tickets List + New Ticket -->
+        <VerticalStackLayout Grid.Row="1" Spacing="10" Margin="0,12,0,0"
+                             IsVisible="{Binding SelectedTab, Converter={x:StaticResource IntToBoolConverter}, ConverterParameter=1}">
+            <!-- New Ticket Form -->
+            <Frame Style="{StaticResource CardFrame}" IsVisible="{Binding ShowNewTicket}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Nouveau ticket" FontAttributes="Bold" FontSize="16" />
+                    <Entry Placeholder="Sujet" Text="{Binding TicketSubject}" Style="{StaticResource FormEntry}" />
+                    <Picker Title="Catégorie" ItemsSource="{Binding Categories}" SelectedItem="{Binding TicketCategory}" />
+                    <Editor Placeholder="Décrivez votre problème..." Text="{Binding TicketDescription}"
+                            HeightRequest="100" Style="{StaticResource FormEditor}" />
+                    <Button Text="Envoyer" Style="{StaticResource PrimaryButton}" Command="{Binding SubmitTicketCommand}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <CollectionView ItemsSource="{Binding Tickets}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="x:Object">
+                        <Frame Style="{StaticResource CardFrame}" Margin="0,3">
+                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                <Label Text="{Binding Subject}" FontSize="15" FontAttributes="Bold" />
+                                <Frame Grid.Column="1" CornerRadius="10" Padding="8,3" BackgroundColor="{Binding StatusColor}" HasShadow="False">
+                                    <Label Text="{Binding StatusLabel}" FontSize="11" TextColor="White" />
+                                </Frame>
+                                <Label Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding CreatedAt, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
+                                       FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+
+        <!-- Bottom Actions -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
+            <Button Text="➕ Nouveau ticket" Style="{StaticResource PrimaryButton}" HeightRequest="44" FontSize="14"
+                    Command="{Binding ToggleNewTicketCommand}" />
+            <Button Grid.Column="1" Text="📞 Appeler" Style="{StaticResource SecondaryButton}" HeightRequest="44" FontSize="14"
+                    Command="{Binding CallSupportCommand}" />
+        </Grid>
+    </Grid>
+</ContentPage>

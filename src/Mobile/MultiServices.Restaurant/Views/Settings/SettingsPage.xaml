@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Restaurant.ViewModels"
+             x:Class="MultiServices.Restaurant.Views.Settings.SettingsPage" x:DataType="vm:SettingsViewModel" Title="Paramètres">
+    <ScrollView><VerticalStackLayout Spacing="16" Padding="16">
+        <Frame Style="{StaticResource Card}"><VerticalStackLayout Spacing="12">
+            <Label Text="Informations" Style="{StaticResource H3}" />
+            <Entry Placeholder="Nom du restaurant" Text="{Binding Name}" /><Editor Placeholder="Description" Text="{Binding Description}" HeightRequest="80" />
+            <Entry Placeholder="Type de cuisine" Text="{Binding CuisineType}" /><Entry Placeholder="Gamme de prix (€, €€, €€€)" Text="{Binding PriceRange}" />
+            <Entry Placeholder="Téléphone" Text="{Binding Phone}" Keyboard="Telephone" /><Entry Placeholder="Adresse" Text="{Binding Address}" />
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                <Button Text="📷 Logo" Command="{Binding UploadLogoCommand}" BackgroundColor="White" TextColor="{StaticResource Primary}" BorderColor="{StaticResource Border}" BorderWidth="1" CornerRadius="8" HeightRequest="40" />
+                <Button Grid.Column="1" Text="🖼️ Couverture" Command="{Binding UploadCoverCommand}" BackgroundColor="White" TextColor="{StaticResource Primary}" BorderColor="{StaticResource Border}" BorderWidth="1" CornerRadius="8" HeightRequest="40" />
+            </Grid>
+        </VerticalStackLayout></Frame>
+        <Frame Style="{StaticResource Card}"><VerticalStackLayout Spacing="12">
+            <Label Text="Livraison" Style="{StaticResource H3}" />
+            <Entry Placeholder="Frais de livraison (MAD)" Text="{Binding DeliveryFee}" Keyboard="Numeric" />
+            <Entry Placeholder="Commande minimum (MAD)" Text="{Binding MinOrder}" Keyboard="Numeric" />
+            <Entry Placeholder="Distance max (km)" Text="{Binding MaxDistance}" Keyboard="Numeric" />
+            <Entry Placeholder="Temps de livraison estimé (min)" Text="{Binding EstimatedDelivery}" Keyboard="Numeric" />
+        </VerticalStackLayout></Frame>
+        <Frame Style="{StaticResource Card}"><VerticalStackLayout Spacing="12">
+            <Label Text="Préférences" Style="{StaticResource H3}" />
+            <Grid ColumnDefinitions="*,Auto"><Label Text="Alertes sonores" VerticalOptions="Center" /><Switch Grid.Column="1" IsToggled="{Binding SoundEnabled}" /></Grid>
+            <Grid ColumnDefinitions="*,Auto"><Label Text="Mode vacances" VerticalOptions="Center" /><Switch Grid.Column="1" IsToggled="{Binding VacationMode}" /></Grid>
+            <Grid ColumnDefinitions="*,Auto"><Label Text="Auto-accepter commandes" VerticalOptions="Center" /><Switch Grid.Column="1" IsToggled="{Binding AutoAccept}" /></Grid>
+        </VerticalStackLayout></Frame>
+        <Button Text="📅 Gérer les horaires" Command="{Binding ManageHoursCommand}" BackgroundColor="White" TextColor="{StaticResource TextPrimary}" BorderColor="{StaticResource Border}" BorderWidth="1" CornerRadius="10" HeightRequest="44" />
+        <Button Text="👥 Gérer l'équipe" Command="{Binding ManageStaffCommand}" BackgroundColor="White" TextColor="{StaticResource TextPrimary}" BorderColor="{StaticResource Border}" BorderWidth="1" CornerRadius="10" HeightRequest="44" />
+        <Button Text="Enregistrer" Command="{Binding SaveCommand}" Style="{StaticResource PrimaryBtn}" />
+        <Button Text="Déconnexion" Command="{Binding LogoutCommand}" Style="{StaticResource DangerBtn}" />
+    </VerticalStackLayout></ScrollView>
+</ContentPage>

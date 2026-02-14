@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Deliverer.ViewModels"
+             x:Class="MultiServices.Deliverer.Views.PayoutPage"
+             x:DataType="vm:PayoutViewModel"
+             Title="Demander un virement"
+             BackgroundColor="{StaticResource Background}">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16">
+            <Frame Style="{StaticResource StatCard}" BackgroundColor="#E8F5E9">
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                    <Label Text="Solde disponible" FontSize="14" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                    <Label Text="{Binding AvailableBalance, StringFormat='{0:F2} MAD'}" FontSize="28"
+                           FontAttributes="Bold" TextColor="{StaticResource Primary}" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Style="{StaticResource CardFrame}" Padding="20">
+                <VerticalStackLayout Spacing="14">
+                    <Label Text="Montant à retirer" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                    <Entry Text="{Binding RequestAmount}" Keyboard="Numeric" Placeholder="0.00" Style="{StaticResource EntryStyle}" />
+
+                    <Label Text="Nom de la banque" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                    <Entry Text="{Binding BankName}" Placeholder="Ex: Attijariwafa Bank" Style="{StaticResource EntryStyle}" />
+
+                    <Label Text="Numéro de compte (RIB)" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                    <Entry Text="{Binding AccountNumber}" Placeholder="XXXXXXXXXXXXXXXXX" Keyboard="Numeric" Style="{StaticResource EntryStyle}" />
+
+                    <Label Text="Titulaire du compte" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                    <Entry Text="{Binding AccountHolder}" Placeholder="Nom complet" Style="{StaticResource EntryStyle}" />
+
+                    <Frame BackgroundColor="#FFEBEE" CornerRadius="8" Padding="12"
+                           IsVisible="{Binding HasError}" BorderColor="Transparent">
+                        <Label Text="{Binding ErrorMessage}" TextColor="{StaticResource Danger}" FontSize="14" />
+                    </Frame>
+
+                    <Button Text="Demander le virement" Style="{StaticResource PrimaryButton}"
+                            Command="{Binding RequestPayoutCommand}" />
+                    <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Payout History -->
+            <Label Text="Historique des virements" Style="{StaticResource SectionTitle}" />
+            <CollectionView ItemsSource="{Binding PayoutHistory}">
+                <CollectionView.EmptyView>
+                    <Label Text="Aucun virement effectué" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="x:Object">
+                        <Frame Style="{StaticResource CardFrame}" Margin="0,4">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                <BoxView WidthRequest="4" BackgroundColor="{Binding StatusColor}" CornerRadius="2" />
+                                <VerticalStackLayout Grid.Column="1">
+                                    <Label Text="{Binding Amount, StringFormat='{0:F2} MAD'}" FontAttributes="Bold" FontSize="15" />
+                                    <Label Text="{Binding RequestedAt, StringFormat='{0:dd/MM/yyyy}'}" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                                </VerticalStackLayout>
+                                <Label Grid.Column="2" Text="{Binding Status}" FontSize="13" VerticalOptions="Center" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

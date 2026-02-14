@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:views="clr-namespace:MultiServices.Deliverer.Views"
+       xmlns:onboarding="clr-namespace:MultiServices.Deliverer.Views.Onboarding"
+       x:Class="MultiServices.Deliverer.AppShell"
+       FlyoutBehavior="Disabled"
+       Shell.TabBarBackgroundColor="{StaticResource Surface}"
+       Shell.TabBarForegroundColor="{StaticResource Primary}"
+       Shell.TabBarUnselectedColor="{StaticResource TextSecondary}">
+
+    <!-- Main TabBar (visible after login + onboarding) -->
+    <TabBar x:Name="MainTabs" Route="main">
+        <ShellContent Title="Accueil" Icon="home" ContentTemplate="{DataTemplate views:DashboardPage}" Route="dashboard" />
+        <ShellContent Title="Livraisons" Icon="delivery" ContentTemplate="{DataTemplate views:DeliveryHistoryPage}" Route="deliveries" />
+        <ShellContent Title="Gains" Icon="earnings" ContentTemplate="{DataTemplate views:EarningsPage}" Route="earnings" />
+        <ShellContent Title="Profil" Icon="profile" ContentTemplate="{DataTemplate views:ProfilePage}" Route="profile" />
+    </TabBar>
+</Shell>

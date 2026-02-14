@@ -5,6 +5,7 @@ using MultiServices.Application.DTOs.Service;
 using MultiServices.Application.DTOs.Grocery;
 using MultiServices.Application.DTOs.Admin;
 using MultiServices.Domain.Enums;
+using MultiServices.Application.Common.Models;
 
 namespace MultiServices.Application.Interfaces;
 

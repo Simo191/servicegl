@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MultiServices.Application\MultiServices.Application.csproj" />
     <ProjectReference Include="..\MultiServices.Infrastructure\MultiServices.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>

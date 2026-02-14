@@ -1,5 +1,6 @@
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
+using MultiServices.Maui.Services;
 using MultiServices.Maui.Services.Api;
 using MultiServices.Maui.Services.Auth;
 using MultiServices.Maui.Services.Location;
@@ -44,6 +45,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<LocationService>();
         builder.Services.AddSingleton<NotificationService>();
         builder.Services.AddSingleton<AuthService>();
+        builder.Services.AddSingleton<AddressService>();
         builder.Services.AddHttpClient<ApiService>(client =>
         {
             client.BaseAddress = new Uri(Helpers.AppConstants.ApiBaseUrl);
@@ -66,6 +68,7 @@ public static class MauiProgram
         builder.Services.AddTransient<GroceryStoresViewModel>();
         builder.Services.AddTransient<StoreDetailViewModel>();
         builder.Services.AddTransient<ShoppingListsViewModel>();
+        builder.Services.AddTransient<AddressEntryViewModel>();
 
         // Pages
         builder.Services.AddTransient<LoginPage>();
@@ -90,6 +93,7 @@ public static class MauiProgram
         builder.Services.AddTransient<StoreDetailPage>();
         builder.Services.AddTransient<ShoppingListsPage>();
         builder.Services.AddTransient<GroceryCheckoutPage>();
+        builder.Services.AddTransient<AddressEntryPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

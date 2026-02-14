@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:vm="clr-namespace:MultiServices.Store.ViewModels"
+       xmlns:models="clr-namespace:MultiServices.Store.Models"
+       x:Class="MultiServices.Store.Views.Promotions.PromotionsPage" x:DataType="vm:PromotionsViewModel" Title="{Binding Title}">
+    <Grid RowDefinitions="Auto,*">
+        <Button Text="+ Nouvelle promotion" Command="{Binding CreateCommand}" Style="{StaticResource PrimaryBtn}" Margin="16,8" />
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Promotions}" Margin="16,0"><CollectionView.ItemTemplate><DataTemplate x:DataType="models:StorePromotionDto">
+            <Frame Style="{StaticResource Card}" Margin="0,0,0,8"><Grid ColumnDefinitions="*,Auto">
+                <VerticalStackLayout><Label Text="{Binding Title}" FontAttributes="Bold" /><Label Text="{Binding EndDate, StringFormat='Expire: {0:dd/MM}'}" FontSize="12" TextColor="{StaticResource TextMuted}" /></VerticalStackLayout>
+                <Switch Grid.Column="1" IsToggled="{Binding IsActive}" />
+            </Grid></Frame></DataTemplate></CollectionView.ItemTemplate></CollectionView></Grid>
+</ContentPage>

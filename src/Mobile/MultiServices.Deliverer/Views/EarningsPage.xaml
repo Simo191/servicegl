@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Deliverer.ViewModels"
+             x:Class="MultiServices.Deliverer.Views.EarningsPage"
+             x:DataType="vm:EarningsViewModel"
+             Title="Mes Gains"
+             BackgroundColor="{StaticResource Background}">
+    <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}">
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="12">
+                <!-- Period Selector -->
+                <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                    <HorizontalStackLayout Spacing="8">
+                        <Button Text="Aujourd'hui" Style="{StaticResource SecondaryButton}" HeightRequest="36" FontSize="13"
+                                Command="{Binding ChangePeriodCommand}" CommandParameter="today" />
+                        <Button Text="Semaine" Style="{StaticResource SecondaryButton}" HeightRequest="36" FontSize="13"
+                                Command="{Binding ChangePeriodCommand}" CommandParameter="week" />
+                        <Button Text="Mois" Style="{StaticResource SecondaryButton}" HeightRequest="36" FontSize="13"
+                                Command="{Binding ChangePeriodCommand}" CommandParameter="month" />
+                    </HorizontalStackLayout>
+                </ScrollView>
+
+                <!-- Main Earnings Card -->
+                <Frame Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource Primary}" Padding="24">
+                    <VerticalStackLayout HorizontalOptions="Center" Spacing="8">
+                        <Label Text="Gains totaux" FontSize="14" TextColor="#B9F6CA" HorizontalOptions="Center" />
+                        <Label Text="{Binding Summary.TodayEarnings, StringFormat='{0:F2} MAD'}"
+                               FontSize="32" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" />
+                        <HorizontalStackLayout HorizontalOptions="Center" Spacing="16">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Summary.TodayDeliveries}" FontSize="18" FontAttributes="Bold"
+                                       TextColor="White" HorizontalOptions="Center" />
+                                <Label Text="Livraisons" FontSize="11" TextColor="#B9F6CA" HorizontalOptions="Center" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Summary.TodayTips, StringFormat='{0:F2}'}" FontSize="18"
+                                       FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" />
+                                <Label Text="Pourboires" FontSize="11" TextColor="#B9F6CA" HorizontalOptions="Center" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Summary.TodayBonuses, StringFormat='{0:F2}'}" FontSize="18"
+                                       FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" />
+                                <Label Text="Bonus" FontSize="11" TextColor="#B9F6CA" HorizontalOptions="Center" />
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Available Balance + Payout -->
+                <Frame Style="{StaticResource CardFrame}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout>
+                            <Label Text="Solde disponible" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                            <Label Text="{Binding Summary.AvailableBalance, StringFormat='{0:F2} MAD'}"
+                                   FontSize="20" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                        </VerticalStackLayout>
+                        <Button Grid.Column="1" Text="Virement" Style="{StaticResource PrimaryButton}" HeightRequest="40" FontSize="14"
+                                Command="{Binding RequestPayoutCommand}" />
+                    </Grid>
+                </Frame>
+
+                <!-- Bonuses -->
+                <Label Text="🎯 Bonus actifs" Style="{StaticResource SectionTitle}" />
+                <CollectionView ItemsSource="{Binding ActiveBonuses}">
+                    <CollectionView.EmptyView>
+                        <Label Text="Aucun bonus actif" FontSize="14" TextColor="{StaticResource TextSecondary}" Padding="16" />
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="x:Object">
+                            <Frame Style="{StaticResource CardFrame}" Margin="0,4" BackgroundColor="#FFF8E1">
+                                <VerticalStackLayout Spacing="6">
+                                    <Label Text="{Binding Title}" FontAttributes="Bold" FontSize="15" />
+                                    <Label Text="{Binding Description}" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                                    <ProgressBar Progress="{Binding ProgressPercent, Converter={x:StaticResource PercentToDoubleConverter}}"
+                                                 ProgressColor="{StaticResource Accent}" />
+                                </VerticalStackLayout>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Recent Earnings -->
+                <Label Text="💵 Détail des gains" Style="{StaticResource SectionTitle}" />
+                <CollectionView ItemsSource="{Binding RecentEarnings}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="x:Object">
+                            <Frame Style="{StaticResource CardFrame}" Margin="0,4">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding PickupName}" FontAttributes="Bold" FontSize="14" />
+                                        <Label Text="{Binding DateDisplay}" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1" Text="{Binding Total, StringFormat='{0:F2} MAD'}"
+                                           FontAttributes="Bold" FontSize="15" TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>

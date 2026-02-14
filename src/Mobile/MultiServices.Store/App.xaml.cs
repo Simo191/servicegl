@@ -1,0 +1,2 @@
+namespace MultiServices.Store;
+public partial class App : Application { public App() { InitializeComponent(); } protected override Window CreateWindow(IActivationState? a) => new Window(new AppShell()); }

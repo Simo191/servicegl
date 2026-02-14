@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Deliverer.ViewModels"
+             x:Class="MultiServices.Deliverer.Views.EarningDetailPage"
+             x:DataType="vm:EarningDetailViewModel"
+             Title="Détail du gain"
+             BackgroundColor="{StaticResource Background}">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="14">
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="{StaticResource Primary}" />
+
+            <Frame Style="{StaticResource StatCard}" BackgroundColor="#E8F5E9" IsVisible="{Binding Earning, Converter={x:StaticResource ObjectToBoolConverter}}">
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                    <Label Text="💰 Total gagné" FontSize="14" HorizontalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+                    <Label Text="{Binding Earning.Total, StringFormat='{0:F2} MAD'}" FontSize="28" FontAttributes="Bold"
+                           TextColor="{StaticResource Primary}" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Style="{StaticResource CardFrame}">
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto,1,Auto" ColumnDefinitions="*,Auto" RowSpacing="12">
+                    <Label Text="Base" FontSize="15" />
+                    <Label Grid.Column="1" Text="{Binding Earning.BaseFee, StringFormat='{0:F2} MAD'}" FontSize="15" FontAttributes="Bold" />
+                    <Label Grid.Row="1" Text="Distance" FontSize="15" />
+                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding Earning.DistanceFee, StringFormat='{0:F2} MAD'}" FontSize="15" FontAttributes="Bold" />
+                    <Label Grid.Row="2" Text="Pourboire" FontSize="15" />
+                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding Earning.Tip, StringFormat='{0:F2} MAD'}" FontSize="15" FontAttributes="Bold" TextColor="#4CAF50" />
+                    <Label Grid.Row="3" Text="Bonus" FontSize="15" />
+                    <Label Grid.Row="3" Grid.Column="1" Text="{Binding Earning.Bonus, StringFormat='{0:F2} MAD'}" FontSize="15" FontAttributes="Bold" TextColor="#FF9800" />
+                    <BoxView Grid.Row="4" Grid.ColumnSpan="2" Color="{StaticResource DividerColor}" HeightRequest="1" />
+                    <Label Grid.Row="5" Text="Total" FontSize="16" FontAttributes="Bold" />
+                    <Label Grid.Row="5" Grid.Column="1" Text="{Binding Earning.Total, StringFormat='{0:F2} MAD'}" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                </Grid>
+            </Frame>
+
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="📋 Détails de la livraison" FontAttributes="Bold" FontSize="16" />
+                    <Label Text="{Binding Earning.PickupName, StringFormat='Retrait: {0}'}" FontSize="14" />
+                    <Label Text="{Binding Earning.DeliveryAddress, StringFormat='Livraison: {0}'}" FontSize="14" />
+                    <Label Text="{Binding Earning.Distance, StringFormat='Distance: {0:F1} km'}" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                    <Label Text="{Binding Earning.CompletedAt, StringFormat='Terminé le {0:dd/MM/yyyy à HH:mm}'}" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

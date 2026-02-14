@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Deliverer.ViewModels.Onboarding"
+             x:Class="MultiServices.Deliverer.Views.Onboarding.DocumentUploadPage"
+             x:DataType="vm:DocumentUploadViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource Background}">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16">
+            <Label Text="📄 Documents requis" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
+            <Label Text="Uploadez vos documents pour vérification" FontSize="14"
+                   TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+
+            <Frame BackgroundColor="#FFEBEE" CornerRadius="8" Padding="12"
+                   IsVisible="{Binding HasError}" BorderColor="Transparent">
+                <Label Text="{Binding ErrorMessage}" TextColor="{StaticResource Danger}" FontSize="14" />
+            </Frame>
+
+            <!-- Rejection message if re-upload -->
+            <Frame BackgroundColor="#FFF3E0" CornerRadius="8" Padding="12"
+                   IsVisible="{Binding RejectionReason, Converter={StaticResource IsNotNullConverter}}">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="⚠️ Documents refusés" FontAttributes="Bold" TextColor="#E65100" />
+                    <Label Text="{Binding RejectionReason}" TextColor="#BF360C" FontSize="13" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- ID Card -->
+            <Frame Style="{StaticResource CardFrame}">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                    <Frame BackgroundColor="{Binding IdCardUploaded, Converter={x:StaticResource BoolToColorConverter}}"
+                           CornerRadius="24" HeightRequest="48" WidthRequest="48" Padding="0">
+                        <Label Text="{Binding IdCardUploaded, Converter={x:StaticResource BoolToCheckConverter}}"
+                               FontSize="20" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Frame>
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                        <Label Text="Pièce d'identité (CIN)" FontAttributes="Bold" FontSize="15" />
+                        <Label Text="Recto-verso, lisible" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="2" Text="Choisir" Style="{StaticResource SecondaryButton}"
+                            HeightRequest="40" WidthRequest="90" FontSize="13"
+                            Command="{Binding PickIdCardCommand}" />
+                </Grid>
+            </Frame>
+
+            <!-- License -->
+            <Frame Style="{StaticResource CardFrame}">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                    <Frame BackgroundColor="{Binding LicenseUploaded, Converter={x:StaticResource BoolToColorConverter}}"
+                           CornerRadius="24" HeightRequest="48" WidthRequest="48" Padding="0">
+                        <Label Text="{Binding LicenseUploaded, Converter={x:StaticResource BoolToCheckConverter}}"
+                               FontSize="20" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Frame>
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                        <Label Text="Permis de conduire" FontAttributes="Bold" FontSize="15" />
+                        <Label Text="Obligatoire pour motos/voitures" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="2" Text="Choisir" Style="{StaticResource SecondaryButton}"
+                            HeightRequest="40" WidthRequest="90" FontSize="13"
+                            Command="{Binding PickLicenseCommand}" />
+                </Grid>
+            </Frame>
+
+            <!-- Insurance -->
+            <Frame Style="{StaticResource CardFrame}">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                    <Frame BackgroundColor="{Binding InsuranceUploaded, Converter={x:StaticResource BoolToColorConverter}}"
+                           CornerRadius="24" HeightRequest="48" WidthRequest="48" Padding="0">
+                        <Label Text="{Binding InsuranceUploaded, Converter={x:StaticResource BoolToCheckConverter}}"
+                               FontSize="20" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Frame>
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                        <Label Text="Assurance véhicule" FontAttributes="Bold" FontSize="15" />
+                        <Label Text="Document valide" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="2" Text="Choisir" Style="{StaticResource SecondaryButton}"
+                            HeightRequest="40" WidthRequest="90" FontSize="13"
+                            Command="{Binding PickInsuranceCommand}" />
+                </Grid>
+            </Frame>
+
+            <!-- Photo -->
+            <Frame Style="{StaticResource CardFrame}">
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12">
+                    <Frame BackgroundColor="{Binding PhotoUploaded, Converter={x:StaticResource BoolToColorConverter}}"
+                           CornerRadius="24" HeightRequest="48" WidthRequest="48" Padding="0">
+                        <Label Text="{Binding PhotoUploaded, Converter={x:StaticResource BoolToCheckConverter}}"
+                               FontSize="20" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Frame>
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                        <Label Text="Photo de profil" FontAttributes="Bold" FontSize="15" />
+                        <Label Text="Visage dégagé" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="2" Text="📷" Style="{StaticResource SecondaryButton}"
+                            HeightRequest="40" WidthRequest="50" FontSize="18"
+                            Command="{Binding TakePhotoCommand}" />
+                    <Button Grid.Column="3" Text="📁" Style="{StaticResource SecondaryButton}"
+                            HeightRequest="40" WidthRequest="50" FontSize="18"
+                            Command="{Binding PickPhotoCommand}" />
+                </Grid>
+            </Frame>
+
+            <!-- Progress -->
+            <ProgressBar Progress="{Binding UploadProgress}" ProgressColor="{StaticResource Primary}"
+                         IsVisible="{Binding IsBusy}" />
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="{StaticResource Primary}" />
+
+            <!-- Continue -->
+            <Button Text="Continuer →" Style="{StaticResource PrimaryButton}"
+                    Command="{Binding ContinueCommand}"
+                    IsEnabled="{Binding AllUploaded}"
+                    Margin="0,8,0,0" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Deliverer.ViewModels"
+             x:Class="MultiServices.Deliverer.Views.ProfilePage"
+             x:DataType="vm:ProfileViewModel"
+             Title="Mon Profil"
+             BackgroundColor="{StaticResource Background}">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="14">
+            <!-- Profile Header -->
+            <Frame Style="{StaticResource CardFrame}" Padding="24">
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="10">
+                    <Frame CornerRadius="50" HeightRequest="100" WidthRequest="100" Padding="0"
+                           HorizontalOptions="Center" HasShadow="True">
+                        <Image Source="{Binding Profile.PhotoUrl}" Aspect="AspectFill"
+                               HeightRequest="100" WidthRequest="100" />
+                    </Frame>
+                    <Label Text="{Binding Profile.FullName}" FontSize="22" FontAttributes="Bold" HorizontalOptions="Center" />
+                    <Label Text="{Binding Profile.Email}" FontSize="14" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                    <Label Text="{Binding Profile.RatingDisplay}" FontSize="16" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Stats -->
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                <Frame Style="{StaticResource StatCard}">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding Profile.TotalDeliveries}" FontSize="20" FontAttributes="Bold" HorizontalOptions="Center" />
+                        <Label Text="Livraisons" FontSize="11" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+                <Frame Grid.Column="1" Style="{StaticResource StatCard}">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding Profile.AverageRating, StringFormat='{0:F1} ⭐'}" FontSize="20" FontAttributes="Bold" HorizontalOptions="Center" />
+                        <Label Text="Note" FontSize="11" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+                <Frame Grid.Column="2" Style="{StaticResource StatCard}">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding Profile.AcceptanceRate, StringFormat='{0:F0}%'}" FontSize="20" FontAttributes="Bold" HorizontalOptions="Center" />
+                        <Label Text="Acceptation" FontSize="11" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
+
+            <!-- Info sections -->
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Informations" FontAttributes="Bold" FontSize="16" />
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="10" ColumnSpacing="12">
+                        <Label Text="📞" FontSize="16" />
+                        <Label Grid.Column="1" Text="{Binding Profile.PhoneNumber}" FontSize="14" />
+                        <Label Grid.Row="1" Text="🏙" FontSize="16" />
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Profile.City}" FontSize="14" />
+                        <Label Grid.Row="2" Text="🛵" FontSize="16" />
+                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding Profile.VehicleType}" FontSize="14" />
+                        <Label Grid.Row="3" Text="🚨" FontSize="16" />
+                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding Profile.EmergencyContactName, StringFormat='Urgence: {0}'}" FontSize="14" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Actions -->
+            <Button Text="✏️ Modifier le profil" Style="{StaticResource SecondaryButton}"
+                    Command="{Binding EditProfileCommand}" />
+            <Button Text="🆘 Urgence" Style="{StaticResource DangerButton}"
+                    Command="{Binding SOSCommand}" />
+            <Button Text="Se déconnecter" BackgroundColor="Transparent" TextColor="{StaticResource Danger}"
+                    FontAttributes="Bold" Command="{Binding LogoutCommand}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

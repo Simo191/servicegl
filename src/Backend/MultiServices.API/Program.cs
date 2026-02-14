@@ -20,9 +20,16 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
+
 // Add layers
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(MultiServices.Application.DependencyInjection).Assembly); // Application
+    //cfg.RegisterServicesFromAssembly(typeof(LoginCommandHandler).Assembly); // Handler (où qu’il soit)
+});
 
 // JWT Authentication
 builder.Services.AddAuthentication(options =>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Deliverer.ViewModels.Onboarding"
+             x:Class="MultiServices.Deliverer.Views.Onboarding.RegisterPage"
+             x:DataType="vm:RegisterViewModel"
+             Title="Inscription"
+             BackgroundColor="{StaticResource Background}">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="14">
+            <Label Text="🛵 Devenir livreur" FontSize="24" FontAttributes="Bold"
+                   HorizontalOptions="Center" TextColor="{StaticResource TextPrimary}" />
+            <Label Text="Gagnez de l'argent avec votre véhicule" FontSize="14"
+                   HorizontalOptions="Center" TextColor="{StaticResource TextSecondary}" Margin="0,0,0,8" />
+
+            <Frame BackgroundColor="#FFEBEE" CornerRadius="8" Padding="12"
+                   IsVisible="{Binding HasError}" BorderColor="Transparent">
+                <Label Text="{Binding ErrorMessage}" TextColor="{StaticResource Danger}" FontSize="14" />
+            </Frame>
+
+            <Frame Style="{StaticResource CardFrame}" Padding="20">
+                <VerticalStackLayout Spacing="12">
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <VerticalStackLayout>
+                            <Label Text="Prénom *" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                            <Entry Text="{Binding FirstName}" Placeholder="Mohamed" Style="{StaticResource EntryStyle}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1">
+                            <Label Text="Nom *" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                            <Entry Text="{Binding LastName}" Placeholder="Alami" Style="{StaticResource EntryStyle}" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <Label Text="Email *" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                    <Entry Text="{Binding Email}" Placeholder="email@exemple.com" Keyboard="Email" Style="{StaticResource EntryStyle}" />
+
+                    <Label Text="Téléphone *" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                    <Entry Text="{Binding PhoneNumber}" Placeholder="0612345678" Keyboard="Telephone" Style="{StaticResource EntryStyle}" />
+
+                    <Label Text="Ville *" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                    <Picker ItemsSource="{Binding Cities}" SelectedItem="{Binding City}" Title="Choisir une ville" />
+
+                    <Label Text="Type de véhicule *" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                    <Picker ItemsSource="{Binding VehicleTypes}" SelectedIndex="{Binding SelectedVehicleIndex}" />
+
+                    <Label Text="Mot de passe *" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                    <Entry Text="{Binding Password}" IsPassword="True" Placeholder="Min 8 caractères" Style="{StaticResource EntryStyle}" />
+
+                    <Label Text="Confirmer le mot de passe *" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                    <Entry Text="{Binding ConfirmPassword}" IsPassword="True" Style="{StaticResource EntryStyle}" />
+
+                    <Button Text="Créer mon compte" Style="{StaticResource PrimaryButton}"
+                            Command="{Binding RegisterCommand}" Margin="0,8,0,0" />
+
+                    <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
+                <Label Text="Déjà inscrit ?" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                <Label Text="Se connecter" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Primary}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToLoginCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

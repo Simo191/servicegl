@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Maui.ViewModels.Common"
+             x:Class="MultiServices.Maui.Views.Common.AddressEntryPage"
+             x:DataType="vm:AddressEntryViewModel"
+             Shell.NavBarIsVisible="False" BackgroundColor="{StaticResource Background}">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView>
+            <VerticalStackLayout Spacing="24" Padding="24" VerticalOptions="Center">
+                <Label Text="🍔🛒🛠️" FontSize="48" HorizontalOptions="Center" />
+                <Label Text="Ou souhaitez-vous etre livre ?" FontSize="24" FontAttributes="Bold"
+                       HorizontalOptions="Center" TextColor="{StaticResource TextPrimary}" />
+                <Label Text="Entrez votre adresse pour decouvrir les restaurants, magasins et services pres de chez vous"
+                       FontSize="14" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" HorizontalTextAlignment="Center" />
+                
+                <Frame Style="{StaticResource CardFrame}" Padding="4">
+                    <SearchBar Placeholder="Saisissez votre adresse..." Text="{Binding AddressQuery}"
+                               SearchCommand="{Binding SearchAddressCommand}" />
+                </Frame>
+
+                <Button Text="📍 Utiliser ma position actuelle" Command="{Binding UseGPSCommand}"
+                        BackgroundColor="Transparent" TextColor="{StaticResource Primary}" FontAttributes="Bold" />
+
+                <!-- Address suggestions -->
+                <CollectionView ItemsSource="{Binding Suggestions}" SelectionMode="Single"
+                                SelectionChangedCommand="{Binding SelectAddressCommand}"
+                                SelectionChangedCommandParameter="{Binding Source={RelativeSource Self}, Path=SelectedItem}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame BackgroundColor="White" CornerRadius="8" Padding="12" HasShadow="False" Margin="0,2">
+                                <Label Text="{Binding .}" FontSize="14" TextColor="{StaticResource TextPrimary}" />
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Error message if not covered -->
+                <Frame BackgroundColor="#FEE2E2" CornerRadius="8" Padding="12" IsVisible="{Binding ShowNotCovered}" HasShadow="False">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="⚠️ Zone non couverte" FontAttributes="Bold" TextColor="#DC2626" />
+                        <Label Text="{Binding CoverageMessage}" FontSize="13" TextColor="#7F1D1D" />
+                    </VerticalStackLayout>
+                </Frame>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <ActivityIndicator Grid.Row="0" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                           VerticalOptions="Center" HorizontalOptions="Center" />
+    </Grid>
+</ContentPage>

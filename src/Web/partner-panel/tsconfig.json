@@ -1,6 +1,21 @@
 {
-  "compilerOptions": { "outDir": "./dist/out-tsc", "strict": true, "sourceMap": true, "experimentalDecorators": true, "moduleResolution": "bundler", "target": "ES2022", "module": "ES2022", "lib": ["ES2022","dom"],
-    "paths": { "@core/*": ["src/app/core/*"], "@shared/*": ["src/app/shared/*"], "@env/*": ["src/environments/*"] }
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist/out-tsc",
+    "strict": true,
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "bundler",
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": ["ES2022", "dom"],
+    "paths": {
+      "@core/*": ["src/app/core/*"],
+      "@shared/*": ["src/app/shared/*"],
+      "@env/*": ["src/environments/*"]
+    }
   },
-  "angularCompilerOptions": { "strictTemplates": true }
+  "angularCompilerOptions": {
+    "strictTemplates": true
+  }
 }

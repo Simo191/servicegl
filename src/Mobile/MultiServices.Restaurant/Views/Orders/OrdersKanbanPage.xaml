@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Restaurant.ViewModels" xmlns:models="clr-namespace:MultiServices.Restaurant.Models"
+             x:Class="MultiServices.Restaurant.Views.Orders.OrdersKanbanPage" x:DataType="vm:OrdersKanbanViewModel" Title="Commandes">
+    <RefreshView Command="{Binding LoadOrdersCommand}" IsRefreshing="{Binding IsRefreshing}">
+    <ScrollView Orientation="Horizontal"><HorizontalStackLayout Spacing="12" Padding="12">
+        <!-- Column: Nouvelles -->
+        <Frame BackgroundColor="#EBF5FB" CornerRadius="16" WidthRequest="320" Padding="12" HasShadow="False">
+            <VerticalStackLayout Spacing="8">
+                <HorizontalStackLayout Spacing="8"><Frame BackgroundColor="{StaticResource StatusNew}" CornerRadius="12" Padding="6,2" HasShadow="False"><Label Text="{Binding NewCount}" TextColor="White" FontSize="12" FontAttributes="Bold" /></Frame>
+                    <Label Text="Nouvelles" Style="{StaticResource H3}" TextColor="{StaticResource StatusNew}" /></HorizontalStackLayout>
+                <CollectionView ItemsSource="{Binding NewOrders}"><CollectionView.ItemTemplate><DataTemplate x:DataType="models:RestaurantOrderDto">
+                    <Frame Style="{StaticResource Card}" Margin="0,0,0,6" Padding="12"><VerticalStackLayout Spacing="6">
+                        <Grid ColumnDefinitions="*,Auto"><Label Text="{Binding OrderNumber, StringFormat='#{0}'}" FontAttributes="Bold" /><Label Grid.Column="1" Text="{Binding TotalAmount, StringFormat='{0:N0} MAD'}" FontAttributes="Bold" TextColor="{StaticResource Primary}" /></Grid>
+                        <Label Text="{Binding CustomerName}" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                        <Label Text="{Binding Items.Count, StringFormat='{0} articles'}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="6">
+                            <Button Text="Accepter" Style="{StaticResource SuccessBtn}" HeightRequest="34" FontSize="12" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:OrdersKanbanViewModel}}, Path=AcceptCommand}" CommandParameter="{Binding .}" />
+                            <Button Grid.Column="1" Text="Refuser" Style="{StaticResource DangerBtn}" HeightRequest="34" FontSize="12" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:OrdersKanbanViewModel}}, Path=RejectCommand}" CommandParameter="{Binding .}" />
+                        </Grid>
+                    </VerticalStackLayout></Frame>
+                </DataTemplate></CollectionView.ItemTemplate></CollectionView>
+            </VerticalStackLayout>
+        </Frame>
+        <!-- Column: Acceptées -->
+        <Frame BackgroundColor="#F4ECF7" CornerRadius="16" WidthRequest="320" Padding="12" HasShadow="False">
+            <VerticalStackLayout Spacing="8">
+                <HorizontalStackLayout Spacing="8"><Frame BackgroundColor="{StaticResource StatusAccepted}" CornerRadius="12" Padding="6,2" HasShadow="False"><Label Text="{Binding AcceptedCount}" TextColor="White" FontSize="12" FontAttributes="Bold" /></Frame>
+                    <Label Text="Acceptées" Style="{StaticResource H3}" TextColor="{StaticResource StatusAccepted}" /></HorizontalStackLayout>
+                <CollectionView ItemsSource="{Binding AcceptedOrders}"><CollectionView.ItemTemplate><DataTemplate x:DataType="models:RestaurantOrderDto">
+                    <Frame Style="{StaticResource Card}" Margin="0,0,0,6" Padding="12"><VerticalStackLayout Spacing="6">
+                        <Label Text="{Binding OrderNumber, StringFormat='#{0}'}" FontAttributes="Bold" />
+                        <Label Text="{Binding CustomerName}" FontSize="13" />
+                        <Button Text="▶ Commencer préparation" BackgroundColor="{StaticResource StatusPreparing}" TextColor="White" CornerRadius="8" HeightRequest="34" FontSize="12" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:OrdersKanbanViewModel}}, Path=StartPrepCommand}" CommandParameter="{Binding .}" />
+                    </VerticalStackLayout></Frame>
+                </DataTemplate></CollectionView.ItemTemplate></CollectionView>
+            </VerticalStackLayout>
+        </Frame>
+        <!-- Column: En préparation -->
+        <Frame BackgroundColor="#FEF9E7" CornerRadius="16" WidthRequest="320" Padding="12" HasShadow="False">
+            <VerticalStackLayout Spacing="8">
+                <HorizontalStackLayout Spacing="8"><Frame BackgroundColor="{StaticResource StatusPreparing}" CornerRadius="12" Padding="6,2" HasShadow="False"><Label Text="{Binding PreparingCount}" TextColor="White" FontSize="12" FontAttributes="Bold" /></Frame>
+                    <Label Text="En préparation" Style="{StaticResource H3}" TextColor="{StaticResource StatusPreparing}" /></HorizontalStackLayout>
+                <CollectionView ItemsSource="{Binding PreparingOrders}"><CollectionView.ItemTemplate><DataTemplate x:DataType="models:RestaurantOrderDto">
+                    <Frame Style="{StaticResource Card}" Margin="0,0,0,6" Padding="12"><VerticalStackLayout Spacing="6">
+                        <Label Text="{Binding OrderNumber, StringFormat='#{0}'}" FontAttributes="Bold" />
+                        <Label Text="{Binding EstimatedMinutes, StringFormat='~{0} min'}" FontSize="12" TextColor="{StaticResource Warning}" />
+                        <Button Text="✓ Prêt pour livraison" Style="{StaticResource SuccessBtn}" HeightRequest="34" FontSize="12" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:OrdersKanbanViewModel}}, Path=MarkReadyCommand}" CommandParameter="{Binding .}" />
+                    </VerticalStackLayout></Frame>
+                </DataTemplate></CollectionView.ItemTemplate></CollectionView>
+            </VerticalStackLayout>
+        </Frame>
+        <!-- Column: Prêtes -->
+        <Frame BackgroundColor="#E8F8F5" CornerRadius="16" WidthRequest="320" Padding="12" HasShadow="False">
+            <VerticalStackLayout Spacing="8">
+                <HorizontalStackLayout Spacing="8"><Frame BackgroundColor="{StaticResource StatusReady}" CornerRadius="12" Padding="6,2" HasShadow="False"><Label Text="{Binding ReadyCount}" TextColor="White" FontSize="12" FontAttributes="Bold" /></Frame>
+                    <Label Text="Prêtes" Style="{StaticResource H3}" TextColor="{StaticResource StatusReady}" /></HorizontalStackLayout>
+                <CollectionView ItemsSource="{Binding ReadyOrders}"><CollectionView.ItemTemplate><DataTemplate x:DataType="models:RestaurantOrderDto">
+                    <Frame Style="{StaticResource Card}" Margin="0,0,0,6" Padding="12" BackgroundColor="#E8F8F5"><VerticalStackLayout Spacing="6">
+                        <Label Text="{Binding OrderNumber, StringFormat='#{0}'}" FontAttributes="Bold" TextColor="{StaticResource Success}" />
+                        <Label Text="{Binding DelivererName, StringFormat='Livreur: {0}'}" FontSize="13" />
+                        <Label Text="En attente du livreur..." FontSize="12" TextColor="{StaticResource TextMuted}" FontAttributes="Italic" />
+                    </VerticalStackLayout></Frame>
+                </DataTemplate></CollectionView.ItemTemplate></CollectionView>
+            </VerticalStackLayout>
+        </Frame>
+    </HorizontalStackLayout></ScrollView>
+    </RefreshView>
+</ContentPage>

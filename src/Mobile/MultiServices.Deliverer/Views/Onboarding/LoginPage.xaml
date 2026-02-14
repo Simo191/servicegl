@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Deliverer.ViewModels.Onboarding"
+             x:Class="MultiServices.Deliverer.Views.Onboarding.LoginPage"
+             x:DataType="vm:LoginViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource Background}">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16" VerticalOptions="Center">
+            <!-- Logo -->
+            <Frame BackgroundColor="{StaticResource Primary}" CornerRadius="40"
+                   HeightRequest="80" WidthRequest="80" HorizontalOptions="Center" Padding="0" HasShadow="True">
+                <Label Text="🛵" FontSize="40" HorizontalOptions="Center" VerticalOptions="Center" />
+            </Frame>
+            <Label Text="MultiServices" FontSize="28" FontAttributes="Bold"
+                   HorizontalOptions="Center" TextColor="{StaticResource TextPrimary}" />
+            <Label Text="Espace Livreur" FontSize="16"
+                   HorizontalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+
+            <!-- Error -->
+            <Frame BackgroundColor="#FFEBEE" CornerRadius="8" Padding="12"
+                   IsVisible="{Binding HasError}" BorderColor="Transparent">
+                <Label Text="{Binding ErrorMessage}" TextColor="{StaticResource Danger}" FontSize="14" />
+            </Frame>
+
+            <!-- Form -->
+            <Frame Style="{StaticResource CardFrame}" Padding="20">
+                <VerticalStackLayout Spacing="16">
+                    <Label Text="Email" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                    <Entry Text="{Binding Email}" Placeholder="votre@email.com"
+                           Keyboard="Email" Style="{StaticResource EntryStyle}" />
+
+                    <Label Text="Mot de passe" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                    <Entry Text="{Binding Password}" Placeholder="••••••••"
+                           IsPassword="True" Style="{StaticResource EntryStyle}" />
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <HorizontalStackLayout Spacing="8">
+                            <CheckBox IsChecked="{Binding RememberMe}" Color="{StaticResource Primary}" />
+                            <Label Text="Se souvenir de moi" VerticalOptions="Center" FontSize="13" />
+                        </HorizontalStackLayout>
+                        <Label Grid.Column="1" Text="Mot de passe oublié ?" TextColor="{StaticResource Secondary}"
+                               FontSize="13" VerticalOptions="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+
+                    <Button Text="Se connecter" Style="{StaticResource PrimaryButton}"
+                            Command="{Binding LoginCommand}" />
+
+                    <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                                       Color="{StaticResource Primary}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Register link -->
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
+                <Label Text="Pas encore de compte ?" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                <Label Text="S'inscrire" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Primary}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToRegisterCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

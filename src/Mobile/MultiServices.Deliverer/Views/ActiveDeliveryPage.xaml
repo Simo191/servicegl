@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Deliverer.ViewModels"
+             x:Class="MultiServices.Deliverer.Views.ActiveDeliveryPage"
+             x:DataType="vm:ActiveDeliveryViewModel"
+             Title="Livraison en cours"
+             BackgroundColor="{StaticResource Background}">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+            <!-- Status Banner -->
+            <Frame CornerRadius="12" Padding="16" BackgroundColor="{Binding Delivery.StatusColor}" HasShadow="False">
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                    <Label Text="{Binding Delivery.StatusLabel}" FontSize="18" FontAttributes="Bold"
+                           TextColor="White" HorizontalOptions="Center" />
+                    <Label Text="{Binding Delivery.OrderTypeIcon}" FontSize="28" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Pickup Info -->
+            <Frame Style="{StaticResource CardFrame}" IsVisible="{Binding ShowPickupInfo}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="📍 Point de retrait" FontAttributes="Bold" FontSize="16" />
+                    <Label Text="{Binding Delivery.PickupName}" FontSize="15" />
+                    <Label Text="{Binding Delivery.PickupAddress}" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Button Text="🗺 Naviguer" Style="{StaticResource PrimaryButton}" HeightRequest="40" FontSize="14"
+                                Command="{Binding NavigateToPickupCommand}" />
+                        <Button Grid.Column="1" Text="📞 Appeler" Style="{StaticResource SecondaryButton}" HeightRequest="40" FontSize="14"
+                                Command="{Binding CallPickupCommand}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Client Info -->
+            <Frame Style="{StaticResource CardFrame}" IsVisible="{Binding ShowDeliveryInfo}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="🏠 Livraison" FontAttributes="Bold" FontSize="16" />
+                    <Label Text="{Binding Delivery.ClientName}" FontSize="15" />
+                    <Label Text="{Binding Delivery.DeliveryAddress}" FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                        <Button Text="🗺" Style="{StaticResource PrimaryButton}" HeightRequest="40"
+                                Command="{Binding NavigateToClientCommand}" />
+                        <Button Grid.Column="1" Text="📞" Style="{StaticResource SecondaryButton}" HeightRequest="40"
+                                Command="{Binding CallClientCommand}" />
+                        <Button Grid.Column="2" Text="💬" Style="{StaticResource SecondaryButton}" HeightRequest="40"
+                                Command="{Binding ChatClientCommand}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Special Instructions -->
+            <Frame Style="{StaticResource CardFrame}" IsVisible="{Binding Delivery.SpecialInstructions, Converter={x:StaticResource StringToBoolConverter}}">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="📝 Instructions spéciales" FontAttributes="Bold" FontSize="15" />
+                    <Label Text="{Binding Delivery.SpecialInstructions}" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Items -->
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{Binding Delivery.ItemCount, StringFormat='📦 {0} article(s)'}" FontAttributes="Bold" FontSize="15" />
+                    <CollectionView ItemsSource="{Binding Delivery.Items}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="x:Object">
+                                <Grid ColumnDefinitions="Auto,*" Padding="4">
+                                    <Label Text="{Binding Quantity, StringFormat='x{0}'}" FontSize="14" FontAttributes="Bold"
+                                           TextColor="{StaticResource Primary}" WidthRequest="30" />
+                                    <Label Grid.Column="1" Text="{Binding Name}" FontSize="14" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Earning -->
+            <Frame Style="{StaticResource StatCard}" BackgroundColor="#E8F5E9">
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
+                    <Label Text="💰 Gain estimé:" FontSize="16" VerticalOptions="Center" />
+                    <Label Text="{Binding Delivery.EstimatedEarning, StringFormat='{0:F2} MAD'}"
+                           FontSize="20" FontAttributes="Bold" TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Frame>
+
+            <!-- Main Action Button -->
+            <Button Text="{Binding NextAction}" Style="{StaticResource PrimaryButton}"
+                    Command="{Binding AdvanceStatusCommand}" FontSize="16" HeightRequest="56" />
+
+            <!-- Secondary Actions -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <Button Text="⚠️ Problème" Style="{StaticResource SecondaryButton}" HeightRequest="44" FontSize="14"
+                        Command="{Binding ReportProblemCommand}" />
+                <Button Grid.Column="1" Text="🆘 SOS" Style="{StaticResource DangerButton}" HeightRequest="44" FontSize="14"
+                        Command="{Binding SOSCommand}" />
+            </Grid>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="{StaticResource Primary}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

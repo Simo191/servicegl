@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Deliverer.ViewModels.Onboarding"
+             x:Class="MultiServices.Deliverer.Views.Onboarding.TrainingQuizPage"
+             x:DataType="vm:TrainingQuizViewModel"
+             Title="Quiz de certification"
+             BackgroundColor="{StaticResource Background}">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16">
+            <!-- Quiz NOT completed -->
+            <VerticalStackLayout IsVisible="{Binding QuizCompleted, Converter={x:StaticResource InvertBoolConverter}}" Spacing="16">
+                <Label Text="📝 Quiz de certification" FontSize="22" FontAttributes="Bold" HorizontalOptions="Center" />
+                <Label Text="{Binding CurrentQuestionIndex, StringFormat='Question {0:D} / '}" FontSize="14"
+                       HorizontalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+
+                <Frame Style="{StaticResource CardFrame}" Padding="20">
+                    <VerticalStackLayout Spacing="16">
+                        <Label Text="{Binding CurrentQuestion.Question}" FontSize="17" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding CurrentQuestion.Options}" Spacing="8">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <Frame BorderColor="{StaticResource Primary}" CornerRadius="12"
+                                           Padding="14" HasShadow="False" BackgroundColor="White">
+                                        <Label Text="{Binding .}" FontSize="15" />
+                                        <Frame.GestureRecognizers>
+                                            <TapGestureRecognizer CommandParameter="{Binding .}" />
+                                        </Frame.GestureRecognizers>
+                                    </Frame>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame BackgroundColor="#FFEBEE" CornerRadius="8" Padding="12"
+                       IsVisible="{Binding HasError}" BorderColor="Transparent">
+                    <Label Text="{Binding ErrorMessage}" TextColor="{StaticResource Danger}" FontSize="14" />
+                </Frame>
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <Button Text="◀ Précédent" Style="{StaticResource SecondaryButton}" HeightRequest="44"
+                            Command="{Binding PreviousQuestionCommand}" />
+                    <Button Grid.Column="1" Text="Suivant ▶" Style="{StaticResource PrimaryButton}" HeightRequest="44"
+                            Command="{Binding NextQuestionCommand}" />
+                </Grid>
+
+                <Button Text="Soumettre le quiz" Style="{StaticResource PrimaryButton}"
+                        Command="{Binding SubmitQuizCommand}" />
+            </VerticalStackLayout>
+
+            <!-- Quiz COMPLETED -->
+            <VerticalStackLayout IsVisible="{Binding QuizCompleted}" Spacing="20" VerticalOptions="Center">
+                <Label Text="{Binding QuizPassed, Converter={x:StaticResource BoolToEmojiConverter}}"
+                       FontSize="72" HorizontalOptions="Center" />
+                <Label Text="{Binding QuizPassed, Converter={x:StaticResource BoolToResultConverter}}"
+                       FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
+                <Label Text="{Binding ScorePercent, StringFormat='Score: {0:F0}%'}"
+                       FontSize="18" HorizontalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+                <Label Text="{Binding CorrectAnswers, StringFormat='{0} réponses correctes'}"
+                       FontSize="15" HorizontalOptions="Center" />
+
+                <Button Text="Réessayer" Style="{StaticResource SecondaryButton}"
+                        Command="{Binding RetryQuizCommand}"
+                        IsVisible="{Binding QuizPassed, Converter={x:StaticResource InvertBoolConverter}}" />
+            </VerticalStackLayout>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="{StaticResource Primary}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

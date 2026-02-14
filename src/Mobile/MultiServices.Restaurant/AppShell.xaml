@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:auth="clr-namespace:MultiServices.Restaurant.Views.Auth"
+       xmlns:dash="clr-namespace:MultiServices.Restaurant.Views.Dashboard"
+       xmlns:orders="clr-namespace:MultiServices.Restaurant.Views.Orders"
+       xmlns:menu="clr-namespace:MultiServices.Restaurant.Views.Menu"
+       xmlns:promos="clr-namespace:MultiServices.Restaurant.Views.Promotions"
+       xmlns:stats="clr-namespace:MultiServices.Restaurant.Views.Stats"
+       xmlns:reviews="clr-namespace:MultiServices.Restaurant.Views.Reviews"
+       xmlns:settings="clr-namespace:MultiServices.Restaurant.Views.Settings"
+       x:Class="MultiServices.Restaurant.AppShell" Shell.FlyoutBehavior="Disabled"
+       Shell.TabBarBackgroundColor="White" Shell.TabBarForegroundColor="{StaticResource Primary}" Shell.TabBarUnselectedColor="{StaticResource TextMuted}">
+    <ShellContent Route="login" ContentTemplate="{DataTemplate auth:LoginPage}" Shell.TabBarIsVisible="False" Shell.NavBarIsVisible="False" />
+    <TabBar Route="main">
+        <Tab Title="Dashboard"><ShellContent Route="dashboard" ContentTemplate="{DataTemplate dash:DashboardPage}" /></Tab>
+        <Tab Title="Commandes"><ShellContent Route="orders" ContentTemplate="{DataTemplate orders:OrdersKanbanPage}" /></Tab>
+        <Tab Title="Menu"><ShellContent Route="menu" ContentTemplate="{DataTemplate menu:MenuManagementPage}" /></Tab>
+        <Tab Title="Promos"><ShellContent Route="promos" ContentTemplate="{DataTemplate promos:PromotionsPage}" /></Tab>
+        <Tab Title="Stats"><ShellContent Route="stats" ContentTemplate="{DataTemplate stats:StatsPage}" /></Tab>
+    </TabBar>
+</Shell>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:vm="clr-namespace:MultiServices.Store.ViewModels"
+       xmlns:models="clr-namespace:MultiServices.Store.Models"
+       x:Class="MultiServices.Store.Views.Orders.OrderDetailPage" x:DataType="vm:OrderDetailViewModel" Title="{Binding Title}">
+    <ScrollView><VerticalStackLayout Spacing="16" Padding="16">
+        <Frame Style="{StaticResource Card}"><VerticalStackLayout Spacing="6">
+            <Label Text="{Binding Order.OrderNumber, StringFormat='Commande #{0}'}" Style="{StaticResource H2}" />
+            <Label Text="{Binding Order.Status}" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+            <Label Text="{Binding Order.CustomerName}" /><Label Text="{Binding Order.DeliveryAddress}" FontSize="13" TextColor="{StaticResource TextMuted}" />
+            <Label Text="{Binding Order.DeliveryInstructions}" FontSize="13" TextColor="{StaticResource Danger}" IsVisible="{Binding HasInstructions}" FontAttributes="Italic" />
+            <Label Text="{Binding Order.FreshnessPreferences}" FontSize="13" TextColor="{StaticResource Info}" />
+            <ProgressBar Progress="{Binding PickedCount}" /><Label Text="{Binding PickedCount, StringFormat='Picking: {0} produits ramassés'}" FontSize="12" />
+        </VerticalStackLayout></Frame>
+        <CollectionView ItemsSource="{Binding Order.Items}"><CollectionView.ItemTemplate><DataTemplate x:DataType="models:GroceryOrderItemDto">
+            <Frame Style="{StaticResource Card}" Margin="0,0,0,6" Padding="12"><Grid ColumnDefinitions="Auto,*,Auto">
+                <Label Text="{Binding Quantity, StringFormat='{0}x'}" FontAttributes="Bold" WidthRequest="30" />
+                <VerticalStackLayout Grid.Column="1"><Label Text="{Binding ProductName}" FontSize="14" /><Label Text="{Binding UnitPrice, StringFormat='{0:N2} MAD'}" FontSize="12" TextColor="{StaticResource TextMuted}" /></VerticalStackLayout>
+                <Label Grid.Column="2" Text="{Binding TotalPrice, StringFormat='{0:N2}'}" />
+            </Grid></Frame></DataTemplate></CollectionView.ItemTemplate></CollectionView>
+        <Grid ColumnDefinitions="*,Auto"><Label Text="TOTAL" FontAttributes="Bold" FontSize="18" /><Label Grid.Column="1" Text="{Binding Order.TotalAmount, StringFormat='{0:N2} MAD'}" FontAttributes="Bold" FontSize="18" TextColor="{StaticResource Primary}" /></Grid>
+        <Button Text="Commencer le picking" Command="{Binding StartPickingCommand}" Style="{StaticResource PrimaryBtn}" />
+        <Button Text="Prête pour livraison ✓" Command="{Binding MarkReadyCommand}" BackgroundColor="{StaticResource Success}" TextColor="White" CornerRadius="10" HeightRequest="48" />
+    </VerticalStackLayout></ScrollView>
+</ContentPage>

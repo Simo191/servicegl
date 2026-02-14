@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using MultiServices.Application.Common.Models;
 using MultiServices.Application.DTOs.Auth;
 using MultiServices.Application.DTOs.Common;
 using MultiServices.Domain.Entities.Identity;
@@ -85,6 +86,11 @@ public class AuthService : IAuthService
     public async Task<AuthResponse> LoginAsync(LoginRequest request, CancellationToken ct = default)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
+        //await _userManager.RemovePasswordAsync(user);
+        //await _userManager.AddPasswordAsync(user, "Password@2025!");
+        Console.WriteLine($"UserId={user?.Id} Email={user?.Email}");
+        Console.WriteLine($"HashLen={user?.PasswordHash?.Length}");
+        Console.WriteLine($"HashRaw=[{user?.PasswordHash}]"); // entre crochets pour voir espaces
         if (user == null)
             return new AuthResponse { Succeeded = false, Errors = new List<string> { "Invalid credentials" } };
 
@@ -218,7 +224,7 @@ public class AuthService : IAuthService
     private async Task<string> GenerateJwtTokenAsync(ApplicationUser user)
     {
         var roles = await _userManager.GetRolesAsync(user);
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]!));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 
         var claims = new List<Claim>

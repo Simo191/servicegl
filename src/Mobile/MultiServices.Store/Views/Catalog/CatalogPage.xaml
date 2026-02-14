@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:vm="clr-namespace:MultiServices.Store.ViewModels"
+       xmlns:models="clr-namespace:MultiServices.Store.Models"
+       x:Class="MultiServices.Store.Views.Catalog.CatalogPage" x:DataType="vm:CatalogViewModel" Title="{Binding Title}">
+    <Grid RowDefinitions="Auto,Auto,*">
+        <HorizontalStackLayout Padding="16,8" Spacing="8">
+            <Button Text="+ Produit" Command="{Binding AddProductCommand}" BackgroundColor="{StaticResource Primary}" TextColor="White" CornerRadius="8" HeightRequest="36" FontSize="13" />
+            <Button Text="📥 Import CSV" Command="{Binding BulkImportCommand}" BackgroundColor="{StaticResource Accent}" TextColor="White" CornerRadius="8" HeightRequest="36" FontSize="13" />
+            <Button Text="📷 Photos en masse" Command="{Binding UploadPhotosCommand}" BackgroundColor="{StaticResource Info}" TextColor="White" CornerRadius="8" HeightRequest="36" FontSize="13" />
+        </HorizontalStackLayout>
+        <SearchBar Grid.Row="1" Placeholder="Rechercher un produit..." Text="{Binding SearchQuery}" SearchCommand="{Binding SearchCommand}" Margin="16,0" />
+        <Grid Grid.Row="2" ColumnDefinitions="180,*">
+            <CollectionView ItemsSource="{Binding Departments}" SelectionMode="Single" BackgroundColor="#FAFAFA"><CollectionView.ItemTemplate><DataTemplate x:DataType="models:DepartmentDto">
+                <Frame Padding="12,10" HasShadow="False" BackgroundColor="Transparent"><VerticalStackLayout>
+                    <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="14" /><Label Text="{Binding ProductCount, StringFormat='{0} produits'}" FontSize="11" TextColor="{StaticResource TextMuted}" />
+                </VerticalStackLayout></Frame></DataTemplate></CollectionView.ItemTemplate></CollectionView>
+            <CollectionView Grid.Column="1" ItemsSource="{Binding Products}" Margin="8,0"><CollectionView.ItemTemplate><DataTemplate x:DataType="models:ProductDto">
+                <Frame Style="{StaticResource Card}" Margin="0,0,0,6" Padding="12"><Grid ColumnDefinitions="50,*,Auto,Auto" ColumnSpacing="8">
+                    <Frame CornerRadius="8" WidthRequest="50" HeightRequest="50" Padding="0" HasShadow="False" BackgroundColor="#F0F0F0" IsClippedToBounds="True"><Image Source="{Binding ImageUrl}" Aspect="AspectFill" /></Frame>
+                    <VerticalStackLayout Grid.Column="1" Spacing="2">
+                        <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="14" /><Label Text="{Binding Brand}" FontSize="11" TextColor="{StaticResource TextMuted}" />
+                        <HorizontalStackLayout Spacing="6"><Label Text="{Binding Price, StringFormat='{0:N2} MAD'}" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                            <Label Text="{Binding StockQuantity, StringFormat='Stock: {0}'}" FontSize="11" /><Label Text="Bio" FontSize="10" TextColor="{StaticResource Success}" IsVisible="{Binding IsBio}" /><Label Text="Halal" FontSize="10" TextColor="{StaticResource Info}" IsVisible="{Binding IsHalal}" /></HorizontalStackLayout>
+                    </VerticalStackLayout>
+                    <Switch Grid.Column="2" IsToggled="{Binding IsAvailable}" VerticalOptions="Center" />
+                    <Button Grid.Column="3" Text="✏️" BackgroundColor="Transparent" WidthRequest="36" Padding="0" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CatalogViewModel}}, Path=EditProductCommand}" CommandParameter="{Binding .}" />
+                </Grid></Frame></DataTemplate></CollectionView.ItemTemplate></CollectionView>
+        </Grid></Grid>
+</ContentPage>

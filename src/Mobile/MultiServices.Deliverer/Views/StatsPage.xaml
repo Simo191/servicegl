@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Deliverer.ViewModels"
+             x:Class="MultiServices.Deliverer.Views.StatsPage"
+             x:DataType="vm:StatsViewModel"
+             Title="Mes statistiques"
+             BackgroundColor="{StaticResource Background}">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="{StaticResource Primary}" />
+
+            <!-- Rating -->
+            <Frame Style="{StaticResource StatCard}" BackgroundColor="#FFF8E1">
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                    <Label Text="⭐" FontSize="32" HorizontalOptions="Center" />
+                    <Label Text="{Binding AverageRating, StringFormat='{0:F1}'}" FontSize="32" FontAttributes="Bold" HorizontalOptions="Center" />
+                    <Label Text="Note moyenne" FontSize="13" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Key Stats Grid -->
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+                <Frame Style="{StaticResource StatCard}">
+                    <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
+                        <Label Text="{Binding TotalDeliveries}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" TextColor="{StaticResource Primary}" />
+                        <Label Text="Livraisons" FontSize="12" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+                <Frame Grid.Column="1" Style="{StaticResource StatCard}">
+                    <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
+                        <Label Text="{Binding TotalEarnings, StringFormat='{0:F0}'}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#4CAF50" />
+                        <Label Text="MAD gagnés" FontSize="12" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+                <Frame Grid.Row="1" Style="{StaticResource StatCard}">
+                    <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
+                        <Label Text="{Binding AcceptanceRate, StringFormat='{0:F0}%'}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#FF9800" />
+                        <Label Text="Taux acceptation" FontSize="12" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+                <Frame Grid.Row="1" Grid.Column="1" Style="{StaticResource StatCard}">
+                    <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
+                        <Label Text="{Binding TotalDistanceKm, StringFormat='{0:F0} km'}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
+                        <Label Text="Distance totale" FontSize="12" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+                <Frame Grid.Row="2" Style="{StaticResource StatCard}">
+                    <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
+                        <Label Text="{Binding AverageDeliveryTime}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
+                        <Label Text="Temps moyen" FontSize="12" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+                <Frame Grid.Row="2" Grid.Column="1" Style="{StaticResource StatCard}">
+                    <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
+                        <Label Text="{Binding TotalInterventions}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
+                        <Label Text="Interventions" FontSize="12" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
+
+            <!-- Period breakdown -->
+            <Frame Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="📊 Activité récente" FontAttributes="Bold" FontSize="16" />
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="8">
+                        <Label Text="Aujourd'hui" FontSize="14" />
+                        <Label Grid.Column="1" Text="{Binding DeliveriesToday, StringFormat='{0} livraisons'}" FontSize="14" FontAttributes="Bold" />
+                        <Label Grid.Row="1" Text="Cette semaine" FontSize="14" />
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding DeliveriesThisWeek, StringFormat='{0} livraisons'}" FontSize="14" FontAttributes="Bold" />
+                        <Label Grid.Row="2" Text="Ce mois" FontSize="14" />
+                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding DeliveriesThisMonth, StringFormat='{0} livraisons'}" FontSize="14" FontAttributes="Bold" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

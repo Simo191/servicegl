@@ -1,0 +1,2 @@
+namespace MultiServices.Restaurant.Views.Menu;
+public partial class MenuItemFormPage : ContentPage { public MenuItemFormPage(ViewModels.MenuItemFormViewModel vm) { InitializeComponent(); BindingContext = vm; } }

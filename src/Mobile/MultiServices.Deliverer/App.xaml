@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MultiServices.Deliverer.App">
+  <Application.Resources><ResourceDictionary>
+    <Color x:Key="Primary">#FF6B00</Color>
+    <Color x:Key="PrimaryDark">#CC5500</Color>
+    <Color x:Key="Secondary">#1A1A2E</Color>
+    <Color x:Key="Accent">#00C853</Color>
+    <Color x:Key="Danger">#FF1744</Color>
+    <Color x:Key="Warning">#FFD600</Color>
+    <Color x:Key="TextPrimary">#1A1A2E</Color>
+    <Color x:Key="TextSecondary">#6B7280</Color>
+    <Color x:Key="Background">#F5F5F5</Color>
+    <Color x:Key="Surface">#FFFFFF</Color>
+    <Color x:Key="Border">#E5E7EB</Color>
+    <Color x:Key="Online">#00C853</Color>
+    <Color x:Key="Offline">#9E9E9E</Color>
+    <Style TargetType="NavigationPage">
+      <Setter Property="BarBackgroundColor" Value="{StaticResource Primary}" />
+      <Setter Property="BarTextColor" Value="White" />
+    </Style>
+    <Style x:Key="CardFrame" TargetType="Frame">
+      <Setter Property="BackgroundColor" Value="{StaticResource Surface}" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Padding" Value="16" />
+      <Setter Property="HasShadow" Value="True" />
+      <Setter Property="BorderColor" Value="Transparent" />
+    </Style>
+    <Style x:Key="PrimaryButton" TargetType="Button">
+      <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+      <Setter Property="TextColor" Value="White" />
+      <Setter Property="FontAttributes" Value="Bold" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="HeightRequest" Value="50" />
+      <Setter Property="FontSize" Value="16" />
+    </Style>
+    <Style x:Key="DangerButton" TargetType="Button">
+      <Setter Property="BackgroundColor" Value="{StaticResource Danger}" />
+      <Setter Property="TextColor" Value="White" />
+      <Setter Property="FontAttributes" Value="Bold" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="HeightRequest" Value="50" />
+    </Style>
+    <Style x:Key="OutlineButton" TargetType="Button">
+      <Setter Property="BackgroundColor" Value="Transparent" />
+      <Setter Property="TextColor" Value="{StaticResource Primary}" />
+      <Setter Property="BorderColor" Value="{StaticResource Primary}" />
+      <Setter Property="BorderWidth" Value="2" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="HeightRequest" Value="50" />
+    </Style>
+    <Style x:Key="SectionTitle" TargetType="Label">
+      <Setter Property="FontSize" Value="18" />
+      <Setter Property="FontAttributes" Value="Bold" />
+      <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+      <Setter Property="Margin" Value="0,16,0,8" />
+    </Style>
+  </ResourceDictionary></Application.Resources>
+</Application>

@@ -1,0 +1,2 @@
+namespace MultiServices.Restaurant.Views.Menu;
+public partial class CategoryFormPage : ContentPage { public CategoryFormPage() { InitializeComponent(); } private async void OnSave(object s, EventArgs e) { await Shell.Current.GoToAsync(".."  ); } }

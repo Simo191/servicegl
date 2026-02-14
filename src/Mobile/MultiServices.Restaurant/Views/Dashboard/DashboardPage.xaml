@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MultiServices.Restaurant.ViewModels" xmlns:models="clr-namespace:MultiServices.Restaurant.Models"
+             x:Class="MultiServices.Restaurant.Views.Dashboard.DashboardPage" x:DataType="vm:DashboardViewModel" Title="Dashboard">
+    <RefreshView Command="{Binding LoadDataCommand}" IsRefreshing="{Binding IsRefreshing}"><ScrollView>
+        <VerticalStackLayout Spacing="16" Padding="16">
+            <!-- Toggle Ouvert/Fermé -->
+            <Frame Style="{StaticResource Card}"><Grid ColumnDefinitions="Auto,*,Auto">
+                <Frame CornerRadius="25" WidthRequest="50" HeightRequest="50" Padding="0" HasShadow="False" BackgroundColor="#FFF3E0">
+                    <Label Text="🍽️" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" />
+                </Frame>
+                <VerticalStackLayout Grid.Column="1" Margin="12,0,0,0" VerticalOptions="Center">
+                    <Label Text="{Binding RestaurantName}" Style="{StaticResource H2}" />
+                    <Label Text="{Binding StatusText}" FontSize="14" TextColor="{Binding StatusColor}" FontAttributes="Bold" />
+                </VerticalStackLayout>
+                <Switch Grid.Column="2" IsToggled="{Binding IsOpen}" ThumbColor="{StaticResource Primary}" VerticalOptions="Center" />
+            </Grid></Frame>
+
+            <!-- KPI Cards -->
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                <Frame Style="{StaticResource Card}" Padding="12"><VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                    <Label Text="{Binding PendingOrdersCount}" FontSize="32" FontAttributes="Bold" TextColor="{StaticResource StatusNew}" HorizontalOptions="Center" />
+                    <Label Text="En attente" FontSize="11" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" />
+                </VerticalStackLayout></Frame>
+                <Frame Grid.Column="1" Style="{StaticResource Card}" Padding="12"><VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                    <Label Text="{Binding TodayOrdersCount}" FontSize="32" FontAttributes="Bold" TextColor="{StaticResource Primary}" HorizontalOptions="Center" />
+                    <Label Text="Aujourd'hui" FontSize="11" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" />
+                </VerticalStackLayout></Frame>
+                <Frame Grid.Column="2" Style="{StaticResource Card}" Padding="12"><VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                    <Label Text="{Binding AverageRating, StringFormat='★ {0:F1}'}" FontSize="28" FontAttributes="Bold" TextColor="{StaticResource Warning}" HorizontalOptions="Center" />
+                    <Label Text="{Binding TotalReviews, StringFormat='{0} avis'}" FontSize="11" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" />
+                </VerticalStackLayout></Frame>
+            </Grid>
+
+            <!-- Revenue -->
+            <Frame Style="{StaticResource Card}"><Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <VerticalStackLayout HorizontalOptions="Center"><Label Text="CA du jour" FontSize="13" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" />
+                    <Label Text="{Binding TodayRevenue, StringFormat='{0:N0} MAD'}" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource Success}" HorizontalOptions="Center" /></VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center"><Label Text="Commissions" FontSize="13" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" />
+                    <Label Text="{Binding CommissionsToday, StringFormat='{0:N0} MAD'}" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource Danger}" HorizontalOptions="Center" /></VerticalStackLayout>
+            </Grid></Frame>
+
+            <!-- Commandes en attente -->
+            <Grid ColumnDefinitions="*,Auto"><Label Text="Commandes en attente" Style="{StaticResource H3}" />
+                <Button Grid.Column="1" Text="Voir tout" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" FontSize="13" Command="{Binding GoToSettingsCommand}" /></Grid>
+            <CollectionView ItemsSource="{Binding PendingOrders}" EmptyView="Aucune commande en attente 🎉">
+                <CollectionView.ItemTemplate><DataTemplate x:DataType="models:RestaurantOrderDto">
+                    <Frame Style="{StaticResource Card}" Margin="0,0,0,8" BackgroundColor="#FFF8E1">
+                        <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                            <Label Text="{Binding OrderNumber, StringFormat='#{0}'}" FontAttributes="Bold" FontSize="16" TextColor="{StaticResource StatusNew}" />
+                            <Label Grid.Column="1" Text="{Binding TotalAmount, StringFormat='{0:N2} MAD'}" FontAttributes="Bold" FontSize="16" TextColor="{StaticResource Primary}" />
+                            <Label Grid.Row="1" Text="{Binding CustomerName}" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding CreatedAt, StringFormat='{0:HH:mm}'}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                            <Label Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Items.Count, StringFormat='{0} article(s)'}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                            <HorizontalStackLayout Grid.Row="3" Grid.ColumnSpan="2" Spacing="8" Margin="0,10,0,0">
+                                <Button Text="✓ Accepter" Style="{StaticResource SuccessBtn}" HeightRequest="38" FontSize="13" Padding="16,0"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DashboardViewModel}}, Path=AcceptOrderCommand}" CommandParameter="{Binding .}" />
+                                <Button Text="✗ Refuser" Style="{StaticResource DangerBtn}" HeightRequest="38" FontSize="13" Padding="16,0"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DashboardViewModel}}, Path=RejectOrderCommand}" CommandParameter="{Binding .}" />
+                                <Button Text="Détails" BackgroundColor="{StaticResource Info}" TextColor="White" CornerRadius="10" HeightRequest="38" FontSize="13" Padding="16,0"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DashboardViewModel}}, Path=ViewOrderCommand}" CommandParameter="{Binding .}" />
+                            </HorizontalStackLayout>
+                        </Grid>
+                    </Frame>
+                </DataTemplate></CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Quick actions -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <Button Text="📋 Avis clients" Command="{Binding GoToReviewsCommand}" BackgroundColor="White" TextColor="{StaticResource TextPrimary}" CornerRadius="10" HeightRequest="44" BorderColor="{StaticResource Border}" BorderWidth="1" />
+                <Button Grid.Column="1" Text="⚙️ Paramètres" Command="{Binding GoToSettingsCommand}" BackgroundColor="White" TextColor="{StaticResource TextPrimary}" CornerRadius="10" HeightRequest="44" BorderColor="{StaticResource Border}" BorderWidth="1" />
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView></RefreshView>
+</ContentPage>

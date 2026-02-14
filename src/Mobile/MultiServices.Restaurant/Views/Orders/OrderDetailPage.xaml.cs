@@ -1,0 +1,2 @@
+namespace MultiServices.Restaurant.Views.Orders;
+public partial class OrderDetailPage : ContentPage { public OrderDetailPage(ViewModels.OrderDetailViewModel vm) { InitializeComponent(); BindingContext = vm; } }

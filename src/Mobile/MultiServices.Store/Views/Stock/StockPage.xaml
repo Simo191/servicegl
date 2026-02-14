@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:vm="clr-namespace:MultiServices.Store.ViewModels"
+       xmlns:models="clr-namespace:MultiServices.Store.Models"
+       x:Class="MultiServices.Store.Views.Stock.StockPage" x:DataType="vm:StockViewModel" Title="{Binding Title}">
+    <RefreshView Command="{Binding LoadCommand}" IsRefreshing="{Binding IsRefreshing}"><ScrollView><VerticalStackLayout Spacing="16" Padding="16">
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+            <Frame Style="{StaticResource Card}" Padding="12" BackgroundColor="#FFF3E0"><VerticalStackLayout HorizontalOptions="Center">
+                <Label Text="{Binding LowStockProducts.Count}" FontSize="32" FontAttributes="Bold" TextColor="{StaticResource LowStock}" HorizontalOptions="Center" /><Label Text="Stock bas" FontSize="11" HorizontalOptions="Center" /></VerticalStackLayout></Frame>
+            <Frame Grid.Column="1" Style="{StaticResource Card}" Padding="12" BackgroundColor="#FFEBEE"><VerticalStackLayout HorizontalOptions="Center">
+                <Label Text="{Binding OutOfStockProducts.Count}" FontSize="32" FontAttributes="Bold" TextColor="{StaticResource OutOfStock}" HorizontalOptions="Center" /><Label Text="Rupture" FontSize="11" HorizontalOptions="Center" /></VerticalStackLayout></Frame>
+        </Grid>
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+            <Button Text="Réassort en masse" Command="{Binding BulkRestockCommand}" BackgroundColor="{StaticResource Primary}" TextColor="White" CornerRadius="8" HeightRequest="40" />
+            <Button Grid.Column="1" Text="Inventaire" Command="{Binding StartInventoryCommand}" BackgroundColor="{StaticResource Info}" TextColor="White" CornerRadius="8" HeightRequest="40" />
+        </Grid>
+        <Label Text="⚠️ Produits en rupture" Style="{StaticResource H3}" TextColor="{StaticResource Danger}" />
+        <CollectionView ItemsSource="{Binding OutOfStockProducts}"><CollectionView.ItemTemplate><DataTemplate x:DataType="models:ProductDto">
+            <Frame Style="{StaticResource Card}" Margin="0,0,0,6" Padding="12" BackgroundColor="#FFEBEE"><Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                <VerticalStackLayout><Label Text="{Binding Name}" FontAttributes="Bold" /><Label Text="{Binding Brand}" FontSize="12" TextColor="{StaticResource TextMuted}" /></VerticalStackLayout>
+                <Button Grid.Column="1" Text="Réappro" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StockViewModel}}, Path=UpdateStockCommand}" CommandParameter="{Binding .}" BackgroundColor="{StaticResource Success}" TextColor="White" CornerRadius="8" HeightRequest="34" FontSize="12" />
+                <Button Grid.Column="2" Text="Dispo" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StockViewModel}}, Path=MarkAvailableCommand}" CommandParameter="{Binding .}" BackgroundColor="{StaticResource Info}" TextColor="White" CornerRadius="8" HeightRequest="34" FontSize="12" />
+            </Grid></Frame></DataTemplate></CollectionView.ItemTemplate></CollectionView>
+        <Label Text="⚠️ Stock bas" Style="{StaticResource H3}" TextColor="{StaticResource LowStock}" />
+        <CollectionView ItemsSource="{Binding LowStockProducts}"><CollectionView.ItemTemplate><DataTemplate x:DataType="models:ProductDto">
+            <Frame Style="{StaticResource Card}" Margin="0,0,0,6" Padding="12"><Grid ColumnDefinitions="*,Auto,Auto">
+                <VerticalStackLayout><Label Text="{Binding Name}" FontAttributes="Bold" /><Label Text="{Binding StockQuantity, StringFormat='Stock: {0}'}" FontSize="12" TextColor="{StaticResource LowStock}" /></VerticalStackLayout>
+                <Button Grid.Column="1" Text="Réappro" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StockViewModel}}, Path=UpdateStockCommand}" CommandParameter="{Binding .}" BackgroundColor="{StaticResource Success}" TextColor="White" CornerRadius="8" HeightRequest="34" FontSize="12" />
+            </Grid></Frame></DataTemplate></CollectionView.ItemTemplate></CollectionView>
+    </VerticalStackLayout></ScrollView></RefreshView>
+</ContentPage>

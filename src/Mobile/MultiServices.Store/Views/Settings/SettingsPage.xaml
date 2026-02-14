@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:vm="clr-namespace:MultiServices.Store.ViewModels"
+       x:Class="MultiServices.Store.Views.Settings.SettingsPage" x:DataType="vm:SettingsViewModel" Title="{Binding Title}">
+    <ScrollView><VerticalStackLayout Spacing="16" Padding="16">
+        <Frame Style="{StaticResource Card}"><VerticalStackLayout Spacing="12">
+            <Label Text="Informations magasin" Style="{StaticResource H3}" />
+            <Entry Placeholder="Nom" Text="{Binding Name}" /><Editor Placeholder="Description" Text="{Binding Description}" HeightRequest="60" />
+            <Entry Placeholder="Téléphone" Text="{Binding Phone}" Keyboard="Telephone" />
+        </VerticalStackLayout></Frame>
+        <Frame Style="{StaticResource Card}"><VerticalStackLayout Spacing="12">
+            <Label Text="Livraison" Style="{StaticResource H3}" />
+            <Entry Placeholder="Frais livraison (MAD)" Text="{Binding DeliveryFee}" Keyboard="Numeric" />
+            <Entry Placeholder="Livraison gratuite à partir de (MAD)" Text="{Binding FreeDeliveryMin}" Keyboard="Numeric" />
+            <Entry Placeholder="Commande minimum (MAD)" Text="{Binding MinOrder}" Keyboard="Numeric" />
+            <Entry Placeholder="Temps préparation (min)" Text="{Binding PrepTime}" Keyboard="Numeric" />
+        </VerticalStackLayout></Frame>
+        <Frame Style="{StaticResource Card}"><VerticalStackLayout Spacing="8">
+            <Label Text="Intégrations" Style="{StaticResource H3}" />
+            <Grid ColumnDefinitions="*,Auto"><Label Text="Synchronisation caisse" VerticalOptions="Center" /><Switch Grid.Column="1" IsToggled="{Binding SyncCaisse}" /></Grid>
+        </VerticalStackLayout></Frame>
+        <Button Text="Enregistrer" Command="{Binding SaveCommand}" Style="{StaticResource PrimaryBtn}" />
+        <Button Text="Déconnexion" Command="{Binding LogoutCommand}" BackgroundColor="{StaticResource Danger}" TextColor="White" CornerRadius="10" HeightRequest="48" />
+    </VerticalStackLayout></ScrollView>
+</ContentPage>

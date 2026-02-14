@@ -1,12 +1,15 @@
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MultiServices.Domain.Interfaces.Repositories;
+using MultiServices.Domain.Entities.Identity;
 using MultiServices.Domain.Interfaces.Services;
 using MultiServices.Infrastructure.Data;
 using MultiServices.Infrastructure.Data.Interceptors;
-using MultiServices.Infrastructure.Repositories;
 using MultiServices.Infrastructure.Services.Auth;
+using MultiServices.Infrastructure.Services.Cache;
+using MultiServices.Infrastructure.Services.Email;
+using MultiServices.Infrastructure.Services.Sms;
 
 namespace MultiServices.Infrastructure;
 
@@ -14,8 +17,6 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        //services.AddHttpContextAccessor();
-
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<AuditableEntityInterceptor>();
 
@@ -26,13 +27,14 @@ public static class DependencyInjection
                 b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)
             );
 
+            // ✅ Un seul endroit pour ajouter l'interceptor
             options.AddInterceptors(sp.GetRequiredService<AuditableEntityInterceptor>());
         });
-
-
-        // Redis Cache
+        services.AddScoped<ISmsService, SmsService>();
+        services.AddScoped<IEmailService, EmailService>();
         var redisConnection = configuration.GetConnectionString("Redis");
-        if (!string.IsNullOrEmpty(redisConnection))
+
+        if (!string.IsNullOrWhiteSpace(redisConnection))
         {
             services.AddStackExchangeRedisCache(options =>
             {
@@ -42,8 +44,24 @@ public static class DependencyInjection
         }
         else
         {
+            // ✅ Fournit IDistributedCache en mémoire
             services.AddDistributedMemoryCache();
         }
+
+
+        services.AddScoped<ICacheService, CacheService>();
+
+
+        // ✅ Identity : enregistre UserManager<ApplicationUser>
+        services
+            .AddIdentityCore<ApplicationUser>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+            })
+            .AddRoles<ApplicationRole>()
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddSignInManager()
+            .AddDefaultTokenProviders();
 
         return services;
     }

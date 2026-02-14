@@ -3,6 +3,8 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using MultiServices.Application.Common.Behaviors;
+using MultiServices.Application.Interfaces;
+using MultiServices.Application.Services.Auth;
 
 namespace MultiServices.Application;
 
@@ -17,6 +19,8 @@ public static class DependencyInjection
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehavior<,>));
+
+        services.AddScoped<IAuthService, AuthService>();
 
         return services;
     }

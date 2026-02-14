@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:auth="clr-namespace:MultiServices.Store.Views.Auth" xmlns:dash="clr-namespace:MultiServices.Store.Views.Dashboard"
+       xmlns:orders="clr-namespace:MultiServices.Store.Views.Orders" xmlns:catalog="clr-namespace:MultiServices.Store.Views.Catalog"
+       xmlns:stock="clr-namespace:MultiServices.Store.Views.Stock" xmlns:promos="clr-namespace:MultiServices.Store.Views.Promotions"
+       xmlns:stats="clr-namespace:MultiServices.Store.Views.Stats" xmlns:settings="clr-namespace:MultiServices.Store.Views.Settings"
+       x:Class="MultiServices.Store.AppShell" Shell.FlyoutBehavior="Disabled" Shell.TabBarBackgroundColor="White" Shell.TabBarForegroundColor="{StaticResource Primary}">
+    <ShellContent Route="login" ContentTemplate="{DataTemplate auth:LoginPage}" Shell.TabBarIsVisible="False" Shell.NavBarIsVisible="False" />
+    <TabBar Route="main">
+        <Tab Title="Dashboard"><ShellContent Route="dashboard" ContentTemplate="{DataTemplate dash:DashboardPage}" /></Tab>
+        <Tab Title="Commandes"><ShellContent Route="orders" ContentTemplate="{DataTemplate orders:OrdersPage}" /></Tab>
+        <Tab Title="Catalogue"><ShellContent Route="catalog" ContentTemplate="{DataTemplate catalog:CatalogPage}" /></Tab>
+        <Tab Title="Stock"><ShellContent Route="stock" ContentTemplate="{DataTemplate stock:StockPage}" /></Tab>
+        <Tab Title="Stats"><ShellContent Route="stats" ContentTemplate="{DataTemplate stats:StatsPage}" /></Tab>
+    </TabBar>
+</Shell>

@@ -1,0 +1,5 @@
+namespace MultiServices.Restaurant.Models;
+public class ApiResponse<T> { public bool Success { get; set; } public string? Message { get; set; } public T? Data { get; set; } public List<string>? Errors { get; set; } }
+public class PaginatedResult<T> { public List<T> Items { get; set; } = new(); public int TotalCount { get; set; } public int PageNumber { get; set; } public int TotalPages { get; set; } }
+public class AuthResponse { public string Token { get; set; } = string.Empty; public string RefreshToken { get; set; } = string.Empty; public UserDto User { get; set; } = null!; }
+public class UserDto { public Guid Id { get; set; } public string FirstName { get; set; } = string.Empty; public string LastName { get; set; } = string.Empty; public string Email { get; set; } = string.Empty; public string? PhoneNumber { get; set; } public string? PhotoUrl { get; set; } public string Role { get; set; } = string.Empty; }

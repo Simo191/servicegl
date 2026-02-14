@@ -1,0 +1,2 @@
+namespace MultiServices.Restaurant.Views.Reviews;
+public partial class ReviewsPage : ContentPage { public ReviewsPage(ViewModels.ReviewsViewModel vm) { InitializeComponent(); BindingContext = vm; } protected override void OnAppearing() { base.OnAppearing(); (BindingContext as ViewModels.ReviewsViewModel)?.LoadCommand.Execute(null); } }
