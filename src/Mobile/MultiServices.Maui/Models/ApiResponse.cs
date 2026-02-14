@@ -19,14 +19,32 @@ public class PaginatedResult<T>
     public bool HasNextPage => PageNumber < TotalPages;
 }
 
+/// <summary>
+/// Aligned with backend MultiServices.Application.DTOs.Auth.AuthResponse
+/// Backend fields: Succeeded, Token, RefreshToken, TokenExpiration, User, Errors
+/// Also compatible with Identity.AuthResponseDto: AccessToken, RefreshToken, User
+/// </summary>
 public class AuthResponse
 {
+    // Backend Auth DTOs use "Token", Identity DTOs use "AccessToken"
+    // We accept both via Newtonsoft deserialization
     public string Token { get; set; } = string.Empty;
+    public string AccessToken { get; set; } = string.Empty;
     public string RefreshToken { get; set; } = string.Empty;
-    public DateTime Expiration { get; set; }
+    public DateTime? TokenExpiration { get; set; }
+    public bool Succeeded { get; set; }
+    public List<string>? Errors { get; set; }
     public UserDto User { get; set; } = new();
+
+    /// <summary>Returns whichever token field the backend populated</summary>
+    public string GetToken() => !string.IsNullOrEmpty(Token) ? Token : AccessToken;
 }
 
+/// <summary>
+/// Aligned with backend MultiServices.Application.DTOs.Auth.UserDto
+/// Backend: Id, FirstName, LastName, Email, PhoneNumber, ProfileImageUrl,
+///          PreferredLanguage, IsVerified, TwoFactorEnabled, Roles, FullName
+/// </summary>
 public class UserDto
 {
     public Guid Id { get; set; }
@@ -36,16 +54,28 @@ public class UserDto
     public string? PhoneNumber { get; set; }
     public string? ProfileImageUrl { get; set; }
     public string FullName => $"{FirstName} {LastName}";
+
+    // Backend fields
+    public string PreferredLanguage { get; set; } = "French";
+    public bool IsVerified { get; set; }
+    public bool TwoFactorEnabled { get; set; }
+    public List<string> Roles { get; set; } = new();
+
+    // Client-side computed (not from backend)
     public int LoyaltyPoints { get; set; }
     public string LoyaltyTier { get; set; } = "Bronze";
 }
 
+/// <summary>
+/// Aligned with backend MultiServices.Application.DTOs.Common.AddressDto
+/// </summary>
 public class AddressDto
 {
     public Guid Id { get; set; }
     public string Label { get; set; } = string.Empty;
     public string Street { get; set; } = string.Empty;
     public string City { get; set; } = string.Empty;
+    public string PostalCode { get; set; } = string.Empty;
     public string? Building { get; set; }
     public string? Floor { get; set; }
     public string? Apartment { get; set; }
@@ -55,23 +85,41 @@ public class AddressDto
     public bool IsDefault { get; set; }
 }
 
+/// <summary>
+/// Aligned with backend MultiServices.Application.DTOs.Common.NotificationDto
+/// </summary>
 public class NotificationDto
 {
     public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;
+    // Backend uses "Message", keep both for compatibility
     public string Body { get; set; } = string.Empty;
+    public string Message { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty;
+    public string? ImageUrl { get; set; }
     public bool IsRead { get; set; }
     public DateTime CreatedAt { get; set; }
+
+    public string DisplayBody => !string.IsNullOrEmpty(Body) ? Body : Message;
 }
 
+/// <summary>
+/// Aligned with backend MultiServices.Application.DTOs.Common.ReviewDto
+/// Backend: Id, UserName, Stars, Comment, Reply, CreatedAt
+/// </summary>
 public class ReviewDto
 {
     public Guid Id { get; set; }
     public string UserName { get; set; } = string.Empty;
+    public string? UserImageUrl { get; set; }
+    // Backend uses "Stars", keep both
     public int Rating { get; set; }
+    public int Stars { get; set; }
     public string? Comment { get; set; }
+    public string? Reply { get; set; }
     public DateTime CreatedAt { get; set; }
+
+    public int DisplayRating => Stars > 0 ? Stars : Rating;
 }
 
 public class WalletDto

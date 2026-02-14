@@ -17,16 +17,17 @@
                         </Frame>
                         <VerticalStackLayout Grid.Column="1" Padding="12,0" VerticalOptions="Center">
                             <Label Text="{Binding Provider.CompanyName}" Style="{StaticResource Title2}" />
-                            <Label Text="{Binding Provider.Category}" FontSize="14" TextColor="{StaticResource Info}" />
+                            <!-- FIX: Category removed from corrected ServiceProviderDto; show Phone instead -->
+                            <Label Text="{Binding Provider.Phone}" FontSize="14" TextColor="{StaticResource Info}" />
                         </VerticalStackLayout>
                         <Button Grid.Column="2" Text="♡" BackgroundColor="Transparent" TextColor="{StaticResource Danger}" FontSize="22"
                                 Command="{Binding ToggleFavoriteCommand}" VerticalOptions="Start" />
                     </Grid>
                     <HorizontalStackLayout Spacing="16">
                         <Label Text="{Binding Provider.Rating, StringFormat='★ {0:F1}'}" FontSize="14" TextColor="#F59E0B" FontAttributes="Bold" />
-                        <Label Text="{Binding Provider.TotalReviews, StringFormat='{0} avis'}" FontSize="13" TextColor="{StaticResource TextMuted}" />
-                        <Label Text="{Binding Provider.YearsExperience, StringFormat='{0} ans exp.'}" FontSize="13" TextColor="{StaticResource TextMuted}" />
-                        <Label Text="{Binding Provider.CompletedInterventions, StringFormat='{0} interventions'}" FontSize="13" TextColor="{StaticResource TextMuted}" />
+                        <Label Text="{Binding Provider.ReviewCount, StringFormat='{0} avis'}" FontSize="13" TextColor="{StaticResource TextMuted}" />
+                        <!-- FIX: CompletedInterventions removed; use YearsOfExperience -->
+                        <Label Text="{Binding Provider.YearsOfExperience, StringFormat='{0} ans exp.'}" FontSize="13" TextColor="{StaticResource TextMuted}" />
                     </HorizontalStackLayout>
                     <Label Text="{Binding Provider.Description}" Style="{StaticResource BodyText}" />
                 </VerticalStackLayout>
@@ -58,14 +59,18 @@
             <!-- Portfolio -->
             <Label Text="Portfolio" Style="{StaticResource Title3}" Margin="0,8,0,0" />
             <CollectionView ItemsSource="{Binding Portfolio}" HeightRequest="180">
-                <CollectionView.ItemsLayout><LinearItemsLayout Orientation="Horizontal" ItemSpacing="12" /></CollectionView.ItemsLayout>
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="12" />
+                </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:PortfolioItemDto">
                         <Frame WidthRequest="220" CornerRadius="12" Padding="0" HasShadow="True" BorderColor="Transparent">
                             <VerticalStackLayout>
                                 <Grid ColumnDefinitions="*,*" HeightRequest="100">
-                                    <BoxView BackgroundColor="#FEE2E2" /><Label Text="Avant" FontSize="10" HorizontalOptions="Center" VerticalOptions="Center" />
-                                    <BoxView Grid.Column="1" BackgroundColor="#D1FAE5" /><Label Grid.Column="1" Text="Après" FontSize="10" HorizontalOptions="Center" VerticalOptions="Center" />
+                                    <BoxView BackgroundColor="#FEE2E2" />
+                                    <Label Text="Avant" FontSize="10" HorizontalOptions="Center" VerticalOptions="Center" />
+                                    <BoxView Grid.Column="1" BackgroundColor="#D1FAE5" />
+                                    <Label Grid.Column="1" Text="Après" FontSize="10" HorizontalOptions="Center" VerticalOptions="Center" />
                                 </Grid>
                                 <Label Text="{Binding Title}" Padding="8" FontSize="13" FontAttributes="Bold" />
                             </VerticalStackLayout>
@@ -77,12 +82,13 @@
             <Label Text="Avis clients" Style="{StaticResource Title3}" Margin="0,8,0,0" />
             <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Reviews}">
                 <BindableLayout.ItemTemplate>
-                    <DataTemplate x:DataType="models:ReviewDto">
+                    <!-- FIX: was ReviewDto → ServiceProviderReviewDto; UserName→CustomerName, Rating→OverallRating -->
+                    <DataTemplate x:DataType="models:ServiceProviderReviewDto">
                         <Frame CornerRadius="12" Padding="12" HasShadow="False" BackgroundColor="White" BorderColor="{StaticResource Border}">
                             <VerticalStackLayout Spacing="4">
                                 <HorizontalStackLayout Spacing="8">
-                                    <Label Text="{Binding UserName}" FontAttributes="Bold" FontSize="14" />
-                                    <Label Text="{Binding Rating, StringFormat='★ {0}'}" TextColor="#F59E0B" FontSize="13" />
+                                    <Label Text="{Binding CustomerName}" FontAttributes="Bold" FontSize="14" />
+                                    <Label Text="{Binding OverallRating, StringFormat='★ {0}'}" TextColor="#F59E0B" FontSize="13" />
                                 </HorizontalStackLayout>
                                 <Label Text="{Binding Comment}" FontSize="13" TextColor="{StaticResource TextSecondary}" />
                                 <Label Text="{Binding CreatedAt, StringFormat='{0:dd/MM/yyyy}'}" FontSize="11" TextColor="{StaticResource TextMuted}" />

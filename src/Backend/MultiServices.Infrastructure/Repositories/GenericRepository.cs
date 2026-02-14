@@ -26,6 +26,15 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     public virtual async Task<IReadOnlyList<T>> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
         => await _dbSet.Where(predicate).ToListAsync(ct);
 
+    public virtual async Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
+        => await _dbSet.FirstOrDefaultAsync(predicate, ct);
+
+    public virtual async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
+        => await _dbSet.AnyAsync(predicate, ct);
+
+    public virtual async Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null, CancellationToken ct = default)
+        => predicate == null ? await _dbSet.CountAsync(ct) : await _dbSet.CountAsync(predicate, ct);
+
     public virtual async Task<T> AddAsync(T entity, CancellationToken ct = default)
     {
         await _dbSet.AddAsync(entity, ct);
@@ -41,25 +50,29 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         return Task.CompletedTask;
     }
 
+    public virtual Task UpdateRangeAsync(IEnumerable<T> entities, CancellationToken ct = default)
+    {
+        _dbSet.UpdateRange(entities);
+        return Task.CompletedTask;
+    }
+
     public virtual Task DeleteAsync(T entity, CancellationToken ct = default)
     {
         _dbSet.Remove(entity);
         return Task.CompletedTask;
     }
 
-    public virtual Task SoftDeleteAsync(T entity, CancellationToken ct = default)
+    public virtual async Task SoftDeleteAsync(Guid id, CancellationToken ct = default)
     {
-        entity.IsDeleted = true;
-        entity.DeletedAt = DateTime.UtcNow;
-        _dbSet.Update(entity);
-        return Task.CompletedTask;
+        var entity = await GetByIdAsync(id, ct);
+        if (entity != null)
+        {
+            entity.IsDeleted = true;
+            entity.DeletedAt = DateTime.UtcNow;
+            _dbSet.Update(entity);
+        }
     }
 
-    public virtual async Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null, CancellationToken ct = default)
-        => predicate == null ? await _dbSet.CountAsync(ct) : await _dbSet.CountAsync(predicate, ct);
-
-    public virtual async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
-        => await _dbSet.AnyAsync(predicate, ct);
-
-    public virtual IQueryable<T> Query() => _dbSet.AsQueryable();
+    public virtual IQueryable<T> AsQueryable()
+        => _dbSet.AsQueryable();
 }

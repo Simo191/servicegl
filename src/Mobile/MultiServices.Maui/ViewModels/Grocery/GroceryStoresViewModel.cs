@@ -27,15 +27,26 @@ public partial class GroceryStoresViewModel : BaseViewModel
     {
         await ExecuteAsync(async () =>
         {
+            // FIX: Backend GroceryController.SearchStores params:
+            // q, maxDistance, lat, lng, hasPromo, freeDelivery, page, pageSize
+            // Note: Backend does NOT have "brand" filter at API level
             var queryParams = new Dictionary<string, string>
             {
-                ["query"] = SearchQuery,
-                ["brand"] = SelectedBrand ?? ""
+                ["q"] = SearchQuery,          // Was: query
+                ["page"] = "1",
+                ["pageSize"] = "20"
             };
+
             var result = await _api.GetAsync<PaginatedResult<GroceryStoreListDto>>("/grocery/stores", queryParams);
             if (result.Success && result.Data != null)
             {
-                Stores = new ObservableCollection<GroceryStoreListDto>(result.Data.Items);
+                var items = result.Data.Items;
+
+                // Client-side brand filter (backend doesn't support it)
+                if (!string.IsNullOrEmpty(SelectedBrand))
+                    items = items.Where(s => s.Brand == SelectedBrand).ToList();
+
+                Stores = new ObservableCollection<GroceryStoreListDto>(items);
                 IsEmpty = !Stores.Any();
             }
         });

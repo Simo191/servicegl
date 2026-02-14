@@ -14,25 +14,37 @@
             <HorizontalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
                 <Frame BackgroundColor="{Binding FilterBio, Converter={StaticResource BoolToFilterBg}}" CornerRadius="10" Padding="8,4" HasShadow="False">
                     <Label Text="Bio" FontSize="11" />
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ToggleBioFilterCommand}" />
+                    </Frame.GestureRecognizers>
                 </Frame>
                 <Frame BackgroundColor="{Binding FilterHalal, Converter={StaticResource BoolToFilterBg}}" CornerRadius="10" Padding="8,4" HasShadow="False">
                     <Label Text="Halal" FontSize="11" />
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ToggleHalalFilterCommand}" />
+                    </Frame.GestureRecognizers>
+                </Frame>
+                <Frame BackgroundColor="{Binding FilterPromo, Converter={StaticResource BoolToFilterBg}}" CornerRadius="10" Padding="8,4" HasShadow="False">
+                    <Label Text="Promo" FontSize="11" />
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding TogglePromoFilterCommand}" />
+                    </Frame.GestureRecognizers>
                 </Frame>
             </HorizontalStackLayout>
         </Grid>
 
-        <!-- Departments -->
+        <!-- Categories (was Departments) -->
         <ScrollView Grid.Row="1" Orientation="Horizontal" Padding="16,0">
-            <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Departments}">
+            <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Categories}">
                 <BindableLayout.ItemTemplate>
-                    <DataTemplate x:DataType="models:GroceryDepartmentDto">
+                    <DataTemplate x:DataType="models:StoreCategoryDto">
                         <Frame CornerRadius="12" Padding="12,8" HasShadow="False" BackgroundColor="#F3F4F6" BorderColor="Transparent">
                             <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
                                 <Label Text="{Binding Name}" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center" />
                                 <Label Text="{Binding ProductCount, StringFormat='{0} produits'}" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" />
                             </VerticalStackLayout>
                             <Frame.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StoreDetailViewModel}}, Path=SelectDepartmentCommand}"
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StoreDetailViewModel}}, Path=SelectCategoryCommand}"
                                                       CommandParameter="{Binding}" />
                             </Frame.GestureRecognizers>
                         </Frame>
@@ -53,23 +65,19 @@
                             <Grid HeightRequest="100">
                                 <BoxView BackgroundColor="#F9FAFB" />
                                 <Label Text="🛍️" FontSize="32" HorizontalOptions="Center" VerticalOptions="Center" />
-                                <Frame IsVisible="{Binding IsOnPromotion}" BackgroundColor="{StaticResource Danger}" CornerRadius="0" Padding="6,2"
-                                       HasShadow="False" HorizontalOptions="Start" VerticalOptions="Start">
-                                    <Label Text="{Binding PromotionLabel}" FontSize="9" TextColor="White" FontAttributes="Bold" />
+                                <!-- Promo badge -->
+                                <Frame BackgroundColor="{StaticResource Danger}" CornerRadius="6" Padding="4,2" HasShadow="False"
+                                       HorizontalOptions="End" VerticalOptions="Start" Margin="4"
+                                       IsVisible="{Binding IsOnPromotion}">
+                                    <Label Text="PROMO" TextColor="White" FontSize="9" FontAttributes="Bold" />
                                 </Frame>
-                                <HorizontalStackLayout HorizontalOptions="End" VerticalOptions="Start" Margin="4">
-                                    <Frame IsVisible="{Binding IsBio}" BackgroundColor="#D1FAE5" CornerRadius="4" Padding="4,1" HasShadow="False">
-                                        <Label Text="BIO" FontSize="8" TextColor="#065F46" FontAttributes="Bold" />
-                                    </Frame>
-                                </HorizontalStackLayout>
                             </Grid>
-                            <VerticalStackLayout Padding="8" Spacing="2">
-                                <Label Text="{Binding Name}" FontSize="13" FontAttributes="Bold" MaxLines="2" LineBreakMode="TailTruncation" />
+                            <VerticalStackLayout Padding="8" Spacing="4">
+                                <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="13" LineBreakMode="TailTruncation" MaxLines="2" />
                                 <Label Text="{Binding Brand}" FontSize="11" TextColor="{StaticResource TextMuted}" />
                                 <Grid ColumnDefinitions="*,Auto">
                                     <VerticalStackLayout>
-                                        <Label Text="{Binding Price, StringFormat='{0:N2} DH'}" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
-                                        <Label Text="{Binding PricePerUnit, StringFormat='{0:N2} DH/kg'}" FontSize="10" TextColor="{StaticResource TextMuted}" />
+                                        <Label Text="{Binding Price, StringFormat='{0:N2} DH'}" FontAttributes="Bold" FontSize="14" TextColor="{StaticResource Primary}" />
                                     </VerticalStackLayout>
                                     <Button Grid.Column="1" Text="+" BackgroundColor="{StaticResource Success}" TextColor="White"
                                             CornerRadius="16" HeightRequest="32" WidthRequest="32" FontSize="16" Padding="0"

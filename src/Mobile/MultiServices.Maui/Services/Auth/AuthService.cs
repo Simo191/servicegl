@@ -1,5 +1,6 @@
 using MultiServices.Maui.Models;
 using MultiServices.Maui.Services.Api;
+using MultiServices.Maui.Services.Storage;
 
 namespace MultiServices.Maui.Services.Auth;
 
@@ -27,14 +28,19 @@ public class AuthService
             _currentUser = result.Data.User;
             return (true, null);
         }
-        return (false, result.Message ?? "Identifiants incorrects");
+        return (false, result.Data?.Errors?.FirstOrDefault() ?? result.Message ?? "Identifiants incorrects");
     }
 
     public async Task<(bool Success, string? Error)> RegisterAsync(string firstName, string lastName, string email, string password, string phone)
     {
         var result = await _api.PostAsync<AuthResponse>("/auth/register", new
         {
-            firstName, lastName, email, password, phoneNumber = phone
+            firstName,
+            lastName,
+            email,
+            password,
+            confirmPassword = password,
+            phoneNumber = phone
         });
         if (result.Success && result.Data != null)
         {
@@ -42,12 +48,20 @@ public class AuthService
             _currentUser = result.Data.User;
             return (true, null);
         }
-        return (false, result.Message ?? "Erreur lors de l'inscription");
+        return (false, result.Data?.Errors?.FirstOrDefault() ?? result.Message ?? "Erreur lors de l'inscription");
     }
 
+    /// <summary>
+    /// FIX: Backend endpoint is /auth/external-login (not /auth/social-login)
+    /// Backend expects: { provider, accessToken, deviceToken? }
+    /// </summary>
     public async Task<(bool Success, string? Error)> SocialLoginAsync(string provider, string token)
     {
-        var result = await _api.PostAsync<AuthResponse>("/auth/social-login", new { provider, token });
+        var result = await _api.PostAsync<AuthResponse>("/auth/external-login", new
+        {
+            provider,
+            accessToken = token
+        });
         if (result.Success && result.Data != null)
         {
             await SaveTokensAsync(result.Data);
@@ -57,12 +71,15 @@ public class AuthService
         return (false, result.Message ?? "Erreur de connexion sociale");
     }
 
+    /// <summary>
+    /// FIX: Backend endpoint is /auth/profile (not /auth/me)
+    /// </summary>
     public async Task<bool> CheckAuthAsync()
     {
         var token = await _secureStorage.GetAsync("auth_token");
         if (string.IsNullOrEmpty(token)) return false;
 
-        var result = await _api.GetAsync<UserDto>("/auth/me");
+        var result = await _api.GetAsync<UserDto>("/auth/profile");
         if (result.Success && result.Data != null)
         {
             _currentUser = result.Data;
@@ -87,15 +104,37 @@ public class AuthService
         return (result.Success, result.Message);
     }
 
-    public async Task<(bool Success, string? Error)> VerifyPhoneAsync(string code)
+    /// <summary>
+    /// FIX: Backend endpoint is /auth/verify-otp (not /auth/verify-phone)
+    /// Backend expects: { phoneNumber, otp }
+    /// </summary>
+    public async Task<(bool Success, string? Error)> VerifyPhoneAsync(string phoneNumber, string code)
     {
-        var result = await _api.PostAsync<object>("/auth/verify-phone", new { code });
+        var result = await _api.PostAsync<object>("/auth/verify-otp", new { phoneNumber, otp = code });
         return (result.Success, result.Message);
     }
 
+    public async Task<(bool Success, string? Error)> ChangePasswordAsync(string currentPassword, string newPassword)
+    {
+        var result = await _api.PostAsync<object>("/auth/change-password", new
+        {
+            currentPassword,
+            newPassword,
+            confirmPassword = newPassword
+        });
+        return (result.Success, result.Message);
+    }
+
+    /// <summary>
+    /// FIX: Use GetToken() to handle both Token and AccessToken from backend
+    /// </summary>
     private async Task SaveTokensAsync(AuthResponse auth)
     {
-        await _secureStorage.SetAsync("auth_token", auth.Token);
-        await _secureStorage.SetAsync("refresh_token", auth.RefreshToken);
+        var token = auth.GetToken();
+        if (!string.IsNullOrEmpty(token))
+            await _secureStorage.SetAsync("auth_token", token);
+
+        if (!string.IsNullOrEmpty(auth.RefreshToken))
+            await _secureStorage.SetAsync("refresh_token", auth.RefreshToken);
     }
 }

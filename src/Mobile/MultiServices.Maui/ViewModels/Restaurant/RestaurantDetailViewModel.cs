@@ -40,15 +40,18 @@ public partial class RestaurantDetailViewModel : BaseViewModel
             {
                 Restaurant = result.Data;
                 Title = result.Data.Name;
-                MenuCategories = new ObservableCollection<MenuCategoryDto>(result.Data.MenuCategories);
+
+                // FIX: Backend uses "Menu" not "MenuCategories"
+                MenuCategories = new ObservableCollection<MenuCategoryDto>(result.Data.Menu);
                 if (MenuCategories.Any())
                     SelectedCategory = MenuCategories.First();
-                
+
                 Cart.RestaurantId = result.Data.Id;
                 Cart.RestaurantName = result.Data.Name;
                 Cart.RestaurantLogoUrl = result.Data.LogoUrl;
                 Cart.DeliveryFee = result.Data.DeliveryFee;
-                Cart.MinimumOrder = result.Data.MinimumOrder;
+                // FIX: Backend uses "MinOrderAmount" not "MinimumOrder"
+                Cart.MinimumOrder = result.Data.MinOrderAmount;
             }
         });
     }
@@ -68,7 +71,8 @@ public partial class RestaurantDetailViewModel : BaseViewModel
                 MenuItemId = item.Id,
                 Name = item.Name,
                 ImageUrl = item.ImageUrl,
-                BasePrice = item.BasePrice,
+                // FIX: Backend uses "Price" not "BasePrice"
+                BasePrice = item.Price,
                 Quantity = 1
             });
         }
@@ -100,13 +104,14 @@ public partial class RestaurantDetailViewModel : BaseViewModel
         await Shell.Current.GoToAsync("checkout");
     }
 
+    /// <summary>
+    /// FIX: Backend uses POST /restaurants/{id}/favorite as toggle (not separate POST/DELETE)
+    /// </summary>
     [RelayCommand]
     private async Task ToggleFavoriteAsync()
     {
-        IsFavorite = !IsFavorite;
-        if (IsFavorite)
-            await _api.PostAsync<object>($"/favorites/restaurants/{RestaurantId}");
-        else
-            await _api.DeleteAsync<object>($"/favorites/restaurants/{RestaurantId}");
+        var result = await _api.PostAsync<object>($"/restaurants/{RestaurantId}/favorite");
+        if (result.Success)
+            IsFavorite = !IsFavorite;
     }
 }

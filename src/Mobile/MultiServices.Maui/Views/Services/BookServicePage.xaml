@@ -37,8 +37,8 @@
             <Frame Style="{StaticResource CardFrame}">
                 <VerticalStackLayout Spacing="12">
                     <Label Text="📅 Date et heure" Style="{StaticResource Title3}" />
-                    <DatePicker Date="{Binding SelectedDate}" MinimumDate="{x:Static sys:DateTime.Today}"
-                                xmlns:sys="clr-namespace:System;assembly=netstandard" />
+                    <!-- FIX: Bind MinimumDate to ViewModel property instead of sys:DateTime.Today -->
+                    <DatePicker Date="{Binding SelectedDate}" MinimumDate="{Binding MinimumDate}" />
                     <Button Text="Voir les créneaux" Style="{StaticResource SecondaryButton}" Command="{Binding LoadSlotsCommand}" HeightRequest="40" />
                 </VerticalStackLayout>
             </Frame>

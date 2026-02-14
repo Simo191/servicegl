@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json;
 using MultiServices.Maui.Models;
+using MultiServices.Maui.Services.Storage;
 
 namespace MultiServices.Maui.Services.Api;
 
@@ -9,13 +10,13 @@ public class ApiService
 {
     private readonly HttpClient _httpClient;
     private readonly ISecureStorageService _secureStorage;
-    private const string BaseUrl = "https://api.multiservices.ma/api/v1";
 
+    // FIX: Removed duplicate BaseAddress — already set in MauiProgram.cs via AddHttpClient
     public ApiService(HttpClient httpClient, ISecureStorageService secureStorage)
     {
         _httpClient = httpClient;
         _secureStorage = secureStorage;
-        _httpClient.BaseAddress = new Uri(BaseUrl);
+        _httpClient.DefaultRequestHeaders.Accept.Clear();
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
 
@@ -33,7 +34,7 @@ public class ApiService
             await SetAuthHeaderAsync();
             var url = BuildUrl(endpoint, queryParams);
             var response = await _httpClient.GetAsync(url);
-            return await HandleResponse<T>(response);
+            return await HandleResponse<T>(response, HttpMethod.Get, endpoint, queryParams: queryParams);
         }
         catch (Exception ex)
         {
@@ -50,7 +51,7 @@ public class ApiService
                 ? new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json")
                 : null;
             var response = await _httpClient.PostAsync(endpoint, content);
-            return await HandleResponse<T>(response);
+            return await HandleResponse<T>(response, HttpMethod.Post, endpoint, data);
         }
         catch (Exception ex)
         {
@@ -65,7 +66,7 @@ public class ApiService
             await SetAuthHeaderAsync();
             var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
             var response = await _httpClient.PutAsync(endpoint, content);
-            return await HandleResponse<T>(response);
+            return await HandleResponse<T>(response, HttpMethod.Put, endpoint, data);
         }
         catch (Exception ex)
         {
@@ -79,7 +80,7 @@ public class ApiService
         {
             await SetAuthHeaderAsync();
             var response = await _httpClient.DeleteAsync(endpoint);
-            return await HandleResponse<T>(response);
+            return await HandleResponse<T>(response, HttpMethod.Delete, endpoint);
         }
         catch (Exception ex)
         {
@@ -104,23 +105,79 @@ public class ApiService
         }
     }
 
-    private async Task<ApiResponse<T>> HandleResponse<T>(HttpResponseMessage response)
+    /// <summary>
+    /// HandleResponse with optional retry after token refresh
+    /// </summary>
+    private async Task<ApiResponse<T>> HandleResponse<T>(HttpResponseMessage response,
+        HttpMethod? method = null, string? endpoint = null, object? body = null,
+        Dictionary<string, string>? queryParams = null, bool isRetry = false)
     {
         var json = await response.Content.ReadAsStringAsync();
+
         if (response.IsSuccessStatusCode)
         {
-            var result = JsonConvert.DeserializeObject<ApiResponse<T>>(json);
-            return result ?? new ApiResponse<T> { Success = true };
+            try
+            {
+                var result = JsonConvert.DeserializeObject<ApiResponse<T>>(json);
+                return result ?? new ApiResponse<T> { Success = true };
+            }
+            catch
+            {
+                // If the response isn't wrapped in ApiResponse, try direct deserialization
+                try
+                {
+                    var data = JsonConvert.DeserializeObject<T>(json);
+                    return new ApiResponse<T> { Success = true, Data = data };
+                }
+                catch
+                {
+                    return new ApiResponse<T> { Success = true };
+                }
+            }
         }
 
-        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        // FIX: Retry after refresh (only once)
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized && !isRetry)
         {
             var refreshed = await RefreshTokenAsync();
-            if (!refreshed)
+            if (refreshed && method != null && endpoint != null)
             {
-                await Shell.Current.GoToAsync("//login");
-                return new ApiResponse<T> { Success = false, Message = "Session expirée" };
+                // Retry the original request
+                await SetAuthHeaderAsync();
+                HttpResponseMessage retryResponse;
+
+                if (method == HttpMethod.Get)
+                {
+                    var url = BuildUrl(endpoint, queryParams);
+                    retryResponse = await _httpClient.GetAsync(url);
+                }
+                else if (method == HttpMethod.Post)
+                {
+                    var content = body != null
+                        ? new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
+                        : null;
+                    retryResponse = await _httpClient.PostAsync(endpoint, content);
+                }
+                else if (method == HttpMethod.Put)
+                {
+                    var content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
+                    retryResponse = await _httpClient.PutAsync(endpoint, content);
+                }
+                else if (method == HttpMethod.Delete)
+                {
+                    retryResponse = await _httpClient.DeleteAsync(endpoint);
+                }
+                else
+                {
+                    retryResponse = response;
+                }
+
+                return await HandleResponse<T>(retryResponse, isRetry: true);
             }
+
+            // Refresh failed → redirect to login
+            await Shell.Current.GoToAsync("//login");
+            return new ApiResponse<T> { Success = false, Message = "Session expirée" };
         }
 
         return new ApiResponse<T>
@@ -130,24 +187,37 @@ public class ApiService
         };
     }
 
+    /// <summary>
+    /// FIX: Send both token and refreshToken as required by backend RefreshTokenDto
+    /// Backend endpoint: /auth/refresh-token (not /auth/refresh)
+    /// Backend expects: { token: "...", refreshToken: "..." }
+    /// </summary>
     private async Task<bool> RefreshTokenAsync()
     {
+        var accessToken = await _secureStorage.GetAsync("auth_token");
         var refreshToken = await _secureStorage.GetAsync("refresh_token");
         if (string.IsNullOrEmpty(refreshToken)) return false;
 
         try
         {
             var content = new StringContent(
-                JsonConvert.SerializeObject(new { refreshToken }),
+                JsonConvert.SerializeObject(new
+                {
+                    token = accessToken ?? "",
+                    refreshToken = refreshToken
+                }),
                 Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync("/auth/refresh", content);
+
+            // FIX: Correct endpoint
+            var response = await _httpClient.PostAsync("/auth/refresh-token", content);
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
                 var result = JsonConvert.DeserializeObject<ApiResponse<AuthResponse>>(json);
                 if (result?.Data != null)
                 {
-                    await _secureStorage.SetAsync("auth_token", result.Data.Token);
+                    var newToken = result.Data.GetToken();
+                    await _secureStorage.SetAsync("auth_token", newToken);
                     await _secureStorage.SetAsync("refresh_token", result.Data.RefreshToken);
                     return true;
                 }

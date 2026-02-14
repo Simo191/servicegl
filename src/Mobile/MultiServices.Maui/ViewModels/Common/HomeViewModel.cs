@@ -29,7 +29,7 @@ public partial class HomeViewModel : BaseViewModel
     private void SetGreeting()
     {
         var hour = DateTime.Now.Hour;
-        var name = _authService.CurrentUser?.FirstName ?? "";
+        var name = _authService.CurrentUser?.FirstName ?? "vous";
         Greeting = hour switch
         {
             < 12 => $"Bonjour {name} 👋",
@@ -39,45 +39,68 @@ public partial class HomeViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private async Task LoadHomeDataAsync()
+    private async Task LoadDataAsync()
     {
         await ExecuteAsync(async () =>
         {
-            var restaurantsTask = _api.GetAsync<PaginatedResult<RestaurantListDto>>("/restaurants",
-                new Dictionary<string, string> { ["pageSize"] = "5", ["sortBy"] = "popularity" });
+            // Restaurants: GET /restaurants/popular?count=6
+            var restaurantsTask = _api.GetAsync<List<RestaurantListDto>>("/restaurants/popular",
+                new Dictionary<string, string> { ["count"] = "6" });
+
+            // Services: GET /services/providers?page=1&pageSize=6
             var providersTask = _api.GetAsync<PaginatedResult<ServiceProviderListDto>>("/services/providers",
-                new Dictionary<string, string> { ["pageSize"] = "5", ["sortBy"] = "rating" });
+                new Dictionary<string, string> { ["page"] = "1", ["pageSize"] = "6" });
+
+            // Grocery: GET /grocery/stores?page=1&pageSize=6
             var storesTask = _api.GetAsync<PaginatedResult<GroceryStoreListDto>>("/grocery/stores",
-                new Dictionary<string, string> { ["pageSize"] = "5" });
+                new Dictionary<string, string> { ["page"] = "1", ["pageSize"] = "6" });
 
             await Task.WhenAll(restaurantsTask, providersTask, storesTask);
 
-            var restaurants = await restaurantsTask;
-            if (restaurants.Success && restaurants.Data != null)
-                PopularRestaurants = new ObservableCollection<RestaurantListDto>(restaurants.Data.Items);
+            var restaurantsResult = await restaurantsTask;
+            if (restaurantsResult.Success && restaurantsResult.Data != null)
+                PopularRestaurants = new ObservableCollection<RestaurantListDto>(restaurantsResult.Data);
 
-            var providers = await providersTask;
-            if (providers.Success && providers.Data != null)
-                TopProviders = new ObservableCollection<ServiceProviderListDto>(providers.Data.Items);
+            var providersResult = await providersTask;
+            if (providersResult.Success && providersResult.Data != null)
+                TopProviders = new ObservableCollection<ServiceProviderListDto>(providersResult.Data.Items);
 
-            var stores = await storesTask;
-            if (stores.Success && stores.Data != null)
-                NearbyStores = new ObservableCollection<GroceryStoreListDto>(stores.Data.Items);
+            var storesResult = await storesTask;
+            if (storesResult.Success && storesResult.Data != null)
+                NearbyStores = new ObservableCollection<GroceryStoreListDto>(storesResult.Data.Items);
         });
     }
 
     [RelayCommand]
-    private async Task GoToRestaurantsAsync() => await Shell.Current.GoToAsync("//main/restaurants");
+    private async Task GoToRestaurantsAsync() => await Shell.Current.GoToAsync("//restaurants");
 
     [RelayCommand]
-    private async Task GoToServicesAsync() => await Shell.Current.GoToAsync("//main/services");
+    private async Task GoToServicesAsync() => await Shell.Current.GoToAsync("//services");
 
     [RelayCommand]
-    private async Task GoToGroceryAsync() => await Shell.Current.GoToAsync("//main/grocery");
+    private async Task GoToGroceryAsync() => await Shell.Current.GoToAsync("//grocery");
 
     [RelayCommand]
     private async Task GoToOrdersAsync() => await Shell.Current.GoToAsync("//main/orders");
 
     [RelayCommand]
     private async Task GoToNotificationsAsync() => await Shell.Current.GoToAsync("notifications");
+
+    [RelayCommand]
+    private async Task SelectRestaurantAsync(RestaurantListDto restaurant)
+    {
+        await Shell.Current.GoToAsync($"restaurantdetail?id={restaurant.Id}");
+    }
+
+    [RelayCommand]
+    private async Task SelectProviderAsync(ServiceProviderListDto provider)
+    {
+        await Shell.Current.GoToAsync($"servicedetail?id={provider.Id}");
+    }
+
+    [RelayCommand]
+    private async Task SelectStoreAsync(GroceryStoreListDto store)
+    {
+        await Shell.Current.GoToAsync($"storedetail?id={store.Id}");
+    }
 }

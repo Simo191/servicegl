@@ -13,8 +13,9 @@ public partial class StoreDetailViewModel : BaseViewModel
 
     [ObservableProperty] private string _storeId = string.Empty;
     [ObservableProperty] private GroceryStoreDto? _store;
-    [ObservableProperty] private ObservableCollection<GroceryDepartmentDto> _departments = new();
-    [ObservableProperty] private GroceryDepartmentDto? _selectedDepartment;
+    // Backend uses Categories (StoreCategoryDto), not Departments
+    [ObservableProperty] private ObservableCollection<StoreCategoryDto> _categories = new();
+    [ObservableProperty] private StoreCategoryDto? _selectedCategory;
     [ObservableProperty] private ObservableCollection<GroceryProductDto> _products = new();
     [ObservableProperty] private string _searchQuery = string.Empty;
     [ObservableProperty] private GroceryCart _cart = new();
@@ -44,20 +45,23 @@ public partial class StoreDetailViewModel : BaseViewModel
             {
                 Store = result.Data;
                 Title = result.Data.Name;
-                Departments = new ObservableCollection<GroceryDepartmentDto>(result.Data.Departments);
+
+                // Backend uses "Categories" not "Departments"
+                Categories = new ObservableCollection<StoreCategoryDto>(result.Data.Categories);
+
                 Cart.StoreId = result.Data.Id;
                 Cart.StoreName = result.Data.Name;
                 Cart.StoreLogoUrl = result.Data.LogoUrl;
                 Cart.DeliveryFee = result.Data.DeliveryFee;
-                Cart.MinimumOrder = result.Data.MinimumOrder;
+                Cart.MinimumOrder = result.Data.MinOrderAmount;
             }
         });
     }
 
     [RelayCommand]
-    private async Task SelectDepartmentAsync(GroceryDepartmentDto dept)
+    private async Task SelectCategoryAsync(StoreCategoryDto category)
     {
-        SelectedDepartment = dept;
+        SelectedCategory = category;
         await LoadProductsAsync();
     }
 
@@ -68,16 +72,41 @@ public partial class StoreDetailViewModel : BaseViewModel
         {
             var queryParams = new Dictionary<string, string>
             {
-                ["query"] = SearchQuery,
-                ["departmentId"] = SelectedDepartment?.Id.ToString() ?? "",
+                ["q"] = SearchQuery,
+                ["categoryId"] = SelectedCategory?.Id.ToString() ?? "",
                 ["isBio"] = FilterBio ? "true" : "",
                 ["isHalal"] = FilterHalal ? "true" : "",
-                ["isOnPromotion"] = FilterPromo ? "true" : ""
+                ["onPromo"] = FilterPromo ? "true" : "",
+                ["page"] = "1",
+                ["pageSize"] = "20"
             };
-            var result = await _api.GetAsync<PaginatedResult<GroceryProductDto>>($"/grocery/stores/{StoreId}/products", queryParams);
+
+            var result = await _api.GetAsync<PaginatedResult<GroceryProductDto>>(
+                $"/grocery/stores/{StoreId}/products", queryParams);
             if (result.Success && result.Data != null)
                 Products = new ObservableCollection<GroceryProductDto>(result.Data.Items);
         });
+    }
+
+    [RelayCommand]
+    private async Task ToggleBioFilterAsync()
+    {
+        FilterBio = !FilterBio;
+        await LoadProductsAsync();
+    }
+
+    [RelayCommand]
+    private async Task ToggleHalalFilterAsync()
+    {
+        FilterHalal = !FilterHalal;
+        await LoadProductsAsync();
+    }
+
+    [RelayCommand]
+    private async Task TogglePromoFilterAsync()
+    {
+        FilterPromo = !FilterPromo;
+        await LoadProductsAsync();
     }
 
     [RelayCommand]
@@ -112,6 +141,19 @@ public partial class StoreDetailViewModel : BaseViewModel
     [RelayCommand]
     private async Task ProceedToCheckoutAsync()
     {
+        if (!Cart.MeetsMinimum)
+        {
+            await Shell.Current.DisplayAlert("Minimum non atteint",
+                $"Le minimum de commande est {Cart.MinimumOrder:N2} DH", "OK");
+            return;
+        }
         await Shell.Current.GoToAsync("grocerycheckout");
+    }
+
+    [RelayCommand]
+    private async Task ScanBarcodeAsync()
+    {
+        // ZXing scanner integration
+        await Task.CompletedTask;
     }
 }

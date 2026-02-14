@@ -14,6 +14,7 @@ public partial class ServicesViewModel : BaseViewModel
     [ObservableProperty] private ObservableCollection<ServiceProviderListDto> _providers = new();
     [ObservableProperty] private string _searchQuery = string.Empty;
     [ObservableProperty] private string? _selectedCategory;
+    [ObservableProperty] private string? _selectedCity;
     [ObservableProperty] private bool _showFilters;
     [ObservableProperty] private ObservableCollection<CategoryItem> _categories = new();
 
@@ -30,10 +31,13 @@ public partial class ServicesViewModel : BaseViewModel
     {
         await ExecuteAsync(async () =>
         {
+            // FIX: Backend params match ServicesController.SearchProviders:
+            // category, minRating, city, maxPrice, sortBy, page, pageSize
+            // Note: Backend does NOT have a "query" param for text search
             var queryParams = new Dictionary<string, string>
             {
-                ["query"] = SearchQuery,
                 ["category"] = SelectedCategory ?? "",
+                ["city"] = SelectedCity ?? "",
                 ["page"] = "1",
                 ["pageSize"] = "20"
             };

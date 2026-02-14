@@ -24,6 +24,9 @@ public partial class BookServiceViewModel : BaseViewModel
     [ObservableProperty] private string _paymentTiming = "after";
     [ObservableProperty] private int _currentStep = 1;
 
+    /// <summary>Bindable MinimumDate for DatePicker (avoids sys:DateTime in XAML)</summary>
+    public DateTime MinimumDate => DateTime.Today;
+
     public BookServiceViewModel(ApiService api)
     {
         _api = api;
@@ -33,7 +36,7 @@ public partial class BookServiceViewModel : BaseViewModel
     [RelayCommand]
     private async Task LoadAddressesAsync()
     {
-        var result = await _api.GetAsync<List<AddressDto>>("/profile/addresses");
+        var result = await _api.GetAsync<List<AddressDto>>("/auth/profile/addresses");
         if (result.Success && result.Data != null)
         {
             Addresses = new ObservableCollection<AddressDto>(result.Data);
@@ -44,29 +47,20 @@ public partial class BookServiceViewModel : BaseViewModel
     [RelayCommand]
     private async Task LoadSlotsAsync()
     {
+        if (string.IsNullOrEmpty(ProviderId)) return;
+
         var queryParams = new Dictionary<string, string>
         {
-            ["date"] = SelectedDate.ToString("yyyy-MM-dd")
+            ["category"] = "",
+            ["date"] = SelectedDate.ToString("yyyy-MM-dd"),
+            ["city"] = SelectedAddress?.City ?? ""
         };
-        var result = await _api.GetAsync<List<AvailableSlotDto>>($"/services/providers/{ProviderId}/slots", queryParams);
+
+        var result = await _api.GetAsync<List<AvailableSlotDto>>("/services/providers/available", queryParams);
         if (result.Success && result.Data != null)
+        {
             AvailableSlots = new ObservableCollection<AvailableSlotDto>(result.Data);
-    }
-
-    [RelayCommand]
-    private async Task AddPhotoAsync()
-    {
-        var result = await MediaPicker.Default.CapturePhotoAsync();
-        if (result != null)
-            ProblemPhotos.Add(result.FullPath);
-    }
-
-    [RelayCommand]
-    private async Task PickPhotoAsync()
-    {
-        var result = await MediaPicker.Default.PickPhotoAsync();
-        if (result != null)
-            ProblemPhotos.Add(result.FullPath);
+        }
     }
 
     [RelayCommand]
@@ -86,28 +80,76 @@ public partial class BookServiceViewModel : BaseViewModel
     {
         if (SelectedAddress == null || SelectedSlot == null)
         {
-            await Shell.Current.DisplayAlert("Erreur", "Veuillez compléter tous les champs", "OK");
+            await Shell.Current.DisplayAlert("Erreur", "Veuillez remplir tous les champs", "OK");
             return;
         }
 
         await ExecuteAsync(async () =>
         {
-            var request = new
+            var result = await _api.PostAsync<InterventionDto>("/services/bookings", new
             {
+                serviceProviderId = Guid.Parse(ProviderId),
                 serviceOfferingId = Guid.Parse(ServiceId),
                 problemDescription = ProblemDescription,
+                problemPhotos = ProblemPhotos.ToList(),
+                scheduledDate = SelectedSlot.Date.ToString("yyyy-MM-dd"),
+                scheduledStartTime = SelectedSlot.StartTime.ToString(@"hh\:mm"),
+                scheduledEndTime = SelectedSlot.EndTime.ToString(@"hh\:mm"),
                 addressId = SelectedAddress.Id,
-                scheduledDate = SelectedDate,
-                scheduledStartTime = SelectedSlot.StartTime,
-                paymentTiming = PaymentTiming
-            };
+                paymentTiming = PaymentTiming  // FIX: use property, not field (MVVMTK0034)
+            });
 
-            var result = await _api.PostAsync<InterventionDto>("/services/interventions", request);
-            if (result.Success)
+            if (result.Success && result.Data != null)
             {
-                await Shell.Current.DisplayAlert("Succès", "Votre réservation a été confirmée!", "OK");
-                await Shell.Current.GoToAsync("../..");
+                await Shell.Current.DisplayAlert("Réservation confirmée",
+                    $"N° {result.Data.InterventionNumber}", "OK");
+                await Shell.Current.GoToAsync($"interventiontracking?id={result.Data.Id}");
+            }
+            else
+            {
+                await Shell.Current.DisplayAlert("Erreur",
+                    result.Message ?? "Impossible de créer la réservation", "OK");
             }
         });
+    }
+
+    [RelayCommand]
+    private async Task AddPhotoAsync()
+    {
+        try
+        {
+            var photo = await MediaPicker.Default.CapturePhotoAsync();
+            if (photo != null)
+            {
+                using var stream = await photo.OpenReadAsync();
+                var uploadResult = await _api.UploadAsync<string>("/files/upload", stream, photo.FileName);
+                if (uploadResult.Success && uploadResult.Data != null)
+                    ProblemPhotos.Add(uploadResult.Data);
+            }
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Erreur", ex.Message, "OK");
+        }
+    }
+
+    [RelayCommand]
+    private async Task PickPhotoAsync()
+    {
+        try
+        {
+            var photo = await MediaPicker.Default.PickPhotoAsync();
+            if (photo != null)
+            {
+                using var stream = await photo.OpenReadAsync();
+                var uploadResult = await _api.UploadAsync<string>("/files/upload", stream, photo.FileName);
+                if (uploadResult.Success && uploadResult.Data != null)
+                    ProblemPhotos.Add(uploadResult.Data);
+            }
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Erreur", ex.Message, "OK");
+        }
     }
 }

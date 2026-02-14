@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:MultiServices.Maui.ViewModels.Restaurant"
+             xmlns:models="clr-namespace:MultiServices.Maui.Models"
              x:Class="MultiServices.Maui.Views.Restaurant.RestaurantOrderTrackingPage"
              x:DataType="vm:RestaurantOrderTrackingViewModel"
              Title="Suivi commande">
@@ -20,7 +21,7 @@
             <Frame Style="{StaticResource CardFrame}">
                 <VerticalStackLayout Spacing="4" BindableLayout.ItemsSource="{Binding StatusHistory}">
                     <BindableLayout.ItemTemplate>
-                        <DataTemplate x:DataType="models:OrderStatusHistoryDto" xmlns:models="clr-namespace:MultiServices.Maui.Models">
+                        <DataTemplate x:DataType="models:OrderStatusHistoryDto">
                             <HorizontalStackLayout Spacing="12" Padding="0,4">
                                 <Frame BackgroundColor="{StaticResource Success}" CornerRadius="8" HeightRequest="16" WidthRequest="16" HasShadow="False" Padding="0" />
                                 <VerticalStackLayout>
@@ -50,10 +51,19 @@
             <Frame Style="{StaticResource CardFrame}">
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Résumé" Style="{StaticResource Title3}" />
-                    <Grid ColumnDefinitions="*,Auto"><Label Text="Sous-total" /><Label Grid.Column="1" Text="{Binding Order.SubTotal, StringFormat='{0:N2} DH'}" /></Grid>
-                    <Grid ColumnDefinitions="*,Auto"><Label Text="Livraison" /><Label Grid.Column="1" Text="{Binding Order.DeliveryFee, StringFormat='{0:N2} DH'}" /></Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Sous-total" />
+                        <Label Grid.Column="1" Text="{Binding Order.SubTotal, StringFormat='{0:N2} DH'}" />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Livraison" />
+                        <Label Grid.Column="1" Text="{Binding Order.DeliveryFee, StringFormat='{0:N2} DH'}" />
+                    </Grid>
                     <BoxView HeightRequest="1" BackgroundColor="{StaticResource Border}" />
-                    <Grid ColumnDefinitions="*,Auto"><Label Text="Total" FontAttributes="Bold" /><Label Grid.Column="1" Text="{Binding Order.TotalAmount, StringFormat='{0:N2} DH'}" FontAttributes="Bold" TextColor="{StaticResource Primary}" /></Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Total" FontAttributes="Bold" />
+                        <Label Grid.Column="1" Text="{Binding Order.TotalAmount, StringFormat='{0:N2} DH'}" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                    </Grid>
                 </VerticalStackLayout>
             </Frame>
         </VerticalStackLayout>

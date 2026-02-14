@@ -29,11 +29,12 @@ public partial class RestaurantsViewModel : BaseViewModel
     {
         await ExecuteAsync(async () =>
         {
+            // FIX: Backend param names: q, cuisine, price, minRating, hasPromo, sortBy
             var queryParams = new Dictionary<string, string>
             {
-                ["query"] = SearchQuery,
-                ["cuisineType"] = SelectedCuisine ?? "",
-                ["priceRange"] = SelectedPriceRange ?? "",
+                ["q"] = SearchQuery,                          // Was: query
+                ["cuisine"] = SelectedCuisine ?? "",          // Was: cuisineType
+                ["price"] = SelectedPriceRange ?? "",         // Was: priceRange
                 ["minRating"] = MinRating?.ToString() ?? "",
                 ["page"] = "1",
                 ["pageSize"] = "20"

@@ -15,7 +15,7 @@ public partial class ServiceDetailViewModel : BaseViewModel
     [ObservableProperty] private ServiceProviderDto? _provider;
     [ObservableProperty] private ObservableCollection<ServiceOfferingDto> _services = new();
     [ObservableProperty] private ObservableCollection<PortfolioItemDto> _portfolio = new();
-    [ObservableProperty] private ObservableCollection<ReviewDto> _reviews = new();
+    [ObservableProperty] private ObservableCollection<ServiceProviderReviewDto> _reviews = new();  // Fixed: was ReviewDto
     [ObservableProperty] private ServiceOfferingDto? _selectedService;
     [ObservableProperty] private string _activeTab = "services";
     [ObservableProperty] private bool _isFavorite;
@@ -43,7 +43,7 @@ public partial class ServiceDetailViewModel : BaseViewModel
                 Title = result.Data.CompanyName;
                 Services = new ObservableCollection<ServiceOfferingDto>(result.Data.Services);
                 Portfolio = new ObservableCollection<PortfolioItemDto>(result.Data.Portfolio);
-                Reviews = new ObservableCollection<ReviewDto>(result.Data.Reviews);
+                Reviews = new ObservableCollection<ServiceProviderReviewDto>(result.Data.Reviews);  // Fixed: was ReviewDto
             }
         });
     }

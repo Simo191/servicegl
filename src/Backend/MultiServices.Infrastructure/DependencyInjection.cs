@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MultiServices.Domain.Interfaces.Repositories;
 using MultiServices.Domain.Interfaces.Services;
 using MultiServices.Infrastructure.Data;
+using MultiServices.Infrastructure.Data.Interceptors;
 using MultiServices.Infrastructure.Repositories;
 using MultiServices.Infrastructure.Services.Auth;
 
@@ -13,21 +14,21 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        // Database
-        services.AddDbContext<ApplicationDbContext>(options =>
+        //services.AddHttpContextAccessor();
+
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<AuditableEntityInterceptor>();
+
+        services.AddDbContext<ApplicationDbContext>((sp, options) =>
+        {
             options.UseNpgsql(
                 configuration.GetConnectionString("DefaultConnection"),
                 b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)
-            )
-        );
+            );
 
-        // Repositories
-        services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
+            options.AddInterceptors(sp.GetRequiredService<AuditableEntityInterceptor>());
+        });
 
-        // Services
-        services.AddScoped<IAuthService, JwtTokenService>();
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         // Redis Cache
         var redisConnection = configuration.GetConnectionString("Redis");

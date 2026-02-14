@@ -24,13 +24,83 @@ public partial class OrdersViewModel : BaseViewModel
     {
         await ExecuteAsync(async () =>
         {
+            // FIX: Backend has NO unified /orders endpoint.
+            // Must query 3 separate endpoints and merge results:
+            // - /restaurant-orders/my-orders?status=...
+            // - /services/bookings/my-bookings?status=...
+            // - /grocery/orders/my-orders?status=...
             var status = ActiveTab == "active" ? "active" : "completed";
-            var result = await _api.GetAsync<List<OrderSummary>>("/orders", new Dictionary<string, string> { ["status"] = status });
-            if (result.Success && result.Data != null)
+            var allOrders = new List<OrderSummary>();
+
+            // Restaurant orders
+            var restaurantTask = _api.GetAsync<PaginatedResult<RestaurantOrderDto>>(
+                "/restaurant-orders/my-orders",
+                new Dictionary<string, string> { ["status"] = status, ["page"] = "1", ["pageSize"] = "10" });
+
+            // Service bookings
+            var serviceTask = _api.GetAsync<PaginatedResult<InterventionDto>>(
+                "/services/bookings/my-bookings",
+                new Dictionary<string, string> { ["status"] = status, ["page"] = "1", ["pageSize"] = "10" });
+
+            // Grocery orders
+            var groceryTask = _api.GetAsync<PaginatedResult<GroceryOrderDto>>(
+                "/grocery/orders/my-orders",
+                new Dictionary<string, string> { ["status"] = status, ["page"] = "1", ["pageSize"] = "10" });
+
+            await Task.WhenAll(restaurantTask, serviceTask, groceryTask);
+
+            var restaurantResult = await restaurantTask;
+            if (restaurantResult.Success && restaurantResult.Data != null)
             {
-                Orders = new ObservableCollection<OrderSummary>(result.Data);
-                IsEmpty = !Orders.Any();
+                allOrders.AddRange(restaurantResult.Data.Items.Select(o => new OrderSummary
+                {
+                    Id = o.Id,
+                    OrderNumber = o.OrderNumber,
+                    Type = "restaurant",
+                    ProviderName = o.RestaurantName,
+                    ProviderLogoUrl = o.RestaurantLogoUrl,
+                    Status = o.Status,
+                    TotalAmount = o.TotalAmount,
+                    CreatedAt = o.CreatedAt
+                }));
             }
+
+            var serviceResult = await serviceTask;
+            if (serviceResult.Success && serviceResult.Data != null)
+            {
+                allOrders.AddRange(serviceResult.Data.Items.Select(o => new OrderSummary
+                {
+                    Id = o.Id,
+                    OrderNumber = o.InterventionNumber,
+                    Type = "service",
+                    ProviderName = o.ProviderName,
+                    ProviderLogoUrl = o.ProviderLogoUrl,
+                    Status = o.Status,
+                    TotalAmount = o.FinalPrice ?? o.EstimatedPrice,
+                    CreatedAt = o.CreatedAt
+                }));
+            }
+
+            var groceryResult = await groceryTask;
+            if (groceryResult.Success && groceryResult.Data != null)
+            {
+                allOrders.AddRange(groceryResult.Data.Items.Select(o => new OrderSummary
+                {
+                    Id = o.Id,
+                    OrderNumber = o.OrderNumber,
+                    Type = "grocery",
+                    ProviderName = o.StoreName,
+                    ProviderLogoUrl = o.StoreLogoUrl,
+                    Status = o.Status,
+                    TotalAmount = o.TotalAmount,
+                    CreatedAt = o.CreatedAt
+                }));
+            }
+
+            // Sort by most recent
+            Orders = new ObservableCollection<OrderSummary>(
+                allOrders.OrderByDescending(o => o.CreatedAt));
+            IsEmpty = !Orders.Any();
         });
     }
 
@@ -48,7 +118,7 @@ public partial class OrdersViewModel : BaseViewModel
         {
             "restaurant" => $"restaurantordertracking?id={order.Id}",
             "service" => $"interventiontracking?id={order.Id}",
-            "grocery" => $"groceryordertracking?id={order.Id}",
+            "grocery" => $"grocerycheckout?id={order.Id}",  // FIX: groceryordertracking doesn't exist in routes
             _ => ""
         };
         if (!string.IsNullOrEmpty(route))

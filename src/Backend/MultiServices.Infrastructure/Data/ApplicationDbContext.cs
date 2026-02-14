@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using MultiServices.Domain.Entities.Common;
+using MultiServices.Domain.Entities.Grocery;
 using MultiServices.Domain.Entities.Identity;
 using MultiServices.Domain.Entities.Restaurant;
 using MultiServices.Domain.Entities.Service;
-using MultiServices.Domain.Entities.Grocery;
-using MultiServices.Domain.Entities.Common;
 using MultiServices.Infrastructure.Data.Interceptors;
+using System.Linq.Expressions;
 
 namespace MultiServices.Infrastructure.Data;
 
@@ -99,8 +100,21 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
         {
             if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
             {
-                builder.Entity(entityType.ClrType).HasQueryFilter(
-                    (System.Linq.Expressions.Expression<Func<BaseEntity, bool>>)(e => !e.IsDeleted));
+                // e =>
+                var parameter = Expression.Parameter(entityType.ClrType, "e");
+
+                // ((BaseEntity)e).IsDeleted
+                var isDeletedProperty = Expression.Property(
+                    Expression.Convert(parameter, typeof(BaseEntity)),
+                    nameof(BaseEntity.IsDeleted));
+
+                // !((BaseEntity)e).IsDeleted
+                var body = Expression.Not(isDeletedProperty);
+
+                // Expression<Func<TEntity, bool>>
+                var lambda = Expression.Lambda(body, parameter);
+
+                builder.Entity(entityType.ClrType).HasQueryFilter(lambda);
             }
         }
 
