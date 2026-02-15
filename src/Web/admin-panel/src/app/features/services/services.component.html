@@ -1,0 +1,261 @@
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <div>
+    <h4 class="fw-bold mb-1">Prestataires de Services</h4>
+    <p class="text-muted mb-0">{{ totalCount() }} prestataires enregistrés</p>
+  </div>
+  <div class="d-flex align-items-center gap-2">
+    <div class="btn-group btn-group-sm" role="group">
+      <button class="btn" [class]="viewMode === 'list' ? 'btn-primary' : 'btn-outline-secondary'" (click)="viewMode = 'list'" title="Vue liste">
+        <i class="bi bi-list-ul"></i>
+      </button>
+      <button class="btn" [class]="viewMode === 'card' ? 'btn-primary' : 'btn-outline-secondary'" (click)="viewMode = 'card'" title="Vue cartes">
+        <i class="bi bi-grid-3x3-gap"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Category Cards -->
+<div class="row g-3 mb-4">
+  @for (cat of categories; track cat.name) {
+    <div class="col-md-3 col-6">
+      <div class="stat-card text-center" style="cursor:pointer" [class.border-primary]="categoryFilter === cat.name"
+           (click)="categoryFilter = categoryFilter === cat.name ? '' : cat.name; loadProviders()">
+        <i class="bi" [class]="cat.icon" style="font-size:1.5rem" [style.color]="cat.color"></i>
+        <p class="fw-bold mb-0 mt-1">{{ cat.count }}</p>
+        <small class="text-muted">{{ cat.name }}</small>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Table -->
+<div class="table-card">
+  <div class="card-header">
+    <div class="d-flex gap-2 flex-wrap">
+      <div class="input-group" style="max-width:280px">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="text" class="form-control" placeholder="Rechercher..." [(ngModel)]="search" (input)="onSearch()" />
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading />
+  } @else if (providers().length === 0) {
+    <app-empty-state icon="bi-tools" message="Aucun prestataire trouvé" />
+  } @else {
+
+    <!-- ═══════ LIST VIEW ═══════ -->
+    @if (viewMode === 'list') {
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Prestataire</th>
+              <th>Catégorie</th>
+              <th>Ville</th>
+              <th>Expérience</th>
+              <th>Note</th>
+              <th>Interventions</th>
+              <th>CA</th>
+              <th>Statut</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of providers(); track p.id) {
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="avatar-icon bg-info-subtle text-info"><i class="bi bi-tools"></i></div>
+                    <div>
+                      <div class="fw-medium">{{ p.companyName }}</div>
+                      <small class="text-muted">{{ p.ownerName }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="badge bg-info-subtle text-info">{{ p.category }}</span></td>
+                <td>{{ p.city }}</td>
+                <td>{{ p.yearsOfExperience }} ans</td>
+                <td><span class="text-warning">★</span> {{ p.rating.toFixed(1) }}</td>
+                <td>{{ p.totalInterventions | number }}</td>
+                <td class="fw-medium">{{ p.totalRevenue | number:'1.0-0' }} MAD</td>
+                <td>
+                  @if (p.isVerified && p.isActive) {
+                    <span class="badge-status badge-success">Actif</span>
+                  } @else if (!p.isVerified) {
+                    <span class="badge-status badge-warning">En attente</span>
+                  } @else {
+                    <span class="badge-status badge-danger">Suspendu</span>
+                  }
+                </td>
+                <td class="text-end">
+                  <div class="dropdown">
+                    <button class="btn btn-sm btn-light border-0 rounded-circle action-dots" data-bs-toggle="dropdown">
+                      <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                      <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer">
+                          <i class="bi bi-eye text-primary"></i> Voir le profil
+                        </a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer">
+                          <i class="bi bi-pencil-square text-secondary"></i> Modifier
+                        </a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer">
+                          <i class="bi bi-bar-chart text-info"></i> Statistiques
+                        </a>
+                      </li>
+                      @if (!p.isVerified) {
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                          <a class="dropdown-item d-flex align-items-center gap-2 text-success" (click)="approve(p.id)" style="cursor:pointer">
+                            <i class="bi bi-check-circle"></i> Approuver
+                          </a>
+                        </li>
+                      }
+                      @if (p.isVerified) {
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                          <a class="dropdown-item d-flex align-items-center gap-2" [class]="p.isActive ? 'text-danger' : 'text-success'" (click)="suspendToggle(p)" style="cursor:pointer">
+                            @if (p.isActive) {
+                              <i class="bi bi-pause-circle"></i> Suspendre
+                            } @else {
+                              <i class="bi bi-play-circle"></i> Réactiver
+                            }
+                          </a>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <!-- ═══════ CARD VIEW ═══════ -->
+    @if (viewMode === 'card') {
+      <div class="row g-3 p-3">
+        @for (p of providers(); track p.id) {
+          <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="card border-0 shadow-sm card-hover h-100" style="border-radius:12px">
+              <div class="card-body p-3">
+                <!-- Header -->
+                <div class="d-flex align-items-start justify-content-between mb-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="avatar-icon bg-info-subtle text-info"><i class="bi bi-tools"></i></div>
+                    <div>
+                      <h6 class="fw-bold mb-0 text-truncate" style="max-width:130px">{{ p.companyName }}</h6>
+                      <small class="text-muted">{{ p.ownerName }}</small>
+                    </div>
+                  </div>
+                  <div class="dropdown">
+                    <button class="btn btn-sm btn-light border-0 rounded-circle action-dots" data-bs-toggle="dropdown">
+                      <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                      <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer">
+                          <i class="bi bi-eye text-primary"></i> Voir le profil
+                        </a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer">
+                          <i class="bi bi-pencil-square text-secondary"></i> Modifier
+                        </a>
+                      </li>
+                      @if (!p.isVerified) {
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                          <a class="dropdown-item d-flex align-items-center gap-2 text-success" (click)="approve(p.id)" style="cursor:pointer">
+                            <i class="bi bi-check-circle"></i> Approuver
+                          </a>
+                        </li>
+                      }
+                      @if (p.isVerified) {
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                          <a class="dropdown-item d-flex align-items-center gap-2" [class]="p.isActive ? 'text-danger' : 'text-success'" (click)="suspendToggle(p)" style="cursor:pointer">
+                            @if (p.isActive) {
+                              <i class="bi bi-pause-circle"></i> Suspendre
+                            } @else {
+                              <i class="bi bi-play-circle"></i> Réactiver
+                            }
+                          </a>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                </div>
+
+                <!-- Badges -->
+                <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+                  <span class="badge bg-info-subtle text-info">{{ p.category }}</span>
+                  <span class="badge bg-light text-muted"><i class="bi bi-geo-alt me-1"></i>{{ p.city }}</span>
+                  @if (p.isVerified && p.isActive) {
+                    <span class="badge bg-success-subtle text-success rounded-pill" style="font-size:0.7rem">Actif</span>
+                  } @else if (!p.isVerified) {
+                    <span class="badge bg-warning-subtle text-warning rounded-pill" style="font-size:0.7rem">En attente</span>
+                  } @else {
+                    <span class="badge bg-danger-subtle text-danger rounded-pill" style="font-size:0.7rem">Suspendu</span>
+                  }
+                </div>
+
+                <!-- Stats -->
+                <div class="row g-2 text-center">
+                  <div class="col-3">
+                    <div class="bg-light rounded-3 p-2">
+                      <div class="fw-bold" style="font-size:0.85rem"><span class="text-warning">★</span> {{ p.rating.toFixed(1) }}</div>
+                      <div class="text-muted" style="font-size:0.65rem">Note</div>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <div class="bg-light rounded-3 p-2">
+                      <div class="fw-bold" style="font-size:0.85rem">{{ p.yearsOfExperience }}</div>
+                      <div class="text-muted" style="font-size:0.65rem">Ans exp.</div>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <div class="bg-light rounded-3 p-2">
+                      <div class="fw-bold" style="font-size:0.85rem">{{ p.totalInterventions | number }}</div>
+                      <div class="text-muted" style="font-size:0.65rem">Interv.</div>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <div class="bg-light rounded-3 p-2">
+                      <div class="fw-bold" style="font-size:0.85rem">{{ p.commissionRate }}%</div>
+                      <div class="text-muted" style="font-size:0.65rem">Comm.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Revenue -->
+                <div class="mt-3 pt-2 border-top">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">Chiffre d'affaires</small>
+                    <span class="fw-bold" style="font-size:0.88rem">{{ p.totalRevenue | number:'1.0-0' }} MAD</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="p-3 border-top">
+      <app-pagination [currentPage]="page()" [totalPages]="totalPages()" (pageChange)="goToPage($event)" />
+    </div>
+  }
+</div>
+
+<app-confirm-modal [show]="showConfirm()" [title]="confirmTitle()" [message]="confirmMessage()"
+  [confirmText]="confirmText()" (confirmed)="onConfirm()" (cancelled)="onCancel()" />

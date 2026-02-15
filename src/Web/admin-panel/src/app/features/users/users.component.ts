@@ -7,192 +7,122 @@ import { PaginationComponent } from '../../shared/components/pagination.componen
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state.component';
 import { ConfirmModalComponent } from '../../shared/components/confirm-modal.component';
-import { UserDto, PaginatedResult } from '../../core/models/api.models';
+import { AdminUserDto, PaginatedResult } from '../../core/models/api.models';
+
+interface RoleOption { 
+  value: string; 
+  label: string; 
+  icon: string; 
+  color: string; 
+}
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [FormsModule, DatePipe, DecimalPipe, PaginationComponent, LoadingSpinnerComponent, EmptyStateComponent, ConfirmModalComponent],
-  template: `
-    <div class="d-flex align-items-center justify-content-between mb-4">
-      <div>
-        <h4 class="fw-bold mb-1">Gestion des Utilisateurs</h4>
-        <p class="text-muted mb-0">{{ totalCount() }} utilisateurs inscrits</p>
-      </div>
-      <button class="btn btn-primary" (click)="exportUsers()">
-        <i class="bi bi-download me-2"></i>Exporter
-      </button>
-    </div>
-
-    <!-- Filters -->
-    <div class="table-card mb-4">
-      <div class="card-body p-3">
-        <div class="row g-3 align-items-end">
-          <div class="col-md-4">
-            <label class="form-label small fw-medium">Recherche</label>
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-search"></i></span>
-              <input type="text" class="form-control" placeholder="Nom, email, téléphone..." [(ngModel)]="search" (input)="onSearch()" />
-            </div>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label small fw-medium">Rôle</label>
-            <select class="form-select" [(ngModel)]="roleFilter" (change)="loadUsers()">
-              <option value="">Tous</option>
-              <option value="Client">Client</option>
-              <option value="RestaurantOwner">Restaurant</option>
-              <option value="ServiceProvider">Prestataire</option>
-              <option value="GroceryManager">Magasin</option>
-              <option value="Deliverer">Livreur</option>
-              <option value="Admin">Admin</option>
-            </select>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label small fw-medium">Statut</label>
-            <select class="form-select" [(ngModel)]="statusFilter" (change)="loadUsers()">
-              <option value="">Tous</option>
-              <option value="true">Actif</option>
-              <option value="false">Inactif</option>
-            </select>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label small fw-medium">Tri</label>
-            <select class="form-select" [(ngModel)]="sortBy" (change)="loadUsers()">
-              <option value="createdAt">Date inscription</option>
-              <option value="lastLoginAt">Dernière connexion</option>
-              <option value="totalSpent">Total dépensé</option>
-            </select>
-          </div>
-          <div class="col-md-2">
-            <button class="btn btn-outline-secondary w-100" (click)="resetFilters()">
-              <i class="bi bi-x-circle me-1"></i>Réinitialiser
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Table -->
-    @if (loading()) {
-      <app-loading />
-    } @else if (users().length === 0) {
-      <app-empty-state icon="bi-people" message="Aucun utilisateur trouvé" />
-    } @else {
-      <div class="table-card">
-        <div class="table-responsive">
-          <table class="table table-hover mb-0">
-            <thead>
-              <tr>
-                <th>Utilisateur</th>
-                <th>Rôle</th>
-                <th>Téléphone</th>
-                <th>Statut</th>
-                <th>Commandes</th>
-                <th>Dépensé</th>
-                <th>Inscrit le</th>
-                <th class="text-end">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (user of users(); track user.id) {
-                <tr>
-                  <td>
-                    <div class="d-flex align-items-center gap-2">
-                      <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center" style="width:36px;height:36px;font-size:0.8rem;font-weight:600">
-                        {{ user.firstName[0] }}{{ user.lastName[0] }}
-                      </div>
-                      <div>
-                        <div class="fw-medium">{{ user.firstName }} {{ user.lastName }}</div>
-                        <small class="text-muted">{{ user.email }}</small>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <span class="badge bg-primary-subtle text-primary">{{ user.role }}</span>
-                  </td>
-                  <td>{{ user.phoneNumber || '-' }}</td>
-                  <td>
-                    @if (user.isActive) {
-                      <span class="badge-status bg-success-subtle text-success">Actif</span>
-                    } @else {
-                      <span class="badge-status bg-danger-subtle text-danger">Inactif</span>
-                    }
-                  </td>
-                  <td>{{ user.totalOrders }}</td>
-                  <td>{{ user.totalSpent | number:'1.0-0' }} MAD</td>
-                  <td class="text-muted">{{ user.createdAt | date:'dd/MM/yyyy' }}</td>
-                  <td class="text-end">
-                    <div class="dropdown">
-                      <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-eye me-2"></i>Voir profil</a></li>
-                        <li>
-                          @if (user.isActive) {
-                            <a class="dropdown-item text-warning" (click)="toggleUser(user)" style="cursor:pointer">
-                              <i class="bi bi-pause-circle me-2"></i>Suspendre
-                            </a>
-                          } @else {
-                            <a class="dropdown-item text-success" (click)="toggleUser(user)" style="cursor:pointer">
-                              <i class="bi bi-play-circle me-2"></i>Activer
-                            </a>
-                          }
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" (click)="prepareDelete(user)" style="cursor:pointer"><i class="bi bi-trash me-2"></i>Supprimer</a></li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-        <div class="p-3 border-top">
-          <app-pagination [currentPage]="page()" [totalPages]="totalPages()" (pageChange)="goToPage($event)" />
-        </div>
-      </div>
-    }
-
-    <app-confirm-modal [show]="showDeleteModal()" title="Supprimer l'utilisateur"
-      [message]="'Êtes-vous sûr de vouloir supprimer ' + (selectedUser()?.firstName || '') + ' ' + (selectedUser()?.lastName || '') + ' ?'"
-      confirmText="Supprimer" (confirmed)="deleteUser()" (cancelled)="showDeleteModal.set(false)" />
-  `
+  imports: [
+    FormsModule, 
+    DatePipe, 
+    DecimalPipe, 
+    PaginationComponent, 
+    LoadingSpinnerComponent, 
+    EmptyStateComponent, 
+    ConfirmModalComponent
+  ],
+  templateUrl: './users.component.html',
+  styleUrls: ['./users.component.scss']
 })
 export class UsersComponent implements OnInit {
-  users = signal<UserDto[]>([]);
+  // Signals pour la réactivité
+  users = signal<AdminUserDto[]>([]);
   loading = signal(true);
   page = signal(1);
   totalPages = signal(1);
   totalCount = signal(0);
 
+  // Filtres et recherche
   search = '';
   roleFilter = '';
   statusFilter = '';
   sortBy = 'createdAt';
+  viewMode: 'list' | 'card' = 'list';
 
+  // Modals de confirmation
   showDeleteModal = signal(false);
-  selectedUser = signal<UserDto | null>(null);
+  showActivateModal = signal(false);
+  showSuspendModal = signal(false);
+  showEditModal = signal(false);
+  showAddModal = signal(false);
+  
+  selectedUser = signal<AdminUserDto | null>(null);
+  
+  // Formulaire d'édition/ajout
+  userForm = {
+    fullName: '',
+    email: '',
+    phone: '',
+    role: 'Client',
+    isActive: true
+  };
 
   private searchTimeout: any;
 
-  constructor(private api: ApiService, private toast: ToastService) {}
+  roleOptions: RoleOption[] = [
+    { value: '', label: 'Tous les rôles', icon: 'bi-people', color: '' },
+    { value: 'Client', label: 'Client', icon: 'bi-person', color: 'primary' },
+    { value: 'RestaurantOwner', label: 'Restaurant', icon: 'bi-shop', color: 'warning' },
+    { value: 'ServiceProvider', label: 'Prestataire', icon: 'bi-tools', color: 'info' },
+    { value: 'GroceryManager', label: 'Magasin', icon: 'bi-cart3', color: 'success' },
+    { value: 'Deliverer', label: 'Livreur', icon: 'bi-truck', color: 'danger' },
+    { value: 'Admin', label: 'Admin', icon: 'bi-shield-lock', color: 'dark' }
+  ];
+
+  constructor(
+    private api: ApiService, 
+    private toast: ToastService
+  ) {}
 
   ngOnInit(): void {
     this.loadUsers();
   }
 
+  // ═══════════════════════════════════════════════════════════
+  // RECHERCHE & FILTRES
+  // ═══════════════════════════════════════════════════════════
+  
   onSearch(): void {
     clearTimeout(this.searchTimeout);
-    this.searchTimeout = setTimeout(() => this.loadUsers(), 400);
+    this.searchTimeout = setTimeout(() => { 
+      this.page.set(1); 
+      this.loadUsers(); 
+    }, 400);
   }
 
+  resetFilters(): void {
+    this.search = '';
+    this.roleFilter = '';
+    this.statusFilter = '';
+    this.sortBy = 'createdAt';
+    this.page.set(1);
+    this.loadUsers();
+  }
+
+  hasActiveFilters(): boolean {
+    return this.roleFilter !== '' || this.statusFilter !== '' || this.sortBy !== 'createdAt';
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // CHARGEMENT DES DONNÉES (READ)
+  // ═══════════════════════════════════════════════════════════
+  
   loadUsers(): void {
     this.loading.set(true);
-    this.api.getPaginated<UserDto>('admin/users', {
-      search: this.search, role: this.roleFilter, isActive: this.statusFilter,
-      sortBy: this.sortBy, page: this.page(), pageSize: 15
+    this.api.getPaginated<AdminUserDto>('admin/users', {
+      search: this.search,
+      role: this.roleFilter,
+      isActive: this.statusFilter,
+      sortBy: this.sortBy,
+      page: this.page(),
+      pageSize: 15
     }).subscribe({
       next: res => {
         if (res.success) {
@@ -202,33 +132,141 @@ export class UsersComponent implements OnInit {
         }
         this.loading.set(false);
       },
-      error: () => {
-        // Demo
-        this.users.set([
-          { id: '1', firstName: 'Ahmed', lastName: 'Bennani', email: 'ahmed@mail.com', phoneNumber: '+212612345678', photoUrl: '', role: 'Client', isActive: true, emailVerified: true, phoneVerified: true, createdAt: '2025-01-15', lastLoginAt: '2025-06-01', totalOrders: 45, totalSpent: 12500 },
-          { id: '2', firstName: 'Fatima', lastName: 'Zahra', email: 'fatima@mail.com', phoneNumber: '+212698765432', photoUrl: '', role: 'Client', isActive: true, emailVerified: true, phoneVerified: true, createdAt: '2025-02-20', lastLoginAt: '2025-06-02', totalOrders: 32, totalSpent: 8900 },
-          { id: '3', firstName: 'Youssef', lastName: 'Alami', email: 'youssef@restaurant.ma', phoneNumber: '+212655555555', photoUrl: '', role: 'RestaurantOwner', isActive: true, emailVerified: true, phoneVerified: true, createdAt: '2025-01-10', lastLoginAt: '2025-06-02', totalOrders: 0, totalSpent: 0 },
-          { id: '4', firstName: 'Omar', lastName: 'Tazi', email: 'omar@services.ma', phoneNumber: '+212644444444', photoUrl: '', role: 'ServiceProvider', isActive: false, emailVerified: true, phoneVerified: false, createdAt: '2025-03-05', lastLoginAt: '2025-05-20', totalOrders: 0, totalSpent: 0 },
-        ]);
-        this.totalCount.set(4);
-        this.totalPages.set(1);
+      error: (err) => {
+        this.toast.error('Erreur lors du chargement des utilisateurs');
         this.loading.set(false);
       }
     });
   }
 
-  goToPage(p: number): void { this.page.set(p); this.loadUsers(); }
-  resetFilters(): void { this.search = ''; this.roleFilter = ''; this.statusFilter = ''; this.sortBy = 'createdAt'; this.loadUsers(); }
-  exportUsers(): void { this.toast.info('Export en cours...'); }
+  goToPage(p: number): void { 
+    this.page.set(p); 
+    this.loadUsers(); 
+  }
 
-  toggleUser(user: UserDto): void {
-    this.api.patch(`admin/users/${user.id}/toggle`, {}).subscribe({
-      next: () => { this.toast.success('Statut mis à jour'); this.loadUsers(); },
-      error: () => this.toast.error('Erreur lors de la mise à jour')
+  // ═══════════════════════════════════════════════════════════
+  // CRÉATION (CREATE)
+  // ═══════════════════════════════════════════════════════════
+  
+  openAddModal(): void {
+    this.userForm = {
+      fullName: '',
+      email: '',
+      phone: '',
+      role: 'Client',
+      isActive: true
+    };
+    this.showAddModal.set(true);
+  }
+
+  createUser(): void {
+    if (!this.userForm.fullName || !this.userForm.email) {
+      this.toast.warning('Veuillez remplir tous les champs obligatoires');
+      return;
+    }
+
+    this.api.post('admin/users', this.userForm).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.toast.success('Utilisateur créé avec succès');
+          this.showAddModal.set(false);
+          this.loadUsers();
+        }
+      },
+      error: (err) => {
+        this.toast.error('Erreur lors de la création de l\'utilisateur');
+      }
     });
   }
 
-  prepareDelete(user: UserDto): void {
+  // ═══════════════════════════════════════════════════════════
+  // MODIFICATION (UPDATE)
+  // ═══════════════════════════════════════════════════════════
+  
+  openEditModal(user: AdminUserDto): void {
+    this.selectedUser.set(user);
+    this.userForm = {
+      fullName: user.fullName,
+      email: user.email,
+      phone: user.phone || '',
+      role: user.roles[0] || 'Client',
+      isActive: user.isActive
+    };
+    this.showEditModal.set(true);
+  }
+
+  updateUser(): void {
+    const user = this.selectedUser();
+    if (!user) return;
+
+    this.api.put(`admin/users/${user.id}`, this.userForm).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.toast.success('Utilisateur mis à jour avec succès');
+          this.showEditModal.set(false);
+          this.loadUsers();
+        }
+      },
+      error: (err) => {
+        this.toast.error('Erreur lors de la mise à jour');
+      }
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // ACTIVATION / DÉSACTIVATION (ACTIVATE / DEACTIVATE)
+  // ═══════════════════════════════════════════════════════════
+  
+  prepareActivate(user: AdminUserDto): void {
+    this.selectedUser.set(user);
+    this.showActivateModal.set(true);
+  }
+
+  activateUser(): void {
+    const user = this.selectedUser();
+    if (!user) return;
+
+    this.api.post(`admin/users/${user.id}/activate`, {}).subscribe({
+      next: () => {
+        this.toast.success('Utilisateur activé avec succès');
+        this.showActivateModal.set(false);
+        this.loadUsers();
+      },
+      error: (err) => {
+        this.toast.error('Erreur lors de l\'activation');
+      }
+    });
+  }
+
+  prepareSuspend(user: AdminUserDto): void {
+    this.selectedUser.set(user);
+    this.showSuspendModal.set(true);
+  }
+
+  suspendUser(): void {
+    const user = this.selectedUser();
+    if (!user) return;
+
+    const reason = "Suspension temporaire par l'administrateur";
+    
+    this.api.postJson(`admin/users/${user.id}/suspend`, JSON.stringify(reason))
+      .subscribe({
+        next: () => {
+          this.toast.success('Utilisateur suspendu');
+          this.showSuspendModal.set(false);
+          this.loadUsers();
+        },
+        error: (err) => {
+          this.toast.error('Erreur lors de la suspension');
+        }
+      });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // SUPPRESSION (DELETE)
+  // ═══════════════════════════════════════════════════════════
+  
+  prepareDelete(user: AdminUserDto): void {
     this.selectedUser.set(user);
     this.showDeleteModal.set(true);
   }
@@ -236,9 +274,74 @@ export class UsersComponent implements OnInit {
   deleteUser(): void {
     const user = this.selectedUser();
     if (!user) return;
+
     this.api.delete(`admin/users/${user.id}`).subscribe({
-      next: () => { this.toast.success('Utilisateur supprimé'); this.showDeleteModal.set(false); this.loadUsers(); },
-      error: () => this.toast.error('Erreur lors de la suppression')
+      next: () => {
+        this.toast.success('Utilisateur supprimé avec succès');
+        this.showDeleteModal.set(false);
+        this.loadUsers();
+      },
+      error: () => {
+        this.toast.error('Erreur lors de la suppression');
+      }
     });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // EXPORT
+  // ═══════════════════════════════════════════════════════════
+  
+  exportUsers(): void {
+    this.api.get('admin/users/export', {
+      format: 'xlsx',
+      search: this.search,
+      role: this.roleFilter,
+      isActive: this.statusFilter
+    }).subscribe({
+      next: () => {
+        this.toast.success('Export téléchargé avec succès');
+      },
+      error: () => {
+        this.toast.info('Export en cours de génération...');
+      }
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // HELPERS
+  // ═══════════════════════════════════════════════════════════
+  
+  getRoleBadge(role: string): RoleOption {
+    return this.roleOptions.find(r => r.value === role) ?? this.roleOptions[0];
+  }
+
+  getInitials(user: AdminUserDto): string {
+    const fullName = (user?.fullName ?? '').trim();
+    if (!fullName) return '?';
+
+    const parts = fullName.split(/\s+/).filter(Boolean);
+
+    if (parts.length === 1) {
+      return parts[0].substring(0, 2).toUpperCase();
+    }
+
+    const first = parts[0][0] ?? '';
+    const last = parts[parts.length - 1][0] ?? '';
+    return (first + last).toUpperCase();
+  }
+
+  getAvatarColor(user: AdminUserDto): string {
+    const colors = [
+      '#6366f1', '#f59e0b', '#10b981', '#ef4444', 
+      '#06b6d4', '#8b5cf6', '#ec4899'
+    ];
+
+    const initials = this.getInitials(user);
+    let hash = 0;
+    for (let i = 0; i < initials.length; i++) {
+      hash = (hash * 31 + initials.charCodeAt(i)) | 0;
+    }
+
+    return colors[Math.abs(hash) % colors.length];
   }
 }

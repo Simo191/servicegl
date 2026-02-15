@@ -28,7 +28,7 @@ public class SearchRestaurantsQueryHandler(ApplicationDbContext db)
             .Select(x => new RestaurantListDto(x.Id, x.Name, x.LogoUrl, x.CoverImageUrl,
                 x.CuisineType, x.PriceRange, x.AverageRating, x.TotalReviews,
                 x.MinOrderAmount, x.DeliveryFee, x.AverageDeliveryMinutes, 0, x.IsOpen,
-                x.Promotions.Any(p => p.IsActive && p.EndDate > DateTime.UtcNow)))
+                x.Promotions.Any(p => p.IsActive && p.EndDate > DateTime.UtcNow),x.Latitude, x.Longitude, x.Phone))
             .ToListAsync(ct);
         return ApiResponse<PaginatedList<RestaurantListDto>>.Ok(new(items, total, r.Page, r.PageSize));
     }
@@ -76,7 +76,7 @@ public class GetNearbyRestaurantsQueryHandler(ApplicationDbContext db)
             .OrderByDescending(x => x.AverageRating).Take(20)
             .Select(x => new RestaurantListDto(x.Id, x.Name, x.LogoUrl, x.CoverImageUrl,
                 x.CuisineType, x.PriceRange, x.AverageRating, x.TotalReviews,
-                x.MinOrderAmount, x.DeliveryFee, x.AverageDeliveryMinutes, 0, x.IsOpen, false))
+                x.MinOrderAmount, x.DeliveryFee, x.AverageDeliveryMinutes, 0, x.IsOpen, false, x.Latitude, x.Longitude, x.Phone))
             .ToListAsync(ct);
         return ApiResponse<List<RestaurantListDto>>.Ok(items);
     }
@@ -91,7 +91,7 @@ public class GetPopularRestaurantsQueryHandler(ApplicationDbContext db)
             .OrderByDescending(x => x.TotalOrders).Take(r.Count)
             .Select(x => new RestaurantListDto(x.Id, x.Name, x.LogoUrl, x.CoverImageUrl,
                 x.CuisineType, x.PriceRange, x.AverageRating, x.TotalReviews,
-                x.MinOrderAmount, x.DeliveryFee, x.AverageDeliveryMinutes, 0, x.IsOpen, false))
+                x.MinOrderAmount, x.DeliveryFee, x.AverageDeliveryMinutes, 0, x.IsOpen, false, x.Latitude, x.Longitude, x.Phone))
             .ToListAsync(ct);
         return ApiResponse<List<RestaurantListDto>>.Ok(items);
     }
@@ -108,7 +108,7 @@ public class GetFavoriteRestaurantsQueryHandler(ApplicationDbContext db, IHttpCo
         var items = await db.Restaurants.Where(x => favIds.Contains(x.Id))
             .Select(x => new RestaurantListDto(x.Id, x.Name, x.LogoUrl, x.CoverImageUrl,
                 x.CuisineType, x.PriceRange, x.AverageRating, x.TotalReviews,
-                x.MinOrderAmount, x.DeliveryFee, x.AverageDeliveryMinutes, 0, x.IsOpen, false))
+                x.MinOrderAmount, x.DeliveryFee, x.AverageDeliveryMinutes, 0, x.IsOpen, false, x.Latitude, x.Longitude, x.Phone))
             .ToListAsync(ct);
         return ApiResponse<List<RestaurantListDto>>.Ok(items);
     }
@@ -238,7 +238,7 @@ public class GetMyRestaurantsQueryHandler(ApplicationDbContext db, IHttpContextA
         var items = await db.Restaurants.Where(x => x.OwnerId == userId)
             .Select(x => new RestaurantListDto(x.Id, x.Name, x.LogoUrl, x.CoverImageUrl,
                 x.CuisineType, x.PriceRange, x.AverageRating, x.TotalReviews,
-                x.MinOrderAmount, x.DeliveryFee, x.AverageDeliveryMinutes, 0, x.IsOpen, false))
+                x.MinOrderAmount, x.DeliveryFee, x.AverageDeliveryMinutes, 0, x.IsOpen, false, x.Latitude, x.Longitude, x.Phone))
             .ToListAsync(ct);
         return ApiResponse<List<RestaurantListDto>>.Ok(items);
     }

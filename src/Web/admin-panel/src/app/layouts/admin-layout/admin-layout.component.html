@@ -1,0 +1,166 @@
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SIDEBAR                                               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<aside class="sidebar"
+       [class.collapsed]="sidebarCollapsed()"
+       [class.mobile-open]="mobileOpen()">
+
+  <!-- Brand -->
+  <div class="sidebar-brand">
+    <a routerLink="/dashboard" class="brand-link">
+      <div class="brand-icon">
+        <i class="bi bi-hexagon-fill"></i>
+      </div>
+      <span class="brand-text">MultiServices</span>
+    </a>
+    <button class="btn-collapse d-none d-lg-flex" (click)="toggleSidebar()">
+      <i class="bi" [class.bi-chevron-left]="!sidebarCollapsed()" [class.bi-chevron-right]="sidebarCollapsed()"></i>
+    </button>
+  </div>
+
+  <!-- Navigation -->
+  <div class="sidebar-nav">
+    @for (section of navSections; track section.title) {
+      <div class="nav-section">
+        <span class="nav-section-title">{{ section.title }}</span>
+        <ul class="nav flex-column">
+          @for (item of section.items; track item.route) {
+            <li class="nav-item">
+              <a class="nav-link"
+                 [routerLink]="item.route"
+                 routerLinkActive="active"
+                 [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+                 (click)="closeMobile()">
+                <i class="bi {{ item.icon }}"></i>
+                <span class="nav-label">{{ item.label }}</span>
+                @if (item.badge) {
+                  <span class="nav-badge">{{ item.badge }}</span>
+                }
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+
+  <!-- Sidebar Footer -->
+  <div class="sidebar-footer">
+    <div class="user-mini-card" (click)="toggleProfileMenu()">
+      <div class="user-avatar-sm">{{ userInitials() }}</div>
+      <div class="user-info-sm">
+        <span class="user-name-sm">{{ userFullName() }}</span>
+        <span class="user-role-sm">{{ userRole() }}</span>
+      </div>
+      <i class="bi bi-three-dots-vertical"></i>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- MAIN CONTENT AREA                                     -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<main class="main-content" [class.sidebar-collapsed]="sidebarCollapsed()">
+
+  <!-- Top Header -->
+  <header class="top-header">
+    <div class="header-left">
+      <button class="btn-menu d-lg-none" (click)="toggleSidebar()">
+        <i class="bi bi-list"></i>
+      </button>
+      <button class="btn-menu d-none d-lg-flex" (click)="toggleSidebar()">
+        <i class="bi" [class.bi-text-indent-left]="!sidebarCollapsed()" [class.bi-text-indent-right]="sidebarCollapsed()"></i>
+      </button>
+
+      <nav class="breadcrumb-nav d-none d-md-flex">
+        <span class="breadcrumb-item text-muted">Admin</span>
+        <i class="bi bi-chevron-right breadcrumb-sep"></i>
+        <span class="breadcrumb-item active">{{ currentPageTitle() }}</span>
+      </nav>
+    </div>
+
+    <div class="header-right">
+      <!-- Search -->
+      <div class="header-search d-none d-md-flex">
+        <i class="bi bi-search"></i>
+        <input type="text"
+               placeholder="Rechercher..."
+               [value]="searchQuery()"
+               (input)="searchQuery.set($any($event.target).value)">
+        <kbd>⌘K</kbd>
+      </div>
+
+      <!-- Time -->
+      <div class="header-time d-none d-lg-flex">
+        <i class="bi bi-clock"></i>
+        <span>{{ currentTime() }}</span>
+      </div>
+
+      <!-- Notifications -->
+      <button class="btn-icon" title="Notifications">
+        <i class="bi bi-bell"></i>
+        @if (notificationCount() > 0) {
+          <span class="icon-badge">{{ notificationCount() }}</span>
+        }
+      </button>
+
+      <!-- Theme toggle placeholder -->
+      <button class="btn-icon d-none d-lg-flex" title="Mode sombre">
+        <i class="bi bi-moon"></i>
+      </button>
+
+      <!-- Profile Dropdown -->
+      <div class="profile-dropdown">
+        <button class="profile-trigger" (click)="toggleProfileMenu()">
+          <div class="profile-avatar">{{ userInitials() }}</div>
+          <div class="profile-info d-none d-xl-block">
+            <span class="profile-name">{{ auth.user()?.firstName }}</span>
+            <span class="profile-role">{{ userRole() }}</span>
+          </div>
+          <i class="bi bi-chevron-down d-none d-xl-inline"></i>
+        </button>
+
+        @if (profileMenuOpen()) {
+          <div class="profile-menu">
+            <div class="profile-menu-header">
+              <div class="profile-avatar lg">{{ userInitials() }}</div>
+              <div>
+                <div class="fw-semibold">{{ userFullName() }}</div>
+                <small class="text-muted">{{ auth.user()?.email }}</small>
+              </div>
+            </div>
+            <div class="profile-menu-divider"></div>
+            <a class="profile-menu-item" routerLink="/settings">
+              <i class="bi bi-person"></i> Mon profil
+            </a>
+            <a class="profile-menu-item" routerLink="/settings">
+              <i class="bi bi-gear"></i> Paramètres
+            </a>
+            <div class="profile-menu-divider"></div>
+            <button class="profile-menu-item text-danger" (click)="logout()">
+              <i class="bi bi-box-arrow-right"></i> Déconnexion
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Body -->
+  <div class="page-body">
+    <router-outlet />
+  </div>
+</main>
+
+<!-- Mobile Overlay -->
+@if (mobileOpen()) {
+  <div class="mobile-overlay" (click)="closeMobile()"></div>
+}
+
+<!-- Profile Menu Overlay -->
+@if (profileMenuOpen()) {
+  <div class="click-away" (click)="toggleProfileMenu()"></div>
+}
+
+<!-- Toasts -->
+<app-toast-container />

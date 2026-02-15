@@ -1,0 +1,119 @@
+<div class="login-wrapper">
+  <!-- Animated Background -->
+  <div class="login-bg">
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
+  </div>
+
+  <!-- Login Card -->
+  <div class="login-card">
+    <!-- Left Panel - Branding -->
+    <div class="login-branding d-none d-lg-flex">
+      <div class="branding-content">
+        <div class="brand-logo">
+          <i class="bi bi-hexagon-fill"></i>
+        </div>
+        <h2>MultiServices</h2>
+        <p>Plateforme de gestion multi-services intégrée</p>
+        <div class="brand-features">
+          <div class="brand-feature">
+            <i class="bi bi-shield-check"></i>
+            <span>Accès sécurisé</span>
+          </div>
+          <div class="brand-feature">
+            <i class="bi bi-graph-up-arrow"></i>
+            <span>Analytics en temps réel</span>
+          </div>
+          <div class="brand-feature">
+            <i class="bi bi-gear-wide-connected"></i>
+            <span>Gestion centralisée</span>
+          </div>
+        </div>
+      </div>
+      <div class="branding-footer">
+        <small>&copy; 2026 MultiServices — Admin Panel v2.0</small>
+      </div>
+    </div>
+
+    <!-- Right Panel - Form -->
+    <div class="login-form-panel">
+      <!-- Mobile brand -->
+      <div class="mobile-brand d-lg-none">
+        <div class="brand-logo sm">
+          <i class="bi bi-hexagon-fill"></i>
+        </div>
+        <span>MultiServices</span>
+      </div>
+
+      <div class="form-header">
+        <h4>Bon retour 👋</h4>
+        <p>Connectez-vous à votre espace administrateur</p>
+      </div>
+
+      <!-- Email -->
+      <div class="form-floating-group">
+        <label>Email</label>
+        <div class="input-wrapper" [class.focused]="email.length > 0">
+          <i class="bi bi-envelope"></i>
+          <input type="email"
+                 [(ngModel)]="email"
+                 placeholder="admin@multiservices.ma"
+                 (keydown.enter)="login()">
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="form-floating-group">
+        <div class="label-row">
+          <label>Mot de passe</label>
+          <a href="#" class="forgot-link">Oublié ?</a>
+        </div>
+        <div class="input-wrapper" [class.focused]="password.length > 0">
+          <i class="bi bi-lock"></i>
+          <input [type]="showPass() ? 'text' : 'password'"
+                 [(ngModel)]="password"
+                 placeholder="••••••••"
+                 (keydown.enter)="login()">
+          <button class="btn-toggle-pass" type="button" (click)="togglePassword()">
+            <i class="bi" [class.bi-eye]="!showPass()" [class.bi-eye-slash]="showPass()"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Remember -->
+      <div class="remember-row">
+        <label class="custom-check" (click)="toggleRemember()">
+          <span class="check-box" [class.checked]="rememberMe()">
+            @if (rememberMe()) {
+              <i class="bi bi-check2"></i>
+            }
+          </span>
+          <span>Se souvenir de moi</span>
+        </label>
+      </div>
+
+      <!-- Submit -->
+      <button class="btn-login" [disabled]="loading()" (click)="login()">
+        @if (loading()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          Connexion...
+        } @else {
+          Se connecter
+          <i class="bi bi-arrow-right ms-2"></i>
+        }
+      </button>
+
+      <!-- Divider -->
+      <div class="login-divider">
+        <span>ou</span>
+      </div>
+
+      <!-- SSO placeholder -->
+      <button class="btn-sso" disabled>
+        <i class="bi bi-microsoft"></i>
+        Continuer avec Microsoft SSO
+      </button>
+    </div>
+  </div>
+</div>

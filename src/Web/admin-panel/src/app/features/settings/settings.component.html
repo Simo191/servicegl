@@ -1,0 +1,223 @@
+<div class="mb-4">
+  <h4 class="fw-bold mb-1">Configuration</h4>
+  <p class="text-muted mb-0">Paramètres généraux de la plateforme</p>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-4">
+  @for (tab of settingsTabs; track tab.id) {
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab() === tab.id" (click)="onTabChange(tab.id)" style="cursor:pointer">
+        <i class="bi me-1" [class]="tab.icon"></i>{{ tab.label }}
+      </a>
+    </li>
+  }
+</ul>
+
+<!-- Commissions -->
+@if (activeTab() === 'commissions') {
+  <div class="table-card">
+    <div class="card-header"><h6 class="fw-bold mb-0">Taux de commission par module</h6></div>
+    <div class="card-body p-4">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="p-3 rounded-3 border">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <i class="bi bi-shop text-warning fs-4"></i>
+              <h6 class="fw-bold mb-0">Restaurants</h6>
+            </div>
+            <label class="form-label small">Commission (%)</label>
+            <input type="number" class="form-control" [(ngModel)]="commissions.restaurant" min="0" max="50" />
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 rounded-3 border">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <i class="bi bi-tools text-info fs-4"></i>
+              <h6 class="fw-bold mb-0">Services</h6>
+            </div>
+            <label class="form-label small">Commission (%)</label>
+            <input type="number" class="form-control" [(ngModel)]="commissions.service" min="0" max="50" />
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 rounded-3 border">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <i class="bi bi-cart3 text-success fs-4"></i>
+              <h6 class="fw-bold mb-0">Courses</h6>
+            </div>
+            <label class="form-label small">Commission (%)</label>
+            <input type="number" class="form-control" [(ngModel)]="commissions.grocery" min="0" max="50" />
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label small fw-medium">Frais de base livraison (MAD)</label>
+          <input type="number" class="form-control" [(ngModel)]="commissions.deliveryBaseFee" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-medium">Frais par km (MAD)</label>
+          <input type="number" class="form-control" [(ngModel)]="commissions.deliveryPerKm" />
+        </div>
+      </div>
+      <div class="mt-4">
+        <button class="btn btn-primary" (click)="saveCommissions()" [disabled]="savingCommissions()">
+          @if (savingCommissions()) {
+            <span class="spinner-border spinner-border-sm me-2"></span>Sauvegarde...
+          } @else {
+            <i class="bi bi-check-lg me-2"></i>Sauvegarder
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Zones -->
+@if (activeTab() === 'zones') {
+  <div class="table-card">
+    <div class="card-header">
+      <h6 class="fw-bold mb-0">Zones géographiques</h6>
+      <button class="btn btn-sm btn-primary"><i class="bi bi-plus-lg me-1"></i>Ajouter</button>
+    </div>
+    <div class="card-body p-4">
+      <div class="row g-3">
+        @for (zone of zones; track zone.name) {
+          <div class="col-md-4">
+            <div class="p-3 rounded-3 border">
+              <h6 class="fw-bold">{{ zone.name }}</h6>
+              <p class="text-muted small mb-2">Frais de livraison: {{ zone.deliveryFee }} MAD</p>
+              <p class="text-muted small mb-0">Supplément: {{ zone.surcharge }} MAD</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Payment -->
+@if (activeTab() === 'payment') {
+  <div class="table-card">
+    <div class="card-header"><h6 class="fw-bold mb-0">Configuration paiement</h6></div>
+    <div class="card-body p-4">
+      <div class="row g-4">
+        <div class="col-md-6">
+          <label class="form-label fw-medium">Clé API Stripe</label>
+          <input type="password" class="form-control" value="sk_live_•••••••••••" disabled />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-medium">Webhook Secret</label>
+          <input type="password" class="form-control" value="whsec_•••••••••••" disabled />
+        </div>
+      </div>
+      <div class="mt-3">
+        <div class="form-check form-switch"><input class="form-check-input" type="checkbox" checked id="enableCash"><label class="form-check-label" for="enableCash">Autoriser paiement en espèces</label></div>
+        <div class="form-check form-switch mt-2"><input class="form-check-input" type="checkbox" checked id="enableWallet"><label class="form-check-label" for="enableWallet">Activer le portefeuille virtuel</label></div>
+        <div class="form-check form-switch mt-2"><input class="form-check-input" type="checkbox" checked id="enable3ds"><label class="form-check-label" for="enable3ds">3D Secure obligatoire</label></div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Logs -->
+@if (activeTab() === 'logs') {
+  <div class="table-card">
+    <div class="card-header">
+      <h6 class="fw-bold mb-0">Logs système</h6>
+      <div class="d-flex gap-2">
+        <select class="form-select form-select-sm" style="width:auto" [(ngModel)]="logLevel" (change)="loadLogs()">
+          <option value="">Tous niveaux</option>
+          <option value="Info">Info</option>
+          <option value="Warning">Warning</option>
+          <option value="Error">Error</option>
+        </select>
+        <button class="btn btn-sm btn-outline-primary" (click)="loadLogs()"><i class="bi bi-arrow-repeat"></i></button>
+      </div>
+    </div>
+    @if (logsLoading()) {
+      <app-loading />
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 small">
+          <thead>
+            <tr><th>Heure</th><th>Niveau</th><th>Source</th><th>Message</th></tr>
+          </thead>
+          <tbody>
+            @for (log of logs(); track log.id) {
+              <tr>
+                <td class="text-muted text-nowrap">{{ log.timestamp | date:'dd/MM HH:mm:ss' }}</td>
+                <td>
+                  @switch (log.level) {
+                    @case ('Info') { <span class="badge bg-info-subtle text-info">Info</span> }
+                    @case ('Warning') { <span class="badge bg-warning-subtle text-warning">Warning</span> }
+                    @case ('Error') { <span class="badge bg-danger-subtle text-danger">Error</span> }
+                  }
+                </td>
+                <td class="text-muted">{{ log.source }}</td>
+                <td>{{ log.message }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="p-3 border-top">
+        <app-pagination [currentPage]="logPage()" [totalPages]="logTotalPages()" (pageChange)="logPage.set($event); loadLogs()" />
+      </div>
+    }
+  </div>
+}
+
+<!-- Notifications -->
+@if (activeTab() === 'system') {
+  <div class="row g-3">
+    <div class="col-lg-6">
+      <div class="table-card">
+        <div class="card-header"><h6 class="fw-bold mb-0">Système</h6></div>
+        <div class="card-body p-4">
+          <div class="row g-3 mb-3">
+            <div class="col-md-6"><strong>Version API:</strong> 1.0.0</div>
+            <div class="col-md-6"><strong>Environnement:</strong> Production</div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6"><strong>Cache Redis:</strong> <span class="text-success">Connecté</span></div>
+            <div class="col-md-6"><strong>Stripe:</strong> <span class="text-success">Connecté</span></div>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6"><strong>Firebase:</strong> <span class="text-success">Connecté</span></div>
+            <div class="col-md-6"><strong>Base de données:</strong> <span class="text-success">PostgreSQL 16</span></div>
+          </div>
+          <hr>
+          <button class="btn btn-outline-warning me-2"><i class="bi bi-arrow-repeat me-1"></i>Vider le cache</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="table-card">
+        <div class="card-header"><h6 class="fw-bold mb-0">Notification groupée</h6></div>
+        <div class="card-body p-4">
+          <div class="mb-3">
+            <label class="form-label small fw-medium">Audience</label>
+            <select class="form-select" [(ngModel)]="bulkNotif.targetAudience">
+              <option value="All">Tous les utilisateurs</option>
+              <option value="Clients">Clients uniquement</option>
+              <option value="Restaurants">Restaurants</option>
+              <option value="Drivers">Livreurs</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-medium">Titre</label>
+            <input type="text" class="form-control" [(ngModel)]="bulkNotif.title" placeholder="Titre de la notification" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-medium">Message</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="bulkNotif.message" placeholder="Contenu du message..."></textarea>
+          </div>
+          <button class="btn btn-primary" (click)="sendNotification()"><i class="bi bi-send me-2"></i>Envoyer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

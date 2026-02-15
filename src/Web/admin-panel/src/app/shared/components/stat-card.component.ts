@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, computed } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 
 @Component({
@@ -12,17 +12,19 @@ import { DecimalPipe } from '@angular/common';
           <p class="stat-label mb-1">{{ label() }}</p>
           <h3 class="stat-value mb-1">
             @if (isCurrency()) {
-              {{ value() | number:'1.0-0' }} <small class="fs-6 fw-normal">MAD</small>
+              {{ value() | number:'1.0-0' }} <small class="fs-6 fw-normal text-muted">MAD</small>
             } @else {
               {{ value() | number:'1.0-0' }}
             }
           </h3>
-          @if (change() !== null) {
+          @if (hasChange()) {
             <span class="stat-change" [class.text-success]="change()! >= 0" [class.text-danger]="change()! < 0">
               <i class="bi" [class.bi-arrow-up]="change()! >= 0" [class.bi-arrow-down]="change()! < 0"></i>
               {{ change()! >= 0 ? '+' : '' }}{{ change() }}%
               <span class="text-muted fw-normal"> vs mois dernier</span>
             </span>
+          } @else if (subtitle()) {
+            <span class="text-muted small">{{ subtitle() }}</span>
           }
         </div>
         <div class="stat-icon" [style.background-color]="bgColor()">
@@ -40,4 +42,10 @@ export class StatCardComponent {
   bgColor = input('#eef2ff');
   iconColor = input('#4f46e5');
   isCurrency = input(false);
+  subtitle = input('');
+
+  hasChange = computed(() => {
+    const c = this.change();
+    return c !== null && c !== undefined && !isNaN(c);
+  });
 }

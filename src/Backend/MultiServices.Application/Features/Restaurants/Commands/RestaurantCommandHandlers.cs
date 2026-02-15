@@ -231,6 +231,7 @@ public class UpdateRestaurantCommandHandler(ApplicationDbContext db)
         restaurant.AverageDeliveryMinutes = r.EstimatedDeliveryMinutes;
         restaurant.Street = r.Street; restaurant.City = r.City; restaurant.Phone = r.Phone;
         restaurant.Latitude = r.Latitude; restaurant.Longitude = r.Longitude;
+        restaurant.CoverImageUrl = r.CoverImageUrl; restaurant.LogoUrl = r.LogoUrl;
         await db.SaveChangesAsync(ct);
         return ApiResponse.Ok("Restaurant mis a jour");
     }

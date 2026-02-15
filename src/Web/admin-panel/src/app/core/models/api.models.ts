@@ -1,3 +1,6 @@
+// ══════════════════════════════════════════════════════
+// API RESPONSE WRAPPERS — matches backend ApiResponse<T>
+// ══════════════════════════════════════════════════════
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
@@ -8,56 +11,71 @@ export interface ApiResponse<T> {
 export interface PaginatedResult<T> {
   items: T[];
   totalCount: number;
-  pageNumber: number;
+  page: number;
   pageSize: number;
   totalPages: number;
   hasPreviousPage: boolean;
   hasNextPage: boolean;
 }
 
+// ══════════════════════════════════════════════════════
+// DASHBOARD — matches DashboardDto
+// ══════════════════════════════════════════════════════
 export interface DashboardStats {
-  totalRevenue: number;
-  revenueChange: number;
   totalOrders: number;
-  ordersChange: number;
+  totalOrdersToday: number;
+  totalRevenue: number;
+  revenueToday: number;
   activeClients: number;
-  clientsChange: number;
-  activeProviders: number;
-  providersChange: number;
-  restaurantOrders: number;
-  serviceInterventions: number;
-  groceryOrders: number;
+  activeRestaurants: number;
+  activeServiceProviders: number;
+  activeGroceryStores: number;
   activeDeliverers: number;
-  revenueChart: ChartData[];
-  ordersChart: ChartData[];
-  topRestaurants: TopItem[];
-  topProviders: TopItem[];
-  recentOrders: RecentOrder[];
+  pendingApprovals: number;
+  openTickets: number;
+  revenueChart: RevenueChartData[];
+  orderChart: OrderChartData[];
+  restaurantStats: ModuleStats;
+  serviceStats: ModuleStats;
+  groceryStats: ModuleStats;
 }
 
-export interface ChartData {
-  label: string;
-  value: number;
+export interface RevenueChartData {
+  date: string;
+  restaurant: number;
+  service: number;
+  grocery: number;
 }
 
-export interface TopItem {
-  id: string;
-  name: string;
-  orders: number;
+export interface OrderChartData {
+  date: string;
+  restaurant: number;
+  service: number;
+  grocery: number;
+}
+
+export interface ModuleStats {
+  totalOrders: number;
   revenue: number;
-  rating: number;
+  commission: number;
+  avgRating: number;
 }
 
-export interface RecentOrder {
+// ══════════════════════════════════════════════════════
+// USERS — matches AdminUserListDto / UserListDto
+// ══════════════════════════════════════════════════════
+export interface AdminUserDto {
   id: string;
-  orderNumber: string;
-  type: 'Restaurant' | 'Service' | 'Grocery';
-  customerName: string;
-  amount: number;
-  status: string;
+  fullName: string;
+  email: string;
+  phone: string | null;
+  isActive: boolean;
+  isVerified: boolean;
+  roles: string[];
   createdAt: string;
+  lastLoginAt: string | null;
+  totalOrders: number;
 }
-
 export interface UserDto {
   id: string;
   firstName: string;
@@ -74,58 +92,227 @@ export interface UserDto {
   totalOrders: number;
   totalSpent: number;
 }
-
-export interface RestaurantDto {
+// ══════════════════════════════════════════════════════
+// APPROVALS — matches ApprovalDto
+// ══════════════════════════════════════════════════════
+export interface ApprovalDto {
   id: string;
+  entityType: string;
   name: string;
-  slug: string;
-  description: string;
-  ownerName: string;
-  cuisineType: string;
-  address: string;
-  city: string;
-  phone: string;
-  email: string;
-  logoUrl: string;
-  coverUrl: string;
-  isVerified: boolean;
-  isActive: boolean;
-  rating: number;
-  totalOrders: number;
-  totalRevenue: number;
-  commissionRate: number;
+  ownerName: string | null;
+  status: string;
   createdAt: string;
 }
 
+export interface ApproveEntityRequest {
+  entityType: string;
+  entityId: string;
+  approved: boolean;
+  rejectionReason?: string;
+}
+
+// ══════════════════════════════════════════════════════
+// ORDERS — matches AdminOrderListDto
+// ══════════════════════════════════════════════════════
+export interface AdminOrderDto {
+  id: string;
+  orderNumber: string;
+  orderType: string;
+  customerName: string;
+  providerName: string;
+  delivererName: string | null;
+  status: string;
+  totalAmount: number;
+  commissionAmount: number;
+  paymentStatus: string;
+  createdAt: string;
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODÈLES ADAPTÉS À L'API RÉELLE - RESTAURANTS
+// ═══════════════════════════════════════════════════════════
+
+ // ═══════════════════════════════════════════════════════════
+// MODÈLES API RESTAURANTS - VERSION FINALE
+// Inclut coverImageUrl et logoUrl
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * DTO complet retourné par GET /api/v1/Restaurants
+ */
+export interface RestaurantDto {
+  id: string;
+  name: string;
+  description: string | null;
+  logoUrl: string | null;
+  coverImageUrl: string | null;
+  cuisineType: number;
+  priceRange: number;
+  rating: number;
+  reviewCount: number;
+  minOrderAmount: number;
+  deliveryFee: number;
+  estimatedDeliveryMinutes: number;
+  distanceKm: number;
+  isOpen: boolean;
+  isActive: boolean;
+  hasPromotion: boolean;
+  street: string;
+  city: string;
+  postalCode: string;
+  latitude: number;
+  longitude: number;
+  phone: string;
+}
+
+/**
+ * Request body pour POST /api/v1/Restaurants (création)
+ * INCLUT coverImageUrl et logoUrl
+ */
+export interface CreateRestaurantRequest {
+  name: string;
+  description?: string;
+  cuisineType: number;
+  priceRange: number;
+  minOrderAmount: number;
+  deliveryFee: number;
+  estimatedDeliveryMinutes: number;
+  maxDeliveryDistanceKm: number;
+  street: string;
+  city: string;
+  postalCode: string;
+  latitude: number;
+  longitude: number;
+  phone: string;
+  coverImageUrl?: string;    // ✅ AJOUTÉ
+  logoUrl?: string;           // ✅ AJOUTÉ
+}
+
+/**
+ * Request body pour PUT /api/v1/Restaurants/{id} (modification)
+ * INCLUT coverImageUrl et logoUrl
+ */
+export interface UpdateRestaurantRequest {
+  name: string;
+  description?: string;
+  cuisineType: number;
+  priceRange: number;
+  minOrderAmount: number;
+  deliveryFee: number;
+  estimatedDeliveryMinutes: number;
+  maxDeliveryDistanceKm: number;
+  street: string;
+  city: string;
+  postalCode: string;
+  latitude: number;
+  longitude: number;
+  phone: string;
+  coverImageUrl?: string;    // ✅ AJOUTÉ
+  logoUrl?: string;           // ✅ AJOUTÉ
+}
+
+/**
+ * Mapping des types de cuisine
+ */
+export enum CuisineType {
+  Marocain = 0,
+  Italien = 1,
+  Asiatique = 2,
+  Burger = 3,
+  Pizza = 4,
+  Sushi = 5,
+  Indien = 6,
+  Mexicain = 7,
+  Français = 8
+}
+
+/**
+ * Mapping des gammes de prix
+ */
+export enum PriceRange {
+  Economy = 1,
+  Medium = 2,
+  Premium = 3
+}
+
+/**
+ * Helper pour obtenir le label d'une cuisine
+ */
+export const getCuisineLabel = (type: number): string => {
+  const labels: Record<number, string> = {
+    0: 'Marocain',
+    1: 'Italien',
+    2: 'Asiatique',
+    3: 'Burger',
+    4: 'Pizza',
+    5: 'Sushi',
+    6: 'Indien',
+    7: 'Mexicain',
+    8: 'Français'
+  };
+  return labels[type] || 'Autre';
+};
+
+/**
+ * Helper pour obtenir le symbole de prix
+ */
+export const getPriceRangeSymbol = (range: number): string => {
+  const symbols: Record<number, string> = {
+    1: '€',
+    2: '€€',
+    3: '€€€'
+  };
+  return symbols[range] || '€';
+};
+
+// ══════════════════════════════════════════════════════
+// SERVICE PROVIDER — matches ServiceProviderListDto
+// ══════════════════════════════════════════════════════
 export interface ServiceProviderDto {
   id: string;
   companyName: string;
   ownerName: string;
+  description: string | null;
+  logoUrl: string | null;
+  rating: number;
+  reviewCount: number;
+  yearsOfExperience: number;
+  isAvailable: boolean;
+  isActive: boolean;
+  isVerified: boolean;
   category: string;
-  description: string;
-  address: string;
+  serviceCategories: string[];
+  startingPrice: number | null;
+  serviceZones: string[];
   city: string;
   phone: string;
   email: string;
-  logoUrl: string;
-  isVerified: boolean;
-  isActive: boolean;
-  rating: number;
   totalInterventions: number;
   totalRevenue: number;
   commissionRate: number;
-  yearsExperience: number;
   createdAt: string;
 }
 
+// ══════════════════════════════════════════════════════
+// GROCERY STORE — matches StoreListDto / StoreDetailDto
+// ══════════════════════════════════════════════════════
 export interface GroceryStoreDto {
   id: string;
   name: string;
   brand: string;
+  logoUrl: string | null;
+  rating: number;
+  reviewCount: number;
+  minOrderAmount: number;
+  deliveryFee: number;
+  freeDeliveryThreshold: number;
+  distanceKm: number;
+  isOpen: boolean;
+  isActive: boolean;
+  hasPromotion: boolean;
   address: string;
   city: string;
   phone: string;
-  isActive: boolean;
   totalProducts: number;
   totalOrders: number;
   totalRevenue: number;
@@ -133,34 +320,21 @@ export interface GroceryStoreDto {
   createdAt: string;
 }
 
-export interface OrderDto {
-  id: string;
-  orderNumber: string;
-  type: string;
-  providerName: string;
-  customerName: string;
-  customerPhone: string;
-  delivererName: string;
-  status: string;
-  subtotal: number;
-  deliveryFee: number;
-  total: number;
-  paymentMethod: string;
-  paymentStatus: string;
-  createdAt: string;
-  deliveredAt: string;
-}
-
+// ══════════════════════════════════════════════════════
+// DELIVERY DRIVER — matches DeliveryDriverDto
+// ══════════════════════════════════════════════════════
 export interface DelivererDto {
   id: string;
+  name: string;
   firstName: string;
   lastName: string;
   phone: string;
   email: string;
-  photoUrl: string;
-  vehicleType: string;
+  photoUrl: string | null;
+  vehicleType: string | null;
   isActive: boolean;
   isOnline: boolean;
+  isAvailable: boolean;
   isVerified: boolean;
   rating: number;
   totalDeliveries: number;
@@ -170,14 +344,36 @@ export interface DelivererDto {
   createdAt: string;
 }
 
-export interface FinanceOverview {
+// ══════════════════════════════════════════════════════
+// FINANCE — matches AdminFinanceDto / FinancialReportDto
+// ══════════════════════════════════════════════════════
+export interface AdminFinanceDto {
   totalRevenue: number;
   totalCommissions: number;
-  totalPayouts: number;
-  pendingPayouts: number;
-  revenueByModule: { module: string; amount: number }[];
-  monthlyRevenue: ChartData[];
-  recentTransactions: TransactionDto[];
+  totalPayoutsRestaurants: number;
+  totalPayoutsServices: number;
+  totalPayoutsGroceries: number;
+  totalPayoutsDeliverers: number;
+  totalRefunds: number;
+  monthlyData: FinanceChartData[];
+}
+
+export interface FinancialReportDto {
+  totalRevenue: number;
+  restaurantRevenue: number;
+  groceryRevenue: number;
+  serviceRevenue: number;
+  totalCommissions: number;
+  totalRefunds: number;
+  totalOrders: number;
+  totalPaidOrders: number;
+}
+
+export interface FinanceChartData {
+  month: string;
+  revenue: number;
+  commissions: number;
+  payouts: number;
 }
 
 export interface TransactionDto {
@@ -190,16 +386,77 @@ export interface TransactionDto {
   reference: string;
 }
 
+// ══════════════════════════════════════════════════════
+// PROMOTIONS — matches CreatePromotionDto
+// ══════════════════════════════════════════════════════
+export interface CreatePromotionRequest {
+  code: string;
+  title: string;
+  description?: string;
+  discountType: string;
+  discountValue: number;
+  minOrderAmount?: number;
+  maxDiscount?: number;
+  startDate: string;
+  endDate: string;
+  maxUsages?: number;
+  applicableModule: string;
+  freeDelivery: boolean;
+}
+
 export interface PromoCodeDto {
   id: string;
   code: string;
-  type: string;
-  value: number;
-  minOrder: number;
+  title: string;
+  discountType: string;
+  discountValue: number;
+  minOrderAmount: number;
   maxDiscount: number;
-  usageLimit: number;
+  maxUsages: number;
   usedCount: number;
   startDate: string;
   endDate: string;
   isActive: boolean;
+  applicableModule: string;
+  freeDelivery: boolean;
+}
+
+// ══════════════════════════════════════════════════════
+// COMMISSIONS — matches CommissionSettingsDto
+// ══════════════════════════════════════════════════════
+export interface CommissionSettingsDto {
+  entityType: string;
+  entityId: string;
+  newRate: number;
+}
+
+// ══════════════════════════════════════════════════════
+// SYSTEM LOGS
+// ══════════════════════════════════════════════════════
+export interface SystemLogDto {
+  id: string;
+  level: string;
+  message: string;
+  source: string;
+  timestamp: string;
+  details: string | null;
+}
+
+// ══════════════════════════════════════════════════════
+// SHARED
+// ══════════════════════════════════════════════════════
+export interface ChartData {
+  label: string;
+  value: number;
+}
+
+export interface RecentOrder {
+  id: string;
+  orderNumber: string;
+  type: 'Restaurant' | 'Service' | 'Grocery';
+  customerName: string;
+  providerName: string;
+  amount: number;
+  status: string;
+  createdAt: string;
 }

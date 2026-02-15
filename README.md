@@ -277,7 +277,7 @@ GET    /api/notifications           Mes notifications
 
 | Rôle | Email | Mot de passe |
 |------|-------|-------------|
-| Super Admin | admin@multiservices.ma | Admin@2025! |
+| Super Admin | admin@multiservices.ma | Password@2025! |
 | Client | amine@demo.ma | Client@2025! |
 | Restaurant | karim@demo.ma | Client@2025! |
 | Prestataire | omar@demo.ma | Client@2025! |

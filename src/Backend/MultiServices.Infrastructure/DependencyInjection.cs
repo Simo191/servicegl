@@ -10,6 +10,7 @@ using MultiServices.Infrastructure.Services.Auth;
 using MultiServices.Infrastructure.Services.Cache;
 using MultiServices.Infrastructure.Services.Email;
 using MultiServices.Infrastructure.Services.Sms;
+using Npgsql;
 
 namespace MultiServices.Infrastructure;
 
@@ -20,16 +21,23 @@ public static class DependencyInjection
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<AuditableEntityInterceptor>();
 
+
+        // ✅ Build NpgsqlDataSource with Dynamic JSON enabled
+        var cs = configuration.GetConnectionString("DefaultConnection");
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(cs);
+        dataSourceBuilder.EnableDynamicJson(); // ✅ FIX
+        var dataSource = dataSourceBuilder.Build();
+
         services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             options.UseNpgsql(
-                configuration.GetConnectionString("DefaultConnection"),
+                dataSource,
                 b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)
             );
 
-            // ✅ Un seul endroit pour ajouter l'interceptor
             options.AddInterceptors(sp.GetRequiredService<AuditableEntityInterceptor>());
         });
+
         services.AddScoped<ISmsService, SmsService>();
         services.AddScoped<IEmailService, EmailService>();
         var redisConnection = configuration.GetConnectionString("Redis");

@@ -1,0 +1,681 @@
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- EN-TÊTE DE PAGE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="page-header">
+  <div>
+    <h4 class="page-title">
+      <i class="bi bi-people-fill me-2"></i>
+      Gestion des Utilisateurs
+    </h4>
+    <p class="page-subtitle">
+      {{ totalCount() }} utilisateurs inscrits sur la plateforme
+    </p>
+  </div>
+  <div class="header-actions">
+    <!-- Boutons de vue (Liste/Cartes) -->
+    <div class="btn-group btn-group-sm me-2" role="group">
+      <button 
+        class="btn" 
+        [class]="viewMode === 'list' ? 'btn-primary' : 'btn-outline-secondary'" 
+        (click)="viewMode = 'list'" 
+        title="Vue liste">
+        <i class="bi bi-list-ul"></i>
+      </button>
+      <button 
+        class="btn" 
+        [class]="viewMode === 'card' ? 'btn-primary' : 'btn-outline-secondary'" 
+        (click)="viewMode = 'card'" 
+        title="Vue cartes">
+        <i class="bi bi-grid-3x3-gap"></i>
+      </button>
+    </div>
+
+    <!-- Bouton Ajouter -->
+    <button class="btn btn-success btn-sm me-2" (click)="openAddModal()">
+      <i class="bi bi-plus-circle me-1"></i>
+      <span class="d-none d-sm-inline">Ajouter</span>
+    </button>
+
+    <!-- Bouton Export -->
+    <button class="btn btn-outline-primary btn-sm" (click)="exportUsers()">
+      <i class="bi bi-download me-1"></i>
+      <span class="d-none d-sm-inline">Exporter</span>
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- BARRE DE RECHERCHE ET FILTRES -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="filter-bar">
+  <div class="search-box">
+    <i class="bi bi-search"></i>
+    <input 
+      type="text"
+      placeholder="Rechercher par nom, email, téléphone..."
+      [(ngModel)]="search"
+      (input)="onSearch()">
+    @if (search.length > 0) {
+      <button class="btn-clear" (click)="search = ''; onSearch()">
+        <i class="bi bi-x"></i>
+      </button>
+    }
+  </div>
+
+  <div class="filter-actions">
+    <!-- Pills de rôles (Desktop) -->
+    <div class="role-pills d-none d-xl-flex">
+      @for (role of roleOptions; track role.value) {
+        <button 
+          class="role-pill"
+          [class.active]="roleFilter === role.value"
+          (click)="roleFilter = role.value; page.set(1); loadUsers()">
+          <i class="bi {{ role.icon }}"></i>
+          {{ role.label }}
+        </button>
+      }
+    </div>
+
+    <!-- Dropdown de filtres (Mobile/Tablet) -->
+    <select 
+      class="form-select filter-select d-xl-none" 
+      [(ngModel)]="roleFilter" 
+      (change)="page.set(1); loadUsers()">
+      @for (role of roleOptions; track role.value) {
+        <option [value]="role.value">{{ role.label }}</option>
+      }
+    </select>
+
+    <!-- Filtre de statut -->
+    <select 
+      class="form-select filter-select" 
+      [(ngModel)]="statusFilter" 
+      (change)="page.set(1); loadUsers()">
+      <option value="">Tous statuts</option>
+      <option value="true">Actifs</option>
+      <option value="false">Inactifs</option>
+    </select>
+
+    <!-- Bouton de réinitialisation -->
+    @if (hasActiveFilters()) {
+      <button class="btn-reset" (click)="resetFilters()">
+        <i class="bi bi-x-circle me-1"></i>
+        Réinitialiser
+      </button>
+    }
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- CONTENU PRINCIPAL -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+@if (loading()) {
+  <app-loading />
+} @else if (users().length === 0) {
+  <app-empty-state 
+    icon="bi-people" 
+    message="Aucun utilisateur trouvé" 
+  />
+} @else {
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- VUE LISTE -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  @if (viewMode === 'list') {
+    <div class="data-panel">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Utilisateur</th>
+              <th>Rôle</th>
+              <th class="d-none d-lg-table-cell">Téléphone</th>
+              <th>Statut</th>
+              <th class="d-none d-md-table-cell">Commandes</th>
+              <th class="d-none d-lg-table-cell">Dépensé</th>
+              <th class="d-none d-xl-table-cell">Inscrit le</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of users(); track user.id) {
+              <tr>
+                <!-- Colonne Utilisateur -->
+                <td>
+                  <div class="user-cell">
+                    <div 
+                      class="user-avatar" 
+                      [style.background]="getAvatarColor(user)">
+                      {{ getInitials(user) }}
+                    </div>
+                    <div class="user-info">
+                      <span class="user-name">{{ user.fullName }}</span>
+                      <span class="user-email">{{ user.email }}</span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Colonne Rôle -->
+                <td>
+                  @let r = getRoleBadge(user.roles[0]);
+                  <span class="role-badge" [class]="'role-' + r.color">
+                    <i class="bi {{ r.icon }}"></i>
+                    {{ r.label }}
+                  </span>
+                </td>
+
+                <!-- Colonne Téléphone -->
+                <td class="d-none d-lg-table-cell">
+                  <span class="text-muted">{{ user.phone || '—' }}</span>
+                </td>
+
+                <!-- Colonne Statut -->
+                <td>
+                  @if (user.isActive) {
+                    <span class="status-dot active"></span>
+                    <span class="status-text active">Actif</span>
+                  } @else {
+                    <span class="status-dot inactive"></span>
+                    <span class="status-text inactive">Inactif</span>
+                  }
+                </td>
+
+                <!-- Colonne Commandes -->
+                <td class="d-none d-md-table-cell">
+                  <span class="fw-medium">{{ user.totalOrders }}</span>
+                </td>
+
+                <!-- Colonne Montant dépensé -->
+                <td class="d-none d-lg-table-cell">
+                  <span class="amount-cell">
+                    {{ user.totalOrders | number:'1.0-0' }} 
+                    <small>MAD</small>
+                  </span>
+                </td>
+
+                <!-- Colonne Date inscription -->
+                <td class="d-none d-xl-table-cell text-muted">
+                  {{ user.createdAt | date:'dd MMM yyyy' }}
+                </td>
+
+                <!-- Colonne Actions -->
+                <td class="text-end">
+                  <div class="dropdown">
+                    <button 
+                      class="btn btn-sm btn-light border-0 rounded-circle action-dots" 
+                      data-bs-toggle="dropdown" 
+                      aria-expanded="false">
+                      <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                      <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer">
+                          <i class="bi bi-eye text-primary"></i> 
+                          Voir le profil
+                        </a>
+                      </li>
+                      <li>
+                        <a 
+                          class="dropdown-item d-flex align-items-center gap-2" 
+                          (click)="openEditModal(user)" 
+                          style="cursor:pointer">
+                          <i class="bi bi-pencil-square text-secondary"></i> 
+                          Modifier
+                        </a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer">
+                          <i class="bi bi-envelope text-info"></i> 
+                          Envoyer un message
+                        </a>
+                      </li>
+                      <li><hr class="dropdown-divider"></li>
+                      
+                      <!-- Actions conditionnelles selon le statut -->
+                      @if (user.isActive) {
+                        <li>
+                          <a 
+                            class="dropdown-item d-flex align-items-center gap-2 text-warning" 
+                            (click)="prepareSuspend(user)" 
+                            style="cursor:pointer">
+                            <i class="bi bi-pause-circle"></i> 
+                            Suspendre
+                          </a>
+                        </li>
+                      } @else {
+                        <li>
+                          <a 
+                            class="dropdown-item d-flex align-items-center gap-2 text-success" 
+                            (click)="prepareActivate(user)" 
+                            style="cursor:pointer">
+                            <i class="bi bi-play-circle"></i> 
+                            Activer
+                          </a>
+                        </li>
+                      }
+                      
+                      <li>
+                        <a 
+                          class="dropdown-item d-flex align-items-center gap-2 text-danger" 
+                          (click)="prepareDelete(user)" 
+                          style="cursor:pointer">
+                          <i class="bi bi-trash3"></i> 
+                          Supprimer
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="table-footer">
+        <span class="showing-text">
+          Affichage de {{ users().length }} sur {{ totalCount() }} résultats
+        </span>
+        <app-pagination 
+          [currentPage]="page()" 
+          [totalPages]="totalPages()" 
+          (pageChange)="goToPage($event)" 
+        />
+      </div>
+    </div>
+  }
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- VUE CARTES -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  @if (viewMode === 'card') {
+    <div class="row g-3">
+      @for (user of users(); track user.id) {
+        <div class="col-xl-3 col-lg-4 col-md-6">
+          <div class="card border-0 shadow-sm card-hover h-100">
+            <div class="card-body p-3">
+              
+              <!-- En-tête avec avatar + dropdown -->
+              <div class="d-flex align-items-start justify-content-between mb-3">
+                <div class="d-flex align-items-center gap-3">
+                  <div 
+                    class="user-avatar-lg" 
+                    [style.background]="getAvatarColor(user)">
+                    {{ getInitials(user) }}
+                    @if (user.isActive) {
+                      <span class="online-indicator"></span>
+                    }
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-0 text-truncate" style="max-width: 140px">
+                      {{ user.fullName }}
+                    </h6>
+                    <small class="text-muted text-truncate d-block" style="max-width: 140px">
+                      {{ user.email }}
+                    </small>
+                  </div>
+                </div>
+                
+                <div class="dropdown">
+                  <button 
+                    class="btn btn-sm btn-light border-0 rounded-circle action-dots" 
+                    data-bs-toggle="dropdown">
+                    <i class="bi bi-three-dots-vertical"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                    <li>
+                      <a class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer">
+                        <i class="bi bi-eye text-primary"></i> 
+                        Voir le profil
+                      </a>
+                    </li>
+                    <li>
+                      <a 
+                        class="dropdown-item d-flex align-items-center gap-2" 
+                        (click)="openEditModal(user)" 
+                        style="cursor:pointer">
+                        <i class="bi bi-pencil-square text-secondary"></i> 
+                        Modifier
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer">
+                        <i class="bi bi-envelope text-info"></i> 
+                        Envoyer un message
+                      </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    
+                    @if (user.isActive) {
+                      <li>
+                        <a 
+                          class="dropdown-item d-flex align-items-center gap-2 text-warning" 
+                          (click)="prepareSuspend(user)" 
+                          style="cursor:pointer">
+                          <i class="bi bi-pause-circle"></i> 
+                          Suspendre
+                        </a>
+                      </li>
+                    } @else {
+                      <li>
+                        <a 
+                          class="dropdown-item d-flex align-items-center gap-2 text-success" 
+                          (click)="prepareActivate(user)" 
+                          style="cursor:pointer">
+                          <i class="bi bi-play-circle"></i> 
+                          Activer
+                        </a>
+                      </li>
+                    }
+                    
+                    <li>
+                      <a 
+                        class="dropdown-item d-flex align-items-center gap-2 text-danger" 
+                        (click)="prepareDelete(user)" 
+                        style="cursor:pointer">
+                        <i class="bi bi-trash3"></i> 
+                        Supprimer
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Rôle + Statut -->
+              <div class="d-flex align-items-center gap-2 mb-3">
+                @let r = getRoleBadge(user.roles[0]);
+                <span class="role-badge" [class]="'role-' + r.color">
+                  <i class="bi {{ r.icon }}"></i> 
+                  {{ r.label }}
+                </span>
+                
+                @if (user.isActive) {
+                  <span class="badge bg-success-subtle text-success rounded-pill" style="font-size:0.7rem">
+                    <i class="bi bi-circle-fill me-1" style="font-size:0.4rem;vertical-align:middle"></i>
+                    Actif
+                  </span>
+                } @else {
+                  <span class="badge bg-danger-subtle text-danger rounded-pill" style="font-size:0.7rem">
+                    <i class="bi bi-circle-fill me-1" style="font-size:0.4rem;vertical-align:middle"></i>
+                    Inactif
+                  </span>
+                }
+              </div>
+
+              <!-- Statistiques -->
+              <div class="row g-2 text-center">
+                <div class="col-4">
+                  <div class="bg-light rounded-3 p-2">
+                    <div class="fw-bold text-dark" style="font-size:0.95rem">
+                      {{ user.totalOrders }}
+                    </div>
+                    <div class="text-muted" style="font-size:0.68rem">
+                      Commandes
+                    </div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="bg-light rounded-3 p-2">
+                    <div class="fw-bold text-dark" style="font-size:0.95rem">
+                      {{ user.totalOrders | number:'1.0-0' }}
+                    </div>
+                    <div class="text-muted" style="font-size:0.68rem">
+                      MAD
+                    </div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="bg-light rounded-3 p-2">
+                    <div class="fw-bold text-dark" style="font-size:0.95rem">
+                      {{ user.createdAt | date:'dd/MM' }}
+                    </div>
+                    <div class="text-muted" style="font-size:0.68rem">
+                      Inscrit
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination pour vue cartes -->
+    <div class="d-flex align-items-center justify-content-between mt-4 flex-wrap gap-2">
+      <span class="showing-text">
+        Affichage de {{ users().length }} sur {{ totalCount() }} résultats
+      </span>
+      <app-pagination 
+        [currentPage]="page()" 
+        [totalPages]="totalPages()" 
+        (pageChange)="goToPage($event)" 
+      />
+    </div>
+  }
+}
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MODALS DE CONFIRMATION -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<!-- Modal de suppression -->
+<app-confirm-modal
+  [show]="showDeleteModal()"
+  title="Supprimer l'utilisateur"
+  [message]="'Êtes-vous sûr de vouloir supprimer ' + (selectedUser()?.fullName || '') + ' ? Cette action est irréversible.'"
+  confirmText="Supprimer"
+  confirmClass="btn-danger"
+  (confirmed)="deleteUser()"
+  (cancelled)="showDeleteModal.set(false)" 
+/>
+
+<!-- Modal d'activation -->
+<app-confirm-modal
+  [show]="showActivateModal()"
+  title="Activer l'utilisateur"
+  [message]="'Voulez-vous activer ' + (selectedUser()?.fullName || '') + ' ? Il pourra de nouveau accéder à la plateforme.'"
+  confirmText="Activer"
+  confirmClass="btn-success"
+  (confirmed)="activateUser()"
+  (cancelled)="showActivateModal.set(false)" 
+/>
+
+<!-- Modal de suspension -->
+<app-confirm-modal
+  [show]="showSuspendModal()"
+  title="Suspendre l'utilisateur"
+  [message]="'Voulez-vous suspendre ' + (selectedUser()?.fullName || '') + ' ? Il ne pourra plus accéder à la plateforme.'"
+  confirmText="Suspendre"
+  confirmClass="btn-warning"
+  (confirmed)="suspendUser()"
+  (cancelled)="showSuspendModal.set(false)" 
+/>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MODAL D'AJOUT/MODIFICATION -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<!-- Modal d'ajout -->
+@if (showAddModal()) {
+  <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5)">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-person-plus-fill me-2"></i>
+            Ajouter un utilisateur
+          </h5>
+          <button 
+            type="button" 
+            class="btn-close" 
+            (click)="showAddModal.set(false)">
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label class="form-label">Nom complet *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                [(ngModel)]="userForm.fullName"
+                name="fullName"
+                placeholder="Ex: Ahmed Bennani">
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Email *</label>
+              <input 
+                type="email" 
+                class="form-control" 
+                [(ngModel)]="userForm.email"
+                name="email"
+                placeholder="exemple@email.com">
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Téléphone</label>
+              <input 
+                type="tel" 
+                class="form-control" 
+                [(ngModel)]="userForm.phone"
+                name="phone"
+                placeholder="+212 6XX XXX XXX">
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Rôle</label>
+              <select 
+                class="form-select" 
+                [(ngModel)]="userForm.role"
+                name="role">
+                @for (role of roleOptions.slice(1); track role.value) {
+                  <option [value]="role.value">{{ role.label }}</option>
+                }
+              </select>
+            </div>
+            
+            <div class="form-check">
+              <input 
+                class="form-check-input" 
+                type="checkbox" 
+                [(ngModel)]="userForm.isActive"
+                name="isActive"
+                id="addIsActive">
+              <label class="form-check-label" for="addIsActive">
+                Compte actif
+              </label>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button 
+            type="button" 
+            class="btn btn-secondary" 
+            (click)="showAddModal.set(false)">
+            Annuler
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-success" 
+            (click)="createUser()">
+            <i class="bi bi-check-circle me-1"></i>
+            Créer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal de modification -->
+@if (showEditModal()) {
+  <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5)">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-pencil-square me-2"></i>
+            Modifier l'utilisateur
+          </h5>
+          <button 
+            type="button" 
+            class="btn-close" 
+            (click)="showEditModal.set(false)">
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label class="form-label">Nom complet *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                [(ngModel)]="userForm.fullName"
+                name="fullName">
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Email *</label>
+              <input 
+                type="email" 
+                class="form-control" 
+                [(ngModel)]="userForm.email"
+                name="email">
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Téléphone</label>
+              <input 
+                type="tel" 
+                class="form-control" 
+                [(ngModel)]="userForm.phone"
+                name="phone">
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Rôle</label>
+              <select 
+                class="form-select" 
+                [(ngModel)]="userForm.role"
+                name="role">
+                @for (role of roleOptions.slice(1); track role.value) {
+                  <option [value]="role.value">{{ role.label }}</option>
+                }
+              </select>
+            </div>
+            
+            <div class="form-check">
+              <input 
+                class="form-check-input" 
+                type="checkbox" 
+                [(ngModel)]="userForm.isActive"
+                name="isActive"
+                id="editIsActive">
+              <label class="form-check-label" for="editIsActive">
+                Compte actif
+              </label>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button 
+            type="button" 
+            class="btn btn-secondary" 
+            (click)="showEditModal.set(false)">
+            Annuler
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-primary" 
+            (click)="updateUser()">
+            <i class="bi bi-check-circle me-1"></i>
+            Enregistrer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

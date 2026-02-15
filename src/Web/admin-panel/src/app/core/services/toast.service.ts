@@ -2,28 +2,28 @@ import { Injectable, signal } from '@angular/core';
 
 export interface Toast {
   id: number;
-  message: string;
   type: 'success' | 'error' | 'warning' | 'info';
-  duration: number;
+  message: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class ToastService {
+  private _toasts = signal<Toast[]>([]);
   private counter = 0;
-  toasts = signal<Toast[]>([]);
+  readonly toasts = this._toasts.asReadonly();
 
-  show(message: string, type: Toast['type'] = 'info', duration = 4000): void {
-    const toast: Toast = { id: ++this.counter, message, type, duration };
-    this.toasts.update(t => [...t, toast]);
-    setTimeout(() => this.remove(toast.id), duration);
+  private show(type: Toast['type'], message: string, duration = 4000): void {
+    const id = ++this.counter;
+    this._toasts.update(t => [...t, { id, type, message }]);
+    setTimeout(() => this.dismiss(id), duration);
   }
 
-  success(message: string): void { this.show(message, 'success'); }
-  error(message: string): void { this.show(message, 'error', 6000); }
-  warning(message: string): void { this.show(message, 'warning'); }
-  info(message: string): void { this.show(message, 'info'); }
+  success(msg: string): void { this.show('success', msg); }
+  error(msg: string): void { this.show('error', msg, 6000); }
+  warning(msg: string): void { this.show('warning', msg, 5000); }
+  info(msg: string): void { this.show('info', msg); }
 
-  remove(id: number): void {
-    this.toasts.update(t => t.filter(x => x.id !== id));
+  dismiss(id: number): void {
+    this._toasts.update(t => t.filter(x => x.id !== id));
   }
 }

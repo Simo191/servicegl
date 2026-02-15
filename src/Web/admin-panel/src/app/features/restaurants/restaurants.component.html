@@ -1,0 +1,778 @@
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- EN-TÊTE DE PAGE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <div>
+    <h4 class="fw-bold mb-1">
+      <i class="bi bi-shop me-2"></i>
+      Gestion des Restaurants
+    </h4>
+    <p class="text-muted mb-0">{{ totalCount() }} restaurants enregistrés</p>
+  </div>
+  <div class="d-flex align-items-center gap-2">
+    <div class="btn-group btn-group-sm" role="group">
+      <button 
+        class="btn" 
+        [class]="viewMode === 'list' ? 'btn-primary' : 'btn-outline-secondary'" 
+        (click)="viewMode = 'list'" 
+        title="Vue liste">
+        <i class="bi bi-list-ul"></i>
+      </button>
+      <button 
+        class="btn" 
+        [class]="viewMode === 'card' ? 'btn-primary' : 'btn-outline-secondary'" 
+        (click)="viewMode = 'card'" 
+        title="Vue cartes">
+        <i class="bi bi-grid-3x3-gap"></i>
+      </button>
+    </div>
+    <button class="btn btn-success btn-sm me-2" (click)="openAddModal()">
+      <i class="bi bi-plus-circle me-1"></i>
+      Ajouter
+    </button>
+    <button class="btn btn-outline-primary btn-sm" (click)="exportRestaurants()">
+      <i class="bi bi-download me-1"></i>
+      Exporter
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- STATISTIQUES -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon" style="background:#fef3c7">
+          <i class="bi bi-shop" style="color:#f59e0b"></i>
+        </div>
+        <div>
+          <p class="stat-label mb-0">Total</p>
+          <h5 class="fw-bold mb-0">{{ totalCount() }}</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon" style="background:#ecfdf5">
+          <i class="bi bi-check-circle" style="color:#10b981"></i>
+        </div>
+        <div>
+          <p class="stat-label mb-0">Actifs</p>
+          <h5 class="fw-bold mb-0">{{ activeCount() }}</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon" style="background:#fef2f2">
+          <i class="bi bi-door-open" style="color:#ef4444"></i>
+        </div>
+        <div>
+          <p class="stat-label mb-0">Ouverts</p>
+          <h5 class="fw-bold mb-0">{{ openCount() }}</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon" style="background:#eef2ff">
+          <i class="bi bi-star" style="color:#4f46e5"></i>
+        </div>
+        <div>
+          <p class="stat-label mb-0">Note moyenne</p>
+          <h5 class="fw-bold mb-0">{{ avgRating() }} ★</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- FILTRES & TABLE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="table-card">
+  <div class="card-header">
+    <div class="d-flex gap-2 flex-wrap">
+      <div class="input-group" style="max-width:280px">
+        <span class="input-group-text">
+          <i class="bi bi-search"></i>
+        </span>
+        <input 
+          type="text" 
+          class="form-control" 
+          placeholder="Rechercher..." 
+          [(ngModel)]="search" 
+          (input)="onSearch()" 
+        />
+      </div>
+
+      <select 
+        class="form-select" 
+        style="width:auto" 
+        [(ngModel)]="cuisineTypeFilter" 
+        (change)="loadRestaurants()">
+        <option [ngValue]="null">Toutes cuisines</option>
+        @for (cuisine of cuisineTypes; track cuisine.value) {
+          <option [ngValue]="cuisine.value">{{ cuisine.icon }} {{ cuisine.label }}</option>
+        }
+      </select>
+
+      <select 
+        class="form-select" 
+        style="width:auto" 
+        [(ngModel)]="cityFilter" 
+        (change)="loadRestaurants()">
+        <option value="">Toutes villes</option>
+        @for (city of cities; track city) {
+          <option [value]="city">{{ city }}</option>
+        }
+      </select>
+
+      <select 
+        class="form-select" 
+        style="width:auto" 
+        [(ngModel)]="statusFilter" 
+        (change)="loadRestaurants()">
+        <option value="">Tous statuts</option>
+        <option value="active">Actifs</option>
+        <option value="inactive">Inactifs</option>
+      </select>
+
+      @if (hasActiveFilters()) {
+        <button class="btn btn-outline-secondary btn-sm" (click)="resetFilters()">
+          <i class="bi bi-x-circle me-1"></i>
+          Réinitialiser
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading />
+  } @else if (restaurants().length === 0) {
+    <app-empty-state icon="bi-shop" message="Aucun restaurant trouvé" />
+  } @else {
+
+    <!-- VUE LISTE -->
+    @if (viewMode === 'list') {
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Restaurant</th>
+              <th>Cuisine</th>
+              <th>Ville</th>
+              <th>Prix</th>
+              <th>Note</th>
+              <th>Livraison</th>
+              <th>Distance</th>
+              <th>Statut</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of restaurants(); track r.id) {
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    @if (r.logoUrl) {
+                      <img [src]="r.logoUrl" alt="Logo" class="rounded" style="width:40px;height:40px;object-fit:cover">
+                    } @else {
+                      <div class="avatar-icon bg-warning-subtle text-warning">
+                        <i class="bi bi-shop"></i>
+                      </div>
+                    }
+                    <div>
+                      <div class="fw-medium">{{ r.name }}</div>
+                      <small class="text-muted">{{ r.phone }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge bg-light text-dark">
+                    {{ getCuisineIcon(r.cuisineType) }} {{ getCuisineLabel(r.cuisineType) }}
+                  </span>
+                </td>
+                <td>{{ r.city }}</td>
+                <td><span class="fw-medium">{{ getPriceRangeSymbol(r.priceRange) }}</span></td>
+                <td>
+                  <span class="text-warning">★</span> 
+                  {{ r.rating.toFixed(1) }}
+                  <small class="text-muted">({{ r.reviewCount }})</small>
+                </td>
+                <td>{{ r.deliveryFee }} MAD - {{ r.estimatedDeliveryMinutes }} min</td>
+                <td>{{ r.distanceKm.toFixed(1) }} km</td>
+                <td>
+                  <div class="d-flex align-items-center gap-1">
+                    @if (r.isActive) {
+                      <span class="badge bg-success-subtle text-success">Actif</span>
+                    } @else {
+                      <span class="badge bg-danger-subtle text-danger">Inactif</span>
+                    }
+                    @if (r.isOpen) {
+                      <i class="bi bi-door-open text-success" title="Ouvert"></i>
+                    } @else {
+                      <i class="bi bi-door-closed text-muted" title="Fermé"></i>
+                    }
+                    @if (r.hasPromotion) {
+                      <i class="bi bi-tag-fill text-danger" title="Promotion"></i>
+                    }
+                  </div>
+                </td>
+                <td class="text-end">
+                  <div class="dropdown">
+                    <button 
+                      class="btn btn-sm btn-light border-0 rounded-circle action-dots" 
+                      data-bs-toggle="dropdown">
+                      <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                      <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer">
+                          <i class="bi bi-eye text-primary"></i> Voir
+                        </a>
+                      </li>
+                      <li>
+                        <a 
+                          class="dropdown-item d-flex align-items-center gap-2" 
+                          (click)="openEditModal(r)" 
+                          style="cursor:pointer">
+                          <i class="bi bi-pencil-square text-secondary"></i> Modifier
+                        </a>
+                      </li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li>
+                        <a 
+                          class="dropdown-item d-flex align-items-center gap-2" 
+                          [class]="r.isActive ? 'text-warning' : 'text-success'" 
+                          (click)="r.isActive ? prepareSuspend(r) : prepareActivate(r)" 
+                          style="cursor:pointer">
+                          @if (r.isActive) {
+                            <i class="bi bi-pause-circle"></i> Suspendre
+                          } @else {
+                            <i class="bi bi-play-circle"></i> Activer
+                          }
+                        </a>
+                      </li>
+                      <li>
+                        <a 
+                          class="dropdown-item d-flex align-items-center gap-2 text-danger" 
+                          (click)="prepareDelete(r)" 
+                          style="cursor:pointer">
+                          <i class="bi bi-trash3"></i> Supprimer
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <!-- VUE CARTES -->
+    @if (viewMode === 'card') {
+      <div class="row g-3 p-3">
+        @for (r of restaurants(); track r.id) {
+          <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="card border-0 shadow-sm card-hover h-100" style="border-radius:12px;overflow:hidden">
+              
+              @if (r.coverImageUrl) {
+                <img [src]="r.coverImageUrl" class="card-img-top" alt="Cover" style="height:150px;object-fit:cover">
+              } @else {
+                <div class="card-img-top bg-gradient" style="height:150px;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%)"></div>
+              }
+
+              <div class="card-body p-3">
+                <div class="d-flex align-items-start justify-content-between mb-3">
+                  <div class="d-flex align-items-center gap-2">
+                    @if (r.logoUrl) {
+                      <img [src]="r.logoUrl" alt="Logo" class="rounded" style="width:40px;height:40px;object-fit:cover">
+                    } @else {
+                      <div class="avatar-icon bg-warning-subtle text-warning">
+                        <i class="bi bi-shop"></i>
+                      </div>
+                    }
+                    <div>
+                      <h6 class="fw-bold mb-0 text-truncate" style="max-width:130px">
+                        {{ r.name }}
+                      </h6>
+                      <small class="text-muted">{{ r.city }}</small>
+                    </div>
+                  </div>
+                  <div class="dropdown">
+                    <button 
+                      class="btn btn-sm btn-light border-0 rounded-circle action-dots" 
+                      data-bs-toggle="dropdown">
+                      <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                      <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer">
+                          <i class="bi bi-eye text-primary"></i> Voir
+                        </a>
+                      </li>
+                      <li>
+                        <a 
+                          class="dropdown-item d-flex align-items-center gap-2" 
+                          (click)="openEditModal(r)" 
+                          style="cursor:pointer">
+                          <i class="bi bi-pencil-square text-secondary"></i> Modifier
+                        </a>
+                      </li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li>
+                        <a 
+                          class="dropdown-item d-flex align-items-center gap-2" 
+                          [class]="r.isActive ? 'text-warning' : 'text-success'" 
+                          (click)="r.isActive ? prepareSuspend(r) : prepareActivate(r)" 
+                          style="cursor:pointer">
+                          @if (r.isActive) {
+                            <i class="bi bi-pause-circle"></i> Suspendre
+                          } @else {
+                            <i class="bi bi-play-circle"></i> Activer
+                          }
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+                  <span class="badge bg-light text-dark">
+                    {{ getCuisineIcon(r.cuisineType) }} {{ getCuisineLabel(r.cuisineType) }}
+                  </span>
+                  <span class="badge bg-light text-dark">{{ getPriceRangeSymbol(r.priceRange) }}</span>
+                  @if (r.isActive) {
+                    <span class="badge bg-success-subtle text-success">Actif</span>
+                  } @else {
+                    <span class="badge bg-danger-subtle text-danger">Inactif</span>
+                  }
+                  @if (r.hasPromotion) {
+                    <span class="badge bg-danger text-white"><i class="bi bi-tag-fill me-1"></i>Promo</span>
+                  }
+                </div>
+
+                <div class="row g-2 text-center mb-3">
+                  <div class="col-4">
+                    <div class="bg-light rounded-3 p-2">
+                      <div class="fw-bold" style="font-size:0.9rem">
+                        <span class="text-warning">★</span> {{ r.rating.toFixed(1) }}
+                      </div>
+                      <div class="text-muted" style="font-size:0.68rem">{{ r.reviewCount }} avis</div>
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <div class="bg-light rounded-3 p-2">
+                      <div class="fw-bold" style="font-size:0.9rem">{{ r.deliveryFee }} MAD</div>
+                      <div class="text-muted" style="font-size:0.68rem">Livraison</div>
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <div class="bg-light rounded-3 p-2">
+                      <div class="fw-bold" style="font-size:0.9rem">{{ r.estimatedDeliveryMinutes }} min</div>
+                      <div class="text-muted" style="font-size:0.68rem">Temps</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                  <small class="text-muted">
+                    <i class="bi bi-geo-alt me-1"></i>{{ r.distanceKm.toFixed(1) }} km
+                  </small>
+                  @if (r.isOpen) {
+                    <span class="badge bg-success rounded-pill">
+                      <i class="bi bi-door-open me-1"></i>Ouvert
+                    </span>
+                  } @else {
+                    <span class="badge bg-secondary rounded-pill">
+                      <i class="bi bi-door-closed me-1"></i>Fermé
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="p-3 border-top">
+      <app-pagination 
+        [currentPage]="page()" 
+        [totalPages]="totalPages()" 
+        (pageChange)="goToPage($event)" 
+      />
+    </div>
+  }
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MODALS DE CONFIRMATION -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<app-confirm-modal 
+  [show]="showDeleteModal()" 
+  title="Supprimer le restaurant"
+  [message]="'Voulez-vous vraiment supprimer ' + (selectedRestaurant()?.name || '') + ' ?'"
+  confirmText="Supprimer" 
+  confirmClass="btn-danger"
+  (confirmed)="deleteRestaurant()" 
+  (cancelled)="showDeleteModal.set(false)" 
+/>
+
+<app-confirm-modal 
+  [show]="showSuspendModal()" 
+  title="Suspendre le restaurant"
+  [message]="'Voulez-vous suspendre ' + (selectedRestaurant()?.name || '') + ' ?'"
+  confirmText="Suspendre" 
+  confirmClass="btn-warning"
+  (confirmed)="suspendRestaurant()" 
+  (cancelled)="showSuspendModal.set(false)" 
+/>
+
+<app-confirm-modal 
+  [show]="showActivateModal()" 
+  title="Activer le restaurant"
+  [message]="'Voulez-vous activer ' + (selectedRestaurant()?.name || '') + ' ?'"
+  confirmText="Activer" 
+  confirmClass="btn-success"
+  (confirmed)="activateRestaurant()" 
+  (cancelled)="showActivateModal.set(false)" 
+/>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MODAL AJOUT - AVEC IMAGES -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+@if (showAddModal()) {
+  <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5)">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-shop me-2"></i>
+            Ajouter un restaurant
+          </h5>
+          <button type="button" class="btn-close" (click)="showAddModal.set(false)"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="row g-3">
+              
+              <!-- ═══ IMAGES ═══ -->
+              <div class="col-12">
+                <h6 class="fw-bold text-primary mb-3">
+                  <i class="bi bi-images me-2"></i>Images
+                </h6>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Logo URL</label>
+                <input type="url" class="form-control" [(ngModel)]="restaurantForm.logoUrl" name="logoUrl" placeholder="https://exemple.com/logo.jpg">
+                @if (restaurantForm.logoUrl) {
+                  <div class="mt-2">
+                    <img [src]="restaurantForm.logoUrl" alt="Preview Logo" class="img-thumbnail" style="max-height:100px">
+                  </div>
+                }
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Image de couverture URL</label>
+                <input type="url" class="form-control" [(ngModel)]="restaurantForm.coverImageUrl" name="coverImageUrl" placeholder="https://exemple.com/cover.jpg">
+                @if (restaurantForm.coverImageUrl) {
+                  <div class="mt-2">
+                    <img [src]="restaurantForm.coverImageUrl" alt="Preview Cover" class="img-thumbnail" style="max-height:100px;width:100%;object-fit:cover">
+                  </div>
+                }
+              </div>
+
+              <!-- ═══ INFORMATIONS DE BASE ═══ -->
+              <div class="col-12 mt-4">
+                <h6 class="fw-bold text-primary mb-3">
+                  <i class="bi bi-info-circle me-2"></i>Informations de base
+                </h6>
+              </div>
+              
+              <div class="col-md-8">
+                <label class="form-label">Nom du restaurant *</label>
+                <input type="text" class="form-control" [(ngModel)]="restaurantForm.name" name="name" placeholder="Ex: Chez Hassan">
+              </div>
+              
+              <div class="col-md-4">
+                <label class="form-label">Téléphone *</label>
+                <input type="tel" class="form-control" [(ngModel)]="restaurantForm.phone" name="phone" placeholder="+212 6XX XXX XXX">
+              </div>
+              
+              <div class="col-12">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" rows="2" [(ngModel)]="restaurantForm.description" name="description" placeholder="Description du restaurant..."></textarea>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Type de cuisine</label>
+                <select class="form-select" [(ngModel)]="restaurantForm.cuisineType" name="cuisineType">
+                  @for (cuisine of cuisineTypes; track cuisine.value) {
+                    <option [ngValue]="cuisine.value">{{ cuisine.icon }} {{ cuisine.label }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Gamme de prix</label>
+                <select class="form-select" [(ngModel)]="restaurantForm.priceRange" name="priceRange">
+                  @for (price of priceRanges; track price.value) {
+                    <option [ngValue]="price.value">{{ price.label }}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- ═══ ADRESSE ═══ -->
+              <div class="col-12 mt-4">
+                <h6 class="fw-bold text-primary mb-3">
+                  <i class="bi bi-geo-alt me-2"></i>Adresse
+                </h6>
+              </div>
+
+              <div class="col-md-8">
+                <label class="form-label">Rue *</label>
+                <input type="text" class="form-control" [(ngModel)]="restaurantForm.street" name="street" placeholder="123 Boulevard Mohammed V">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Code postal</label>
+                <input type="text" class="form-control" [(ngModel)]="restaurantForm.postalCode" name="postalCode" placeholder="20000">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Ville</label>
+                <select class="form-select" [(ngModel)]="restaurantForm.city" name="city">
+                  @for (city of cities; track city) {
+                    <option [value]="city">{{ city }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Latitude</label>
+                <input type="number" step="0.000001" class="form-control" [(ngModel)]="restaurantForm.latitude" name="latitude">
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Longitude</label>
+                <input type="number" step="0.000001" class="form-control" [(ngModel)]="restaurantForm.longitude" name="longitude">
+              </div>
+
+              <!-- ═══ LIVRAISON ═══ -->
+              <div class="col-12 mt-4">
+                <h6 class="fw-bold text-primary mb-3">
+                  <i class="bi bi-truck me-2"></i>Paramètres de livraison
+                </h6>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Montant minimum (MAD)</label>
+                <input type="number" class="form-control" [(ngModel)]="restaurantForm.minOrderAmount" name="minOrderAmount">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Frais de livraison (MAD)</label>
+                <input type="number" class="form-control" [(ngModel)]="restaurantForm.deliveryFee" name="deliveryFee">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Temps de livraison estimé (min)</label>
+                <input type="number" class="form-control" [(ngModel)]="restaurantForm.estimatedDeliveryMinutes" name="estimatedDeliveryMinutes">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Distance max de livraison (km)</label>
+                <input type="number" class="form-control" [(ngModel)]="restaurantForm.maxDeliveryDistanceKm" name="maxDeliveryDistanceKm">
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="showAddModal.set(false)">Annuler</button>
+          <button type="button" class="btn btn-success" (click)="createRestaurant()">
+            <i class="bi bi-check-circle me-1"></i>
+            Créer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MODAL MODIFICATION - AVEC IMAGES -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+@if (showEditModal()) {
+  <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5)">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-pencil-square me-2"></i>
+            Modifier le restaurant
+          </h5>
+          <button type="button" class="btn-close" (click)="showEditModal.set(false)"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="row g-3">
+              
+              <!-- ═══ IMAGES ═══ -->
+              <div class="col-12">
+                <h6 class="fw-bold text-primary mb-3">
+                  <i class="bi bi-images me-2"></i>Images
+                </h6>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Logo URL</label>
+                <input type="url" class="form-control" [(ngModel)]="restaurantForm.logoUrl" name="logoUrl">
+                @if (restaurantForm.logoUrl) {
+                  <div class="mt-2">
+                    <img [src]="restaurantForm.logoUrl" alt="Preview Logo" class="img-thumbnail" style="max-height:100px">
+                  </div>
+                }
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Image de couverture URL</label>
+                <input type="url" class="form-control" [(ngModel)]="restaurantForm.coverImageUrl" name="coverImageUrl">
+                @if (restaurantForm.coverImageUrl) {
+                  <div class="mt-2">
+                    <img [src]="restaurantForm.coverImageUrl" alt="Preview Cover" class="img-thumbnail" style="max-height:100px;width:100%;object-fit:cover">
+                  </div>
+                }
+              </div>
+
+              <!-- ═══ INFORMATIONS DE BASE ═══ -->
+              <div class="col-12 mt-4">
+                <h6 class="fw-bold text-primary mb-3">
+                  <i class="bi bi-info-circle me-2"></i>Informations de base
+                </h6>
+              </div>
+              
+              <div class="col-md-8">
+                <label class="form-label">Nom du restaurant *</label>
+                <input type="text" class="form-control" [(ngModel)]="restaurantForm.name" name="name">
+              </div>
+              
+              <div class="col-md-4">
+                <label class="form-label">Téléphone *</label>
+                <input type="tel" class="form-control" [(ngModel)]="restaurantForm.phone" name="phone">
+              </div>
+              
+              <div class="col-12">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" rows="2" [(ngModel)]="restaurantForm.description" name="description"></textarea>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Type de cuisine</label>
+                <select class="form-select" [(ngModel)]="restaurantForm.cuisineType" name="cuisineType">
+                  @for (cuisine of cuisineTypes; track cuisine.value) {
+                    <option [ngValue]="cuisine.value">{{ cuisine.icon }} {{ cuisine.label }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Gamme de prix</label>
+                <select class="form-select" [(ngModel)]="restaurantForm.priceRange" name="priceRange">
+                  @for (price of priceRanges; track price.value) {
+                    <option [ngValue]="price.value">{{ price.label }}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- ═══ ADRESSE ═══ -->
+              <div class="col-12 mt-4">
+                <h6 class="fw-bold text-primary mb-3">
+                  <i class="bi bi-geo-alt me-2"></i>Adresse
+                </h6>
+              </div>
+
+              <div class="col-md-8">
+                <label class="form-label">Rue *</label>
+                <input type="text" class="form-control" [(ngModel)]="restaurantForm.street" name="street">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Code postal</label>
+                <input type="text" class="form-control" [(ngModel)]="restaurantForm.postalCode" name="postalCode">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Ville</label>
+                <select class="form-select" [(ngModel)]="restaurantForm.city" name="city">
+                  @for (city of cities; track city) {
+                    <option [value]="city">{{ city }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Latitude</label>
+                <input type="number" step="0.000001" class="form-control" [(ngModel)]="restaurantForm.latitude" name="latitude">
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Longitude</label>
+                <input type="number" step="0.000001" class="form-control" [(ngModel)]="restaurantForm.longitude" name="longitude">
+              </div>
+
+              <!-- ═══ LIVRAISON ═══ -->
+              <div class="col-12 mt-4">
+                <h6 class="fw-bold text-primary mb-3">
+                  <i class="bi bi-truck me-2"></i>Paramètres de livraison
+                </h6>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Montant minimum (MAD)</label>
+                <input type="number" class="form-control" [(ngModel)]="restaurantForm.minOrderAmount" name="minOrderAmount">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Frais de livraison (MAD)</label>
+                <input type="number" class="form-control" [(ngModel)]="restaurantForm.deliveryFee" name="deliveryFee">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Temps de livraison estimé (min)</label>
+                <input type="number" class="form-control" [(ngModel)]="restaurantForm.estimatedDeliveryMinutes" name="estimatedDeliveryMinutes">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Distance max de livraison (km)</label>
+                <input type="number" class="form-control" [(ngModel)]="restaurantForm.maxDeliveryDistanceKm" name="maxDeliveryDistanceKm">
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="showEditModal.set(false)">Annuler</button>
+          <button type="button" class="btn btn-primary" (click)="updateRestaurant()">
+            <i class="bi bi-check-circle me-1"></i>
+            Enregistrer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

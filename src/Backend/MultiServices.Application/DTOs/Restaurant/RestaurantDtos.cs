@@ -6,7 +6,7 @@ namespace MultiServices.Application.DTOs.Restaurant;
 public record RestaurantListDto(Guid Id, string Name, string? LogoUrl, string? CoverImageUrl,
     CuisineType CuisineType, PriceRange PriceRange, double Rating, int ReviewCount,
     decimal MinOrderAmount, decimal DeliveryFee, int EstimatedDeliveryMinutes,
-    double DistanceKm, bool IsOpen, bool HasPromotion);
+    double DistanceKm, bool IsOpen, bool HasPromotion, double Latitude, double Longitude, string Phone);
 
 public record RestaurantDetailDto(Guid Id, string Name, string? Description, string? LogoUrl,
     string? CoverImageUrl, CuisineType CuisineType, PriceRange PriceRange, double Rating,
@@ -60,7 +60,7 @@ public class RestaurantSearchRequest
 public record CreateRestaurantDto(string Name, string? Description, CuisineType CuisineType,
     PriceRange PriceRange, decimal MinOrderAmount, decimal DeliveryFee, int EstimatedDeliveryMinutes,
     double MaxDeliveryDistanceKm, string Street, string City, string PostalCode,
-    double Latitude, double Longitude, string Phone);
+    double Latitude, double Longitude, string Phone, string CoverImageUrl, string LogoUrl);
 
 /// <summary>Used by IRestaurantManagementService.CreateRestaurantAsync</summary>
 public class CreateRestaurantRequest
@@ -82,6 +82,8 @@ public class CreateRestaurantRequest
     public string Phone { get; set; } = "";
     public string? Email { get; set; }
     public string? Website { get; set; }
+    public string LogoUrl { get; set; } = string.Empty;
+    public string CoverImageUrl { get; set; } = string.Empty;
 }
 
 /// <summary>Used by IRestaurantManagementService.UpdateRestaurantAsync</summary>
@@ -98,6 +100,10 @@ public class UpdateRestaurantRequest
     public double? MaxDeliveryDistanceKm { get; set; }
     public string? Phone { get; set; }
     public string? Email { get; set; }
+    public string LogoUrl { get; set; } = string.Empty;
+    public string CoverImageUrl { get; set; } = string.Empty;
+    public double Latitude { get; set; }
+    public double Longitude { get; set; }
 }
 
 // ==================== MENU MANAGEMENT ====================

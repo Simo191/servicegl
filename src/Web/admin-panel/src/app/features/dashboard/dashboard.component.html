@@ -1,0 +1,240 @@
+<!-- Page Header -->
+<div class="page-header">
+  <div>
+    <h4 class="page-title">Dashboard</h4>
+    <p class="page-subtitle">Vue d'ensemble de la plateforme</p>
+  </div>
+  <div class="header-actions">
+    <div class="period-selector">
+      @for (p of periods; track p.value) {
+        <button class="period-btn"
+                [class.active]="selectedPeriod() === p.value"
+                (click)="onPeriodChange(p.value)">
+          {{ p.label }}
+        </button>
+      }
+    </div>
+  </div>
+</div>
+
+@if (loading()) {
+  <app-loading />
+} @else {
+  <!-- ═══ KPI Cards ═══ -->
+  <div class="row g-3 mb-4">
+    <div class="col-xl-3 col-md-6">
+      <app-stat-card
+        label="Chiffre d'affaires"
+        [value]="stats().totalRevenue"
+        icon="bi-currency-dollar"
+        bgColor="#ecfdf5"
+        iconColor="#10b981"
+        [isCurrency]="true"
+        [subtitle]="stats().revenueToday > 0 ? (stats().revenueToday | number:'1.0-0') + ' MAD aujourd\'hui' : ''" />
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <app-stat-card
+        label="Commandes totales"
+        [value]="stats().totalOrders"
+        icon="bi-receipt"
+        bgColor="#eef2ff"
+        iconColor="#6366f1"
+        [subtitle]="stats().totalOrdersToday + ' aujourd\'hui'" />
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <app-stat-card
+        label="Clients actifs"
+        [value]="stats().activeClients"
+        icon="bi-people"
+        bgColor="#fef3c7"
+        iconColor="#f59e0b" />
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <app-stat-card
+        label="Prestataires actifs"
+        [value]="stats().activeRestaurants + stats().activeServiceProviders + stats().activeGroceryStores"
+        icon="bi-building"
+        bgColor="#fce7f3"
+        iconColor="#ec4899"
+        [subtitle]="stats().activeDeliverers + ' livreurs en ligne'" />
+    </div>
+  </div>
+
+  <!-- ═══ Module Cards ═══ -->
+  <div class="row g-3 mb-4">
+    <div class="col-lg-4">
+      <div class="module-card module-restaurant">
+        <div class="module-icon"><i class="bi bi-shop"></i></div>
+        <div class="module-body">
+          <span class="module-label">RESTAURANTS</span>
+          <h3 class="module-value">{{ stats().restaurantStats.totalOrders | number }}</h3>
+          <span class="module-sub">commandes · {{ stats().restaurantStats.revenue | number:'1.0-0' }} MAD</span>
+        </div>
+        <div class="module-rating" title="Note moyenne">
+          <i class="bi bi-star-fill"></i>
+          {{ stats().restaurantStats.avgRating | number:'1.1-1' }}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="module-card module-service">
+        <div class="module-icon"><i class="bi bi-tools"></i></div>
+        <div class="module-body">
+          <span class="module-label">SERVICES</span>
+          <h3 class="module-value">{{ stats().serviceStats.totalOrders | number }}</h3>
+          <span class="module-sub">interventions · {{ stats().serviceStats.revenue | number:'1.0-0' }} MAD</span>
+        </div>
+        <div class="module-rating" title="Note moyenne">
+          <i class="bi bi-star-fill"></i>
+          {{ stats().serviceStats.avgRating | number:'1.1-1' }}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="module-card module-grocery">
+        <div class="module-icon"><i class="bi bi-cart3"></i></div>
+        <div class="module-body">
+          <span class="module-label">COURSES</span>
+          <h3 class="module-value">{{ stats().groceryStats.totalOrders | number }}</h3>
+          <span class="module-sub">commandes · {{ stats().groceryStats.revenue | number:'1.0-0' }} MAD</span>
+        </div>
+        <div class="module-rating" title="Note moyenne">
+          <i class="bi bi-star-fill"></i>
+          {{ stats().groceryStats.avgRating | number:'1.1-1' }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Charts ═══ -->
+  <div class="row g-3 mb-4">
+    <div class="col-lg-8">
+      <div class="card-panel">
+        <div class="panel-header">
+          <div>
+            <h6 class="panel-title">Chiffre d'affaires</h6>
+            <span class="panel-subtitle">Évolution par module</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas #revenueChart></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card-panel">
+        <div class="panel-header">
+          <div>
+            <h6 class="panel-title">Répartition</h6>
+            <span class="panel-subtitle">Par type de commande</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas #ordersChart></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Live Activity + Recent Orders ═══ -->
+  <div class="row g-3">
+    <div class="col-lg-4">
+      <div class="card-panel">
+        <div class="panel-header">
+          <div>
+            <h6 class="panel-title">Activité en direct</h6>
+            <span class="panel-subtitle">Statut temps réel</span>
+          </div>
+          <span class="live-dot"></span>
+        </div>
+        <div class="live-stats">
+          <div class="live-stat-row">
+            <div class="live-icon bg-success-subtle text-success"><i class="bi bi-truck"></i></div>
+            <div class="flex-grow-1">
+              <span class="live-label">Livreurs en ligne</span>
+              <span class="live-value">{{ stats().activeDeliverers }}</span>
+            </div>
+          </div>
+          <div class="live-stat-row">
+            <div class="live-icon bg-warning-subtle text-warning"><i class="bi bi-hourglass-split"></i></div>
+            <div class="flex-grow-1">
+              <span class="live-label">Commandes aujourd'hui</span>
+              <span class="live-value">{{ stats().totalOrdersToday }}</span>
+            </div>
+          </div>
+          <div class="live-stat-row">
+            <div class="live-icon bg-primary-subtle text-primary"><i class="bi bi-clock-history"></i></div>
+            <div class="flex-grow-1">
+              <span class="live-label">Approbations en attente</span>
+              <span class="live-value">{{ stats().pendingApprovals }}</span>
+            </div>
+          </div>
+          <div class="live-stat-row">
+            <div class="live-icon bg-danger-subtle text-danger"><i class="bi bi-exclamation-triangle"></i></div>
+            <div class="flex-grow-1">
+              <span class="live-label">Tickets ouverts</span>
+              <span class="live-value">{{ stats().openTickets }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      <div class="card-panel">
+        <div class="panel-header">
+          <div>
+            <h6 class="panel-title">Commandes récentes</h6>
+            <span class="panel-subtitle">Dernières commandes reçues</span>
+          </div>
+          <a routerLink="/orders" class="panel-link">
+            Voir tout <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+        @if (recentOrders().length > 0) {
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Commande</th>
+                  <th>Type</th>
+                  <th>Client</th>
+                  <th>Montant</th>
+                  <th>Statut</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (order of recentOrders(); track order.id) {
+                  <tr>
+                    <td><span class="order-number">#{{ order.orderNumber }}</span></td>
+                    <td>
+                      <span class="type-badge" [class]="getTypeClass(order.type)">
+                        <i class="bi {{ getTypeIcon(order.type) }}"></i>
+                        {{ order.type === 'Grocery' ? 'Courses' : order.type }}
+                      </span>
+                    </td>
+                    <td class="fw-medium">{{ order.customerName }}</td>
+                    <td>
+                      <span class="amount">{{ order.amount | number:'1.2-2' }} <small>MAD</small></span>
+                    </td>
+                    <td>
+                      @let s = (order.status | statusBadge);
+                      <span class="status-pill" [class]="'status-' + s.color">{{ s.label }}</span>
+                    </td>
+                    <td class="text-muted small">{{ order.createdAt | date:'dd/MM HH:mm' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <div class="text-center py-4 text-muted">
+            <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+            Aucune commande récente
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

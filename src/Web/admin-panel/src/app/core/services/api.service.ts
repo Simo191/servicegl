@@ -3,7 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
 import { ApiResponse, PaginatedResult } from '../models/api.models';
-
+import { HttpHeaders } from '@angular/common/http';
+ 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly baseUrl = environment.apiUrl;
@@ -29,6 +30,15 @@ export class ApiService {
   post<T>(path: string, body: any): Observable<ApiResponse<T>> {
     return this.http.post<ApiResponse<T>>(`${this.baseUrl}/${path}`, body);
   }
+
+  // ✅ force application/json même si body est une string
+postJson<T>(path: string, body: any): Observable<ApiResponse<T>> {
+  const headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  });
+  return this.http.post<ApiResponse<T>>(`${this.baseUrl}/${path}`, body, { headers });
+}
 
   put<T>(path: string, body: any): Observable<ApiResponse<T>> {
     return this.http.put<ApiResponse<T>>(`${this.baseUrl}/${path}`, body);

@@ -1,162 +1,37 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
+import { AdminService } from '../../core/services/admin.service';
 import { ToastService } from '../../core/services/toast.service';
-import { ApiService } from '../../core/services/api.service';
+import { PaginationComponent } from '../../shared/components/pagination.component';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner.component';
+import { SystemLogDto } from '../../core/models/api.models';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [FormsModule],
-  template: `
-    <div class="mb-4">
-      <h4 class="fw-bold mb-1">Configuration</h4>
-      <p class="text-muted mb-0">Paramètres généraux de la plateforme</p>
-    </div>
-
-    <!-- Tabs -->
-    <ul class="nav nav-tabs mb-4">
-      @for (tab of settingsTabs; track tab.id) {
-        <li class="nav-item">
-          <a class="nav-link" [class.active]="activeTab() === tab.id" (click)="activeTab.set(tab.id)" style="cursor:pointer">
-            <i class="bi me-1" [class]="tab.icon"></i>{{ tab.label }}
-          </a>
-        </li>
-      }
-    </ul>
-
-    <!-- Commissions -->
-    @if (activeTab() === 'commissions') {
-      <div class="table-card">
-        <div class="card-header"><h6 class="fw-bold mb-0">Taux de commission par module</h6></div>
-        <div class="card-body p-4">
-          <div class="row g-4">
-            <div class="col-md-4">
-              <div class="p-3 rounded-3 border">
-                <div class="d-flex align-items-center gap-2 mb-3">
-                  <i class="bi bi-shop text-warning fs-4"></i>
-                  <h6 class="fw-bold mb-0">Restaurants</h6>
-                </div>
-                <label class="form-label small">Commission (%)</label>
-                <input type="number" class="form-control" [(ngModel)]="commissions.restaurant" min="0" max="50" />
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="p-3 rounded-3 border">
-                <div class="d-flex align-items-center gap-2 mb-3">
-                  <i class="bi bi-tools text-info fs-4"></i>
-                  <h6 class="fw-bold mb-0">Services</h6>
-                </div>
-                <label class="form-label small">Commission (%)</label>
-                <input type="number" class="form-control" [(ngModel)]="commissions.service" min="0" max="50" />
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="p-3 rounded-3 border">
-                <div class="d-flex align-items-center gap-2 mb-3">
-                  <i class="bi bi-cart3 text-success fs-4"></i>
-                  <h6 class="fw-bold mb-0">Courses</h6>
-                </div>
-                <label class="form-label small">Commission (%)</label>
-                <input type="number" class="form-control" [(ngModel)]="commissions.grocery" min="0" max="50" />
-              </div>
-            </div>
-          </div>
-          <div class="mt-4">
-            <button class="btn btn-primary" (click)="saveCommissions()"><i class="bi bi-check-lg me-2"></i>Sauvegarder</button>
-          </div>
-        </div>
-      </div>
-    }
-
-    <!-- Zones -->
-    @if (activeTab() === 'zones') {
-      <div class="table-card">
-        <div class="card-header">
-          <h6 class="fw-bold mb-0">Zones géographiques</h6>
-          <button class="btn btn-sm btn-primary"><i class="bi bi-plus-lg me-1"></i>Ajouter</button>
-        </div>
-        <div class="card-body p-4">
-          <div class="row g-3">
-            @for (zone of zones; track zone.name) {
-              <div class="col-md-4">
-                <div class="p-3 rounded-3 border">
-                  <h6 class="fw-bold">{{ zone.name }}</h6>
-                  <p class="text-muted small mb-2">Frais de livraison: {{ zone.deliveryFee }} MAD</p>
-                  <p class="text-muted small mb-0">Supplément: {{ zone.surcharge }} MAD</p>
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-      </div>
-    }
-
-    <!-- Payment -->
-    @if (activeTab() === 'payment') {
-      <div class="table-card">
-        <div class="card-header"><h6 class="fw-bold mb-0">Configuration paiement</h6></div>
-        <div class="card-body p-4">
-          <div class="row g-4">
-            <div class="col-md-6">
-              <label class="form-label fw-medium">Clé API Stripe</label>
-              <input type="password" class="form-control" value="sk_live_•••••••••••" disabled />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label fw-medium">Webhook Secret</label>
-              <input type="password" class="form-control" value="whsec_•••••••••••" disabled />
-            </div>
-          </div>
-          <div class="mt-3">
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" checked id="enableCash">
-              <label class="form-check-label" for="enableCash">Autoriser paiement en espèces</label>
-            </div>
-            <div class="form-check form-switch mt-2">
-              <input class="form-check-input" type="checkbox" checked id="enableWallet">
-              <label class="form-check-label" for="enableWallet">Activer le portefeuille virtuel</label>
-            </div>
-            <div class="form-check form-switch mt-2">
-              <input class="form-check-input" type="checkbox" checked id="enable3ds">
-              <label class="form-check-label" for="enable3ds">3D Secure obligatoire</label>
-            </div>
-          </div>
-        </div>
-      </div>
-    }
-
-    <!-- System -->
-    @if (activeTab() === 'system') {
-      <div class="table-card">
-        <div class="card-header"><h6 class="fw-bold mb-0">Système</h6></div>
-        <div class="card-body p-4">
-          <div class="row g-3 mb-4">
-            <div class="col-md-4"><strong>Version API:</strong> 1.0.0</div>
-            <div class="col-md-4"><strong>Environnement:</strong> Production</div>
-            <div class="col-md-4"><strong>Base de données:</strong> PostgreSQL 16</div>
-          </div>
-          <div class="row g-3">
-            <div class="col-md-4"><strong>Cache Redis:</strong> <span class="text-success">Connecté</span></div>
-            <div class="col-md-4"><strong>Stripe:</strong> <span class="text-success">Connecté</span></div>
-            <div class="col-md-4"><strong>Firebase:</strong> <span class="text-success">Connecté</span></div>
-          </div>
-          <hr>
-          <button class="btn btn-outline-warning me-2"><i class="bi bi-arrow-repeat me-1"></i>Vider le cache</button>
-          <button class="btn btn-outline-danger"><i class="bi bi-database me-1"></i>Logs système</button>
-        </div>
-      </div>
-    }
-  `
+  imports: [FormsModule, DatePipe, PaginationComponent, LoadingSpinnerComponent],
+  templateUrl: './settings.component.html',
+  styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent {
   activeTab = signal('commissions');
+  savingCommissions = signal(false);
+  logsLoading = signal(false);
+  logs = signal<SystemLogDto[]>([]);
+  logPage = signal(1);
+  logTotalPages = signal(1);
+  logLevel = '';
+
   settingsTabs = [
     { id: 'commissions', label: 'Commissions', icon: 'bi-percent' },
     { id: 'zones', label: 'Zones', icon: 'bi-geo-alt' },
     { id: 'payment', label: 'Paiement', icon: 'bi-credit-card' },
+    { id: 'logs', label: 'Logs système', icon: 'bi-terminal' },
     { id: 'system', label: 'Système', icon: 'bi-gear' },
   ];
 
-  commissions = { restaurant: 15, service: 12, grocery: 8 };
+  commissions = { restaurant: 15, service: 12, grocery: 8, deliveryBaseFee: 10, deliveryPerKm: 3 };
   zones = [
     { name: 'Casablanca Centre', deliveryFee: 15, surcharge: 0 },
     { name: 'Casablanca Périphérie', deliveryFee: 25, surcharge: 5 },
@@ -165,12 +40,55 @@ export class SettingsComponent {
     { name: 'Marrakech', deliveryFee: 20, surcharge: 0 },
   ];
 
-  constructor(private api: ApiService, private toast: ToastService) {}
+  bulkNotif = { title: '', message: '', targetAudience: 'All' };
+
+  constructor(private admin: AdminService, private toast: ToastService) {}
 
   saveCommissions(): void {
-    this.api.put('admin/settings/commissions', this.commissions).subscribe({
-      next: () => this.toast.success('Commissions sauvegardées'),
-      error: () => this.toast.error('Erreur')
+    this.savingCommissions.set(true);
+    // Send for each entity type
+    this.admin.updateCommissions({ entityType: 'Restaurant', entityId: '00000000-0000-0000-0000-000000000000', newRate: this.commissions.restaurant }).subscribe({
+      next: () => {
+        this.admin.updateCommissions({ entityType: 'Service', entityId: '00000000-0000-0000-0000-000000000000', newRate: this.commissions.service }).subscribe();
+        this.admin.updateCommissions({ entityType: 'Grocery', entityId: '00000000-0000-0000-0000-000000000000', newRate: this.commissions.grocery }).subscribe();
+        this.toast.success('Commissions sauvegardées avec succès');
+        this.savingCommissions.set(false);
+      },
+      error: () => { this.toast.error('Erreur lors de la sauvegarde'); this.savingCommissions.set(false); }
     });
+  }
+
+  loadLogs(): void {
+    this.logsLoading.set(true);
+    this.admin.getLogs({ level: this.logLevel, page: this.logPage(), pageSize: 30 }).subscribe({
+      next: res => { if (res.success) { this.logs.set(res.data.items); this.logTotalPages.set(res.data.totalPages); } this.logsLoading.set(false); },
+      error: () => {
+        this.logs.set([
+          { id: '1', level: 'Info', message: 'User login: admin@multiservices.ma', source: 'AuthService', timestamp: '2025-06-02T14:30:00', details: null },
+          { id: '2', level: 'Warning', message: 'Payment retry attempt #2 for order CMD-8854', source: 'PaymentService', timestamp: '2025-06-02T14:28:00', details: null },
+          { id: '3', level: 'Error', message: 'SMS gateway timeout', source: 'NotificationService', timestamp: '2025-06-02T14:25:00', details: 'Timeout after 30s' },
+        ]);
+        this.logsLoading.set(false);
+      }
+    });
+  }
+
+  sendNotification(): void {
+    if (!this.bulkNotif.title || !this.bulkNotif.message) {
+      this.toast.warning('Veuillez remplir le titre et le message');
+      return;
+    }
+    this.admin.sendBulkNotification(this.bulkNotif).subscribe({
+      next: () => {
+        this.toast.success('Notification envoyée à tous les utilisateurs');
+        this.bulkNotif = { title: '', message: '', targetAudience: 'All' };
+      },
+      error: () => this.toast.error('Erreur lors de l\'envoi')
+    });
+  }
+
+  onTabChange(tab: string): void {
+    this.activeTab.set(tab);
+    if (tab === 'logs' && this.logs().length === 0) this.loadLogs();
   }
 }
